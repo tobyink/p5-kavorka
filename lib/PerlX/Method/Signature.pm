@@ -28,7 +28,6 @@ sub parse
 	# PPI genuinely seems to be the best solution here.
 	my $doc = 'PPI::Document'->new(\$str);
 	my $st  = $doc->find_first('PPI::Statement');
-	
 	#require PPI::Dumper; PPI::Dumper->new($st)->print;
 	
 	my $saw_invocant;
