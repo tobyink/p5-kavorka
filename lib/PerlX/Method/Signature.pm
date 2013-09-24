@@ -134,16 +134,16 @@ sub injections
 		else                { push @positional, $p }
 	}
 	
-	$str .= join "\n", map($_->injection, @positional), '';	
-	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position) . "\n" if @named;
-	$str .= join "\n", map($_->injection, @named), '';
+	$str .= join q[], map($_->injection, @positional);
+	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position) if @named;
+	$str .= join q[], map($_->injection, @named);
 	
 	if (@slurpy > 1)
 	{
 		die "Too much slurping!";
 	}
 	
-	return "$str;\n();\n";
+	return "$str; ();";
 }
 
 1;

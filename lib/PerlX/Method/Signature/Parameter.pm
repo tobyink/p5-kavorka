@@ -159,9 +159,8 @@ sub parse
 	);
 }
 
-### XXX - additional constraints
 ### XXX - slurpy arguments
-### XXX - required versus optional
+### XXX - die if too many args
 
 sub injection
 {
@@ -185,26 +184,38 @@ sub injection
 	}
 	elsif ($self->named)
 	{
-		my $defaultish = $default;
-		$defaultish = $self->optional ? 'undef' : 'die()' unless length $defaultish;
+		my $defaultish =
+			length($default) ? $default :
+			$self->optional  ? 'undef'  :
+			sprintf('die(sprintf("Named parameter `%%s` is required", %s))', B::perlstring $self->named_names->[0]);
+			
 		$val = join '', map(
 			sprintf('exists($_{%s}) ? $_{%s} : ', $_, $_),
 			map B::perlstring($_), @{$self->named_names}
 		), $defaultish;
+		
 		$condition = join ' or ', map(
 			sprintf('exists($_{%s})', $_),
 			map B::perlstring($_), @{$self->named_names}
 		);
 	}
+	elsif ($self->invocant)
+	{
+		my $defaultish = sprintf('die(q/Invocant %s is required/)', $self->name);
+		$val = sprintf('@_ ? shift(@_) : (%s)', $defaultish);
+		$condition = 1;
+	}
 	else
 	{
-		$val = $self->invocant
-			? 'shift(@_)'
-			: sprintf('$_[%d]', $self->position);
-		$val = sprintf('$#_ < %d ? (%s) : %s', $self->position, $default, $val)
-			if length $default;
+		my $pos        = $self->position;
+		my $defaultish =
+			length($default) ? $default :
+			$self->optional  ? 'undef'  :
+			sprintf('die("Positional parameter %d is required")', $pos);
 		
-		$condition = $self->invocant ? 1 : sprintf('$#_ < %d', $self->position);
+		$val = sprintf('$#_ >= %d ? $_[%d] : (%s)', $pos, $pos, $defaultish);
+		
+		$condition = sprintf('$#_ >= %d', $self->position);
 	}
 	
 	$condition = 1 if length $default;
@@ -220,7 +231,7 @@ sub injection
 		? sprintf('%s;', $self->_inject_type_check($var))
 		: sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
 	
-	$dummy ? "{ $ass; $type }" : "{ $ass; $type }";
+	$dummy ? "{ $ass $type }" : "$ass $type";
 }
 
 sub _inject_type_check
@@ -267,6 +278,17 @@ sub _inject_type_check
 			__PACKAGE__,
 			$self->ID,
 			$var,
+		);
+	}
+	
+	for my $constraint (@{ $self->constraints })
+	{
+		$check .= sprintf(
+			'do { local $_ = %s; %s } or die(sprintf("%%s failed constraint { %%s }", %s, %s));',
+			$var,
+			$constraint,
+			B::perlstring($var),
+			B::perlstring($constraint),
 		);
 	}
 	
