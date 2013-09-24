@@ -11,19 +11,25 @@ use Text::Balanced qw( extract_codeblock extract_bracketed );
 
 use Moo;
 
-has as_string       => (is => 'ro');
-has variable_name   => (is => 'ro');
-has parameter_name  => (is => 'ro');
-has position        => (is => 'rwp');
-has is_invocant     => (is => 'rwp');
-has is_positional   => (is => 'ro');
-has is_required     => (is => 'ro');
-has is_slurpy       => (is => 'ro');
 has type            => (is => 'ro');
-has constraint      => (is => 'ro');
-has traits          => (is => 'ro');
+has name            => (is => 'ro');
+has constraints     => (is => 'ro', default => sub { +[] });
+has named           => (is => 'ro', default => sub { 0 });
+has named_names     => (is => 'ro', default => sub { +[] });
+
+has as_string       => (is => 'ro');
+has position        => (is => 'rwp');
 has default         => (is => 'ro');
 has ID              => (is => 'rwp');
+has traits          => (is => 'ro', default => sub { +{} });
+
+sub readonly  { +die }
+sub rw        { +die }
+sub copy      { +die }
+sub slurpy    { !!shift->traits->{slurpy} }
+sub optional  { !!shift->traits->{optional} }
+sub invocant  { !!shift->traits->{invocant} }
+sub coerce    { !!shift->traits->{coerce} }
 
 our @PARAMS;
 sub BUILD
@@ -62,16 +68,22 @@ sub parse
 		($type, $rest) = (undef, $str);
 	}
 	
-	my ($is_invocant, $is_positional, $is_required, $varname, $paramname) = (0, 0, 0);
+	my ($named, $varname, $paramname) = 0;
+	my %traits = (
+		invocant  => 0,
+		optional  => 1,
+	);
 	
 	if ($rest =~ /\A(\:(\w+)\(\s*([\$\%\@]\w*)\s*\))/)
 	{
+		$named     = 1;
 		$paramname = $2;
 		$varname   = $3;
 		substr($rest, 0, length($1), '');
 	}
 	elsif ($rest =~ /\A(\:([\$\%\@]\w*))/)
 	{
+		$named     = 1;
 		$paramname = substr($2, 1);
 		$varname   = $2;
 		substr($rest, 0, length($1), '');
@@ -79,40 +91,42 @@ sub parse
 	elsif ($rest =~ /\A([\$\%\@]\w*)/)
 	{
 		$varname   = $1;
+		$traits{optional} = 0;
 		substr($rest, 0, length($1), '');
-		$is_positional = 1;
-		$is_required = 1;
 	}
 	
 	$rest =~ s/\A\s+//;
 	
+	$traits{is_slurpy} = 0+!!( $varname !~ /\A\$/ );
+	
 	if ($rest =~ /\A\:/)
 	{
-		$is_invocant = 1;
-		$is_required = 1;
+		$traits{optional} = 0;
+		$traits{invocant} = 1;
 		substr($rest, 0, 1, '');
 	}
 	elsif ($rest =~ /\A\!/)
 	{
-		$is_required = 1;
+		$traits{optional} = 0;
 		substr($rest, 0, 1, '');
 	}
 	elsif ($rest =~ /\A\?/)
 	{
-		$is_required = 0;
+		$traits{optional} = 1;
 		substr($rest, 0, 1, '');
 	}
 	
 	$rest =~ s/\A\s+//;
 	
-	my ($constraint, $default, %traits);
+	my (@constraints, $default);
 	
-	if ($rest =~ /\Awhere/)
+	while ($rest =~ /\Awhere/)
 	{
 		substr($rest, 0, 5, '');
-		$constraint = extract_codeblock($rest, '(){}[]<>', undef, '{}') or die;
+		my $constraint = extract_codeblock($rest, '(){}[]<>', undef, '{}') or die;
 		$constraint =~ s/\A\s*\{//;
 		$constraint =~ s/}\s*\z//;
+		push @constraints, $constraint;
 		$rest =~ s/\A\s+//;
 	}
 	
@@ -136,31 +150,24 @@ sub parse
 		%args,
 		as_string      => $_[0],
 		type           => $type,
-		variable_name  => $varname,
-		parameter_name => $paramname,
-		is_invocant    => $is_invocant,
-		is_positional  => $is_positional,
-		is_required    => $is_required,
+		name           => $varname,
+		constraints    => \@constraints,
+		named          => $named,
+		named_names    => [ $paramname ],
 		default        => $default,
-		constraint     => $constraint,
 		traits         => \%traits,
-		is_slurpy      => 0+!!( $varname !~ /\A\$/ ),
 	);
 }
+
+### XXX - additional constraints
+### XXX - slurpy arguments
+### XXX - required versus optional
 
 sub injection
 {
 	my $self = shift;
-	my ($ass, $var, $is_dummy) = $self->_inject_assignment;
-	my $types = $self->_inject_type_check($var);
-	$is_dummy ? "{ $ass $types };" : "$ass $types";
-}
-
-sub _inject_assignment
-{
-	my $self = shift;
 	
-	my $var = $self->variable_name;
+	my $var = $self->name;
 	my $dummy = 0;
 	if ($var eq '$')
 	{
@@ -168,14 +175,39 @@ sub _inject_assignment
 		$dummy = 1;
 	}
 	
-	my $val = $self->is_invocant
-		? 'shift(@_)'
-		: sprintf('$_[%d]', $self->position);
+	my $condition;
+	my $val;
+	my $default = $self->default;
 	
-	if (length(my $default = $self->default))
+	if ($self->slurpy)
 	{
-		$val = sprintf('$#_ < %d ? (%s) : %s', $self->position, $default, $val);
+		return '"SLURPY"'; # TODO
 	}
+	elsif ($self->named)
+	{
+		my $defaultish = $default;
+		$defaultish = $self->optional ? 'undef' : 'die()' unless length $defaultish;
+		$val = join '', map(
+			sprintf('exists($_{%s}) ? $_{%s} : ', $_, $_),
+			map B::perlstring($_), @{$self->named_names}
+		), $defaultish;
+		$condition = join ' or ', map(
+			sprintf('exists($_{%s})', $_),
+			map B::perlstring($_), @{$self->named_names}
+		);
+	}
+	else
+	{
+		$val = $self->invocant
+			? 'shift(@_)'
+			: sprintf('$_[%d]', $self->position);
+		$val = sprintf('$#_ < %d ? (%s) : %s', $self->position, $default, $val)
+			if length $default;
+		
+		$condition = $self->invocant ? 1 : sprintf('$#_ < %d', $self->position);
+	}
+	
+	$condition = 1 if length $default;
 	
 	my $ass = sprintf(
 		'%s %s = %s;',
@@ -184,7 +216,11 @@ sub _inject_assignment
 		$val,
 	);
 	
-	return ($ass, $var, $dummy);
+	my $type = $condition eq '1'
+		? sprintf('%s;', $self->_inject_type_check($var))
+		: sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
+	
+	$dummy ? "{ $ass; $type }" : "{ $ass; $type }";
 }
 
 sub _inject_type_check
@@ -195,7 +231,7 @@ sub _inject_type_check
 	my $check = '';
 	return $check unless my $type = $self->type;
 	
-	if ($self->traits->{coerce} and $type->has_coercion)
+	if ($self->coerce and $type->has_coercion)
 	{
 		if ($type->coercion->can_be_inlined)
 		{

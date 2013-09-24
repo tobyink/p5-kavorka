@@ -14,7 +14,7 @@ use Moo;
 
 has package         => (is => 'ro');
 has as_string       => (is => 'ro');
-has parameters      => (is => 'rwp', default => sub { +[] });
+has params          => (is => 'rwp', default => sub { +[] });
 has has_invocants   => (is => 'rwp', default => sub { +undef });
 has parameter_class => (is => 'ro',  default => sub { 'PerlX::Method::Signature::Parameter' });
 
@@ -67,7 +67,7 @@ sub parse
 	}
 	
 	my $self = $class->new(%args, as_string => $_[0]);
-	$self->_set_parameters([
+	$self->_set_params([
 		map $self->parameter_class->parse($_, $self),
 		map s/(\A\s+)|(\s+\z)//rgsm,
 		@arr
@@ -81,33 +81,69 @@ sub sanity_check
 	my $self = shift;
 	
 	my $has_invocants = 0;
-	for my $p (reverse @{ $self->parameters or die })
+	for my $p (reverse @{ $self->params or die })
 	{
-		if ($p->is_invocant) {
+		if ($p->invocant) {
 			$has_invocants++;
 			next;
 		}
 		elsif ($has_invocants) {
 			$has_invocants++;
-			$p->_set_is_invocant(1);  # anything prior to an invocant is also an invocant!
+			$p->traits->{invocant} = 1;  # anything prior to an invocant is also an invocant!
 		}
 	}
 	$self->_set_has_invocants($has_invocants);
 	
 	my $i = 0;
-	for my $p (@{ $self->parameters or die })
+	for my $p (@{ $self->params or die })
 	{
-		next if $p->is_invocant;
-		last if $p->is_slurpy;
-		last if $p->{traits}{slurpy};
+		next if $p->invocant;
+		last if $p->slurpy;
 		$p->_set_position($i++);
+	}
+	
+	my $zone = 'positional';
+	for my $p (@{ $self->params or die })
+	{
+		# Zone transitions
+		if ($zone eq 'positional')
+		{
+			($zone = 'named'  && last ) if $p->named;
+			($zone = 'slurpy' && last ) if $p->slurpy;
+		}
+		elsif ($zone eq 'named')
+		{
+			($zone = 'slurpy' && last ) if $p->slurpy;
+		}
+		
+		my $p_type = $p->slurpy ? 'slurpy' : $p->named ? 'named' : 'positional';
+		die "Found $p_type parameter after $zone; forbidden" if $p_type ne $zone;
 	}
 }
 
 sub injections
 {
 	my $self = shift;
-	return join("\n", map $_->injection, @{$self->parameters}) . "\n();\n";
+	my $str;
+	
+	my (@positional, @named, @slurpy);
+	for my $p (@{$self->params})
+	{
+		if ($p->slurpy)     { push @slurpy, $p }
+		elsif ($p->named)   { push @named, $p }
+		else                { push @positional, $p }
+	}
+	
+	$str .= join "\n", map($_->injection, @positional), '';	
+	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position) . "\n" if @named;
+	$str .= join "\n", map($_->injection, @named), '';
+	
+	if (@slurpy > 1)
+	{
+		die "Too much slurping!";
+	}
+	
+	return "$str;\n();\n";
 }
 
 1;
