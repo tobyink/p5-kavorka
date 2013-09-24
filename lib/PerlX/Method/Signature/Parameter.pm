@@ -161,7 +161,17 @@ sub parse
 	);
 }
 
-### XXX - die if too many args
+sub sanity_check
+{
+	my $self = shift;
+	
+	die if $self->invocant && $self->optional;
+	die if $self->invocant && $self->named;
+	die if $self->invocant && $self->slurpy;
+	die if $self->optional && $self->slurpy;
+	die if $self->named && $self->slurpy;
+}
+
 ### XXX - an "alias" trait
 ### XXX - the @_ and %_ special slurpies
 
@@ -260,23 +270,13 @@ sub injection
 		$val,
 	);
 	
-	my $type;
-	if ($slurpy_style eq '@')
-	{
-		$type = sprintf('for ($var) { %s }', $condition, $self->_inject_type_check('$_'));
-	}
-	elsif ($slurpy_style eq '%')
-	{
-		$type = sprintf('for (values $var) { %s }', $condition, $self->_inject_type_check('$_'));
-	}
-	else
-	{
-		$type = $condition eq '1'
-			? sprintf('%s;', $self->_inject_type_check($var))
-			: sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
-	}
+	my $type = 
+		($slurpy_style eq '@') ? sprintf('for ($var) { %s }', $condition, $self->_inject_type_check('$_')) :
+		($slurpy_style eq '%') ? sprintf('for (values $var) { %s }', $condition, $self->_inject_type_check('$_')) :
+		($condition eq '1')    ? sprintf('%s;', $self->_inject_type_check($var)) :
+		sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
 	
-	$dummy ? "{ $ass $type }" : "$ass $type";
+	$dummy ? "{ $ass$type }" : "$ass$type";
 }
 
 sub _inject_type_check

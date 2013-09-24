@@ -7,8 +7,8 @@ method bar (
 	$self:
 	Int $x where { $_ % 2 == 1 },
 	$y = foo(1,2),
-	HashRef :www($w), #comment
-	HashRef $z is slurpy
+	HashRef :www($w),
+	HashRef $z is slurpy,
 ) :($;@) :method {
 	$Data::Dumper::Sortkeys = 1;
 	print Dumper({

@@ -73,7 +73,7 @@ sub parse
 	$self->_set_params([
 		map $self->parameter_class->parse($_, $self),
 		map s/(\A\s+)|(\s+\z)//rgsm,
-		@arr
+		grep /\S/, @arr
 	]);
 	$self->sanity_check;
 	return $self;
@@ -105,14 +105,14 @@ sub sanity_check
 	$self->_set_has_slurpy($has_slurpy);
 	
 	my $i = 0;
-	for my $p (@{ $self->params or die })
+	for my $p (@{ $self->params })
 	{
 		next if $p->invocant;
 		$p->_set_position($i++);
 	}
 	
 	my $zone = 'positional';
-	for my $p (@{ $self->params or die })
+	for my $p (@{ $self->params })
 	{
 		# Zone transitions
 		if ($zone eq 'positional')
@@ -128,6 +128,10 @@ sub sanity_check
 		my $p_type = $p->slurpy ? 'slurpy' : $p->named ? 'named' : 'positional';
 		die "Found $p_type parameter after $zone; forbidden" if $p_type ne $zone;
 	}
+	
+	$_->sanity_check($self) for @{ $self->params };
+	
+	();
 }
 
 sub injections
@@ -143,8 +147,29 @@ sub injections
 		else                { push @positional, $p }
 	}
 	
+	my (@req_positional, @opt_positional, @req_named, @opt_named);
+	push @{ $_->optional ? \@opt_positional : \@req_positional }, $_ for @positional;
+	push @{ $_->optional ? \@opt_named : \@req_named }, $_ for @named;
+	my @allowed_names = map +($_=>1), map @{$_->named_names}, @named;
+	
 	$str .= join qq[], map($_->injection($self), @positional), q[];
-	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[] if @named;
+	if (@named)
+	{
+		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[];
+		if (!@slurpy)
+		{
+			$str .= sprintf('{ my %%OK = (%s); ', map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
+			$str .= '$OK{$_}||die("Unknown named parameter: $_") for sort keys %_ };';
+		}
+	}
+	else
+	{
+		my $min = scalar(@req_positional);
+		my $max = scalar(@req_positional) + scalar(@opt_positional);
+		$str .= $min==$max
+			? sprintf('die("Expected %d parameters") unless @_ == %d;', $min, $min)
+			: sprintf('die("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min, $max, $min, $max);
+	}
 	$str .= join qq[], map($_->injection($self), @named), q[];
 	
 	if (@slurpy > 1)
