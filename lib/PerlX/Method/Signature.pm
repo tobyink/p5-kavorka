@@ -18,6 +18,7 @@ has params          => (is => 'rwp', default => sub { +[] });
 has has_invocants   => (is => 'rwp', default => sub { +undef });
 has has_named       => (is => 'rwp', default => sub { +undef });
 has has_slurpy      => (is => 'rwp', default => sub { +undef });
+has yadayada        => (is => 'rwp', default => sub { 0 });
 has parameter_class => (is => 'ro',  default => sub { 'PerlX::Method::Signature::Parameter' });
 
 sub parse
@@ -69,12 +70,16 @@ sub parse
 		$last_token = $tok unless $tok->isa('PPI::Token::Whitespace');
 	}
 	
+	# canonicalize
+	@arr = map s/(\A\s+)|(\s+\z)//rgsm, grep /\S/, @arr;
+		
 	my $self = $class->new(%args, as_string => $_[0]);
-	$self->_set_params([
-		map $self->parameter_class->parse($_, $self),
-		map s/(\A\s+)|(\s+\z)//rgsm,
-		grep /\S/, @arr
-	]);
+	if ($arr[-1] =~ /\A\.{3,}\z/)
+	{
+		$self->_set_yadayada(1);
+		pop(@arr);
+	}
+	$self->_set_params([map $self->parameter_class->parse($_, $self), @arr]);
 	$self->sanity_check;
 	return $self;
 }
@@ -156,13 +161,13 @@ sub injections
 	if (@named)
 	{
 		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[];
-		if (!@slurpy)
+		unless (@slurpy or $self->yadayada)
 		{
 			$str .= sprintf('{ my %%OK = (%s); ', map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
 			$str .= '$OK{$_}||die("Unknown named parameter: $_") for sort keys %_ };';
 		}
 	}
-	else
+	elsif (not $self->yadayada)
 	{
 		my $min = scalar(@req_positional);
 		my $max = scalar(@req_positional) + scalar(@opt_positional);
