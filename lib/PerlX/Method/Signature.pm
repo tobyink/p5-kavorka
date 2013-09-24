@@ -16,6 +16,8 @@ has package         => (is => 'ro');
 has as_string       => (is => 'ro');
 has params          => (is => 'rwp', default => sub { +[] });
 has has_invocants   => (is => 'rwp', default => sub { +undef });
+has has_named       => (is => 'rwp', default => sub { +undef });
+has has_slurpy      => (is => 'rwp', default => sub { +undef });
 has parameter_class => (is => 'ro',  default => sub { 'PerlX::Method::Signature::Parameter' });
 
 sub parse
@@ -81,8 +83,13 @@ sub sanity_check
 	my $self = shift;
 	
 	my $has_invocants = 0;
+	my $has_slurpy = 0;
+	my $has_named = 0;
 	for my $p (reverse @{ $self->params or die })
 	{
+		$has_named++ if $p->named;
+		$has_slurpy++ if $p->slurpy;
+		
 		if ($p->invocant) {
 			$has_invocants++;
 			next;
@@ -93,12 +100,13 @@ sub sanity_check
 		}
 	}
 	$self->_set_has_invocants($has_invocants);
+	$self->_set_has_named($has_named);
+	$self->_set_has_slurpy($has_slurpy);
 	
 	my $i = 0;
 	for my $p (@{ $self->params or die })
 	{
 		next if $p->invocant;
-		last if $p->slurpy;
 		$p->_set_position($i++);
 	}
 	
@@ -108,12 +116,12 @@ sub sanity_check
 		# Zone transitions
 		if ($zone eq 'positional')
 		{
-			($zone = 'named'  && last ) if $p->named;
-			($zone = 'slurpy' && last ) if $p->slurpy;
+			($zone = 'named'  && next ) if $p->named;
+			($zone = 'slurpy' && next ) if $p->slurpy;
 		}
 		elsif ($zone eq 'named')
 		{
-			($zone = 'slurpy' && last ) if $p->slurpy;
+			($zone = 'slurpy' && next ) if $p->slurpy;
 		}
 		
 		my $p_type = $p->slurpy ? 'slurpy' : $p->named ? 'named' : 'positional';
@@ -134,13 +142,17 @@ sub injections
 		else                { push @positional, $p }
 	}
 	
-	$str .= join q[], map($_->injection, @positional);
-	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position) if @named;
-	$str .= join q[], map($_->injection, @named);
+	$str .= join qq[\n], map($_->injection($self), @positional), q[];
+	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[\n] if @named;
+	$str .= join qq[\n], map($_->injection($self), @named), q[];
 	
 	if (@slurpy > 1)
 	{
 		die "Too much slurping!";
+	}
+	elsif (@slurpy)
+	{
+		$str .= $slurpy[0]->injection($self);
 	}
 	
 	return "$str; ();";

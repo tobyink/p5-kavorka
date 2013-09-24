@@ -25,11 +25,13 @@ has traits          => (is => 'ro', default => sub { +{} });
 
 sub readonly  { +die }
 sub rw        { +die }
-sub copy      { +die }
+sub copy      { !!shift->traits->{alias} }
 sub slurpy    { !!shift->traits->{slurpy} }
 sub optional  { !!shift->traits->{optional} }
 sub invocant  { !!shift->traits->{invocant} }
 sub coerce    { !!shift->traits->{coerce} }
+
+sub sigil     { substr(shift->name, 0, 1) }
 
 our @PARAMS;
 sub BUILD
@@ -97,7 +99,7 @@ sub parse
 	
 	$rest =~ s/\A\s+//;
 	
-	$traits{is_slurpy} = 0+!!( $varname !~ /\A\$/ );
+	$traits{slurpy} = 0+!!( $varname !~ /\A\$/ );
 	
 	if ($rest =~ /\A\:/)
 	{
@@ -159,12 +161,14 @@ sub parse
 	);
 }
 
-### XXX - slurpy arguments
 ### XXX - die if too many args
+### XXX - an "alias" trait
+### XXX - the @_ and %_ special slurpies
 
 sub injection
 {
 	my $self = shift;
+	my ($sig) = @_;
 	
 	my $var = $self->name;
 	my $dummy = 0;
@@ -177,10 +181,39 @@ sub injection
 	my $condition;
 	my $val;
 	my $default = $self->default;
+	my $slurpy_style = '';
 	
 	if ($self->slurpy)
 	{
-		return '"SLURPY"'; # TODO
+		if ($self->sigil eq '%'
+		or ($self->sigil eq '$'
+			and $self->type
+			and do { require Types::Standard; $self->type->is_a_type_of(Types::Standard::HashRef()) }))
+		{
+			$val = sprintf(
+				'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp }',
+				$self->position - 1,
+				join(
+					q[,],
+					map B::perlstring($_), map(@{$_->named ? $_->named_names : []}, @{$sig->params}),
+				),
+			);
+			$condition = 1;
+			$slurpy_style = '%';
+		}
+		else
+		{
+			die "Cannot have a slurpy array for a function with named parameters" if $sig->has_named;
+			$val = sprintf('@_[ %d .. $#_ ]', $self->position - 1);
+			$condition = 1;
+			$slurpy_style = '@';
+		}
+		
+		if ($self->sigil eq '$')
+		{
+			$val = $slurpy_style ? "+{ $val }" : "[ $val ]";
+			$slurpy_style = '$';
+		}
 	}
 	elsif ($self->named)
 	{
@@ -227,9 +260,21 @@ sub injection
 		$val,
 	);
 	
-	my $type = $condition eq '1'
-		? sprintf('%s;', $self->_inject_type_check($var))
-		: sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
+	my $type;
+	if ($slurpy_style eq '@')
+	{
+		$type = sprintf('for ($var) { %s }', $condition, $self->_inject_type_check('$_'));
+	}
+	elsif ($slurpy_style eq '%')
+	{
+		$type = sprintf('for (values $var) { %s }', $condition, $self->_inject_type_check('$_'));
+	}
+	else
+	{
+		$type = $condition eq '1'
+			? sprintf('%s;', $self->_inject_type_check($var))
+			: sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
+	}
 	
 	$dummy ? "{ $ass $type }" : "$ass $type";
 }
