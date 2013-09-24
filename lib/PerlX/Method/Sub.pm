@@ -46,7 +46,7 @@ sub handle_keyword
 	$$ref =~ s/\A\{// or die "expected block!";
 	
 	substr($$ref, 0, 0) = sprintf(
-		'sub %s %s %s { %s ;;',
+		'sub %s %s %s { %s %s;;',
 		($subname // ''),
 		($proto ? "($proto)" : ''),
 		join(' ', map {
@@ -56,6 +56,7 @@ sub handle_keyword
 				: sprintf(':%s', $attr)
 		} @$attrs),
 		$sig->injections,
+		("\n" x ($self->{skipped_lines}||0)),
 	);
 	
 	warn $$ref;
@@ -73,16 +74,20 @@ sub default_invocant
 
 sub _strip_space
 {
-	shift;
+	my $self = shift;
 	
 	my $X;
 	while (
-		($$ref =~ m{\A( \s+ )}x and $X = 1)
+		($$ref =~ m{\A( \s+ )}xsm and $X = 1)
 		or ($$ref =~ m{\A\#} and $X = 2)
 	) {
 		$X==2
 			? ($$ref =~ s{\A\#.+?\n}{}sm)
 			: substr($$ref, 0, length($1), '');
+		
+		$self->{skipped_lines} += $X==2
+			? 1
+			: (my @tmp = split /\n/, $1)-1;
 	}
 	
 	();
@@ -112,7 +117,9 @@ sub _strip_signature
 	{
 		my $extracted = extract_codeblock($$ref, '(){}[]<>', undef, '()');
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
-		return $self->signature_class->parse($extracted, package => $self->package);
+		my $sig = $self->signature_class->parse($extracted, package => $self->package);
+		$self->{skipped_lines} += scalar(my @tmp = split /\n/, $sig->as_string) - 1;
+		return $sig;
 	}
 	
 	undef;

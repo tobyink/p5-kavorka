@@ -35,6 +35,8 @@ sub parse
 	my @arr;
 	for my $tok ($st->children)
 	{
+		next if $tok->isa('PPI::Token::Comment');
+		
 		@arr = '' unless @arr;
 		
 		if ($tok->isa('PPI::Token::Symbol') and $tok eq '$,')
@@ -141,9 +143,9 @@ sub injections
 		else                { push @positional, $p }
 	}
 	
-	$str .= join qq[\n], map($_->injection($self), @positional), q[];
-	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[\n] if @named;
-	$str .= join qq[\n], map($_->injection($self), @named), q[];
+	$str .= join qq[], map($_->injection($self), @positional), q[];
+	$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[] if @named;
+	$str .= join qq[], map($_->injection($self), @named), q[];
 	
 	if (@slurpy > 1)
 	{
