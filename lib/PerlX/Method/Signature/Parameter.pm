@@ -20,7 +20,7 @@ has named_names     => (is => 'ro', default => sub { +[] });
 has as_string       => (is => 'ro');
 has position        => (is => 'rwp');
 has default         => (is => 'ro');
-has default_type    => (is => 'ro');
+has default_when    => (is => 'ro');
 has ID              => (is => 'rwp');
 has traits          => (is => 'ro', default => sub { +{} });
 
@@ -128,7 +128,7 @@ sub parse
 	
 	$rest =~ s/\A\s+//;
 	
-	my (@constraints, $default, $default_type);
+	my (@constraints, $default, $default_when);
 	
 	while ($rest =~ /\Awhere/)
 	{
@@ -149,8 +149,8 @@ sub parse
 	
 	if ($rest =~ m{\A((?://|\|\|)?=)})
 	{
-		$default_type = $1;
-		substr($rest, 0, length($default_type), '');
+		$default_when = $1;
+		substr($rest, 0, length($default_when), '');
 		$default = $rest;
 		$rest = '';
 		$traits{_optional} = 1;
@@ -170,7 +170,7 @@ sub parse
 		named          => $named,
 		named_names    => [ $paramname ],
 		default        => $default,
-		default_type   => $default_type,
+		default_when   => $default_when,
 		traits         => \%traits,
 	);
 }
