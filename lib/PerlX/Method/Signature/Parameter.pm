@@ -50,6 +50,17 @@ sub parse
 	
 	$str =~ s/\A\s+//;
 	
+	my %traits = (
+		invocant  => 0,
+		_optional => 1,
+	);
+	
+	if ($str =~ /\A(slurpy\s+)/)
+	{
+		substr($str, 0, length($1), '');
+		$traits{slurpy} = 1;
+	}
+	
 	my ($type, $rest);
 	if ($str =~ /\A[^\W0-9]/)
 	{
@@ -72,10 +83,6 @@ sub parse
 	}
 	
 	my ($named, $varname, $paramname) = 0;
-	my %traits = (
-		invocant  => 0,
-		optional  => 1,
-	);
 	
 	if ($rest =~ /\A(\:(\w+)\(\s*([\$\%\@]\w*)\s*\))/)
 	{
@@ -94,13 +101,13 @@ sub parse
 	elsif ($rest =~ /\A([\$\%\@]\w*)/)
 	{
 		$varname   = $1;
-		$traits{optional} = 0;
+		$traits{_optional} = 0;
 		substr($rest, 0, length($1), '');
 	}
 	
 	$rest =~ s/\A\s+//;
 	
-	$traits{slurpy} = 0+!!( $varname !~ /\A\$/ );
+	$traits{slurpy} = 1 if $varname =~ /\A[\@\%]/;
 	
 	if ($rest =~ /\A\:/)
 	{
@@ -146,7 +153,11 @@ sub parse
 		substr($rest, 0, length($default_type), '');
 		$default = $rest;
 		$rest = '';
+		$traits{_optional} = 1;
 	}
+	
+	$traits{optional} //= $traits{_optional};
+	delete($traits{_optional});
 	
 	die if length $rest;
 	
@@ -206,7 +217,7 @@ sub injection
 		{
 			$val = sprintf(
 				'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp }',
-				$self->position - 1,
+				$sig->last_position + 1,
 				join(
 					q[,],
 					map B::perlstring($_), map(@{$_->named ? $_->named_names : []}, @{$sig->params}),
@@ -218,14 +229,14 @@ sub injection
 		else
 		{
 			die "Cannot have a slurpy array for a function with named parameters" if $sig->has_named;
-			$val = sprintf('@_[ %d .. $#_ ]', $self->position - 1);
+			$val = sprintf('@_[ %d .. $#_ ]', $sig->last_position + 1);
 			$condition = 1;
 			$slurpy_style = '@';
 		}
 		
 		if ($self->sigil eq '$')
 		{
-			$val = $slurpy_style ? "+{ $val }" : "[ $val ]";
+			$val = $slurpy_style eq '%' ? "+{ $val }" : "[ $val ]";
 			$slurpy_style = '$';
 		}
 	}
@@ -333,7 +344,7 @@ sub _inject_type_check
 	for my $constraint (@{ $self->constraints })
 	{
 		$check .= sprintf(
-			'do { local $_ = %s; %s } or die(sprintf("%%s failed constraint { %%s }", %s, %s));',
+			'do { local $_ = %s; %s } or die(sprintf("%%s failed constraint {%%s}", %s, %s));',
 			$var,
 			$constraint,
 			B::perlstring($var),

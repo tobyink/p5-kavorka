@@ -3,19 +3,18 @@ use warnings;
 use PerlX::Method;
 use Data::Dumper;
 
+
 method bar (
 	$self:
 	Int $x where { $_ % 2 == 1 },
 	$y ||= foo(1,2),
-	HashRef :www($w),
-	HashRef $z is slurpy,
+	slurpy ArrayRef $z,
 ) :($;@) :method {
 	$Data::Dumper::Sortkeys = 1;
 	print Dumper({
 		'$self'   => $self,
 		'$x'      => $x,
 		'$y'      => $y,
-		'$w'      => $w,
 		'$z'      => $z,
 	});
 	print __LINE__;

@@ -20,6 +20,7 @@ has has_named       => (is => 'rwp', default => sub { +undef });
 has has_slurpy      => (is => 'rwp', default => sub { +undef });
 has yadayada        => (is => 'rwp', default => sub { 0 });
 has parameter_class => (is => 'ro',  default => sub { 'PerlX::Method::Signature::Parameter' });
+has last_position   => (is => 'lazy');
 
 sub parse
 {
@@ -137,10 +138,16 @@ sub sanity_check
 	
 	$_->sanity_check($self) for @{ $self->params };
 	
-	use Data::Dumper;
-	print Dumper($self);
+	#use Data::Dumper; print Dumper($self);
 	
 	();
+}
+
+sub _build_last_position
+{
+	my $self = shift;
+	my ($last) = grep !$_->named && !$_->slurpy, reverse @{$self->params};
+	return $last->position;
 }
 
 sub injections
@@ -164,14 +171,14 @@ sub injections
 	$str .= join qq[], map($_->injection($self), @positional), q[];
 	if (@named)
 	{
-		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $positional[-1]->position).qq[];
+		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $self->last_position).qq[];
 		unless (@slurpy or $self->yadayada)
 		{
 			$str .= sprintf('{ my %%OK = (%s); ', map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
 			$str .= '$OK{$_}||die("Unknown named parameter: $_") for sort keys %_ };';
 		}
 	}
-	elsif (not $self->yadayada)
+	elsif (not ($self->yadayada || @slurpy))
 	{
 		my $min = scalar(@req_positional);
 		my $max = scalar(@req_positional) + scalar(@opt_positional);
