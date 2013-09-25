@@ -252,14 +252,21 @@ sub injection
 			length($default) ? $default :
 			$self->optional  ? 'undef'  :
 			sprintf('die(sprintf("Named parameter `%%s` is required", %s))', B::perlstring $self->named_names->[0]);
-			
+		
+		no warnings 'uninitialized';
+		my $when = +{
+			'//='   => 'defined',
+			'||='   => '!!',
+			'='     => 'exists',
+		}->{ $self->default_when } || 'exists';
+		
 		$val = join '', map(
-			sprintf('exists($_{%s}) ? $_{%s} : ', $_, $_),
+			sprintf('%s($_{%s}) ? $_{%s} : ', $when, $_, $_),
 			map B::perlstring($_), @{$self->named_names}
 		), $defaultish;
 		
 		$condition = join ' or ', map(
-			sprintf('exists($_{%s})', $_),
+			sprintf('%s($_{%s})', $when, $_),
 			map B::perlstring($_), @{$self->named_names}
 		);
 	}
@@ -277,9 +284,16 @@ sub injection
 			$self->optional  ? 'undef'  :
 			sprintf('die("Positional parameter %d is required")', $pos);
 		
-		$val = sprintf('$#_ >= %d ? $_[%d] : (%s)', $pos, $pos, $defaultish);
+		no warnings 'uninitialized';
+		my $when = +{
+			'//='   => 'defined($_[%d])',
+			'||='   => '!!($_[%d])',
+			'='     => '$#_ >= %d',
+		}->{ $self->default_when } || '$#_ >= %d';
 		
-		$condition = sprintf('$#_ >= %d', $self->position);
+		$val = sprintf($when.' ? $_[%d] : (%s)', $pos, $pos, $defaultish);
+		
+		$condition = sprintf($when, $self->position);
 	}
 	
 	$condition = 1 if length $default;
