@@ -216,12 +216,13 @@ sub injection
 			and do { require Types::Standard; $self->type->is_a_type_of(Types::Standard::HashRef()) }))
 		{
 			$val = sprintf(
-				'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp }',
+				'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp ? %%tmp : (%s) }',
 				$sig->last_position + 1,
 				join(
 					q[,],
 					map B::perlstring($_), map(@{$_->named ? $_->named_names : []}, @{$sig->params}),
 				),
+				($default // ''),
 			);
 			$condition = 1;
 			$slurpy_style = '%';
@@ -229,7 +230,12 @@ sub injection
 		else
 		{
 			die "Cannot have a slurpy array for a function with named parameters" if $sig->has_named;
-			$val = sprintf('@_[ %d .. $#_ ]', $sig->last_position + 1);
+			$val = sprintf(
+				'($#_ > %d) ? @_[ %d .. $#_ ] : (%s)',
+				$sig->last_position + 1,
+				$sig->last_position + 1,
+				($default // ''),
+			);
 			$condition = 1;
 			$slurpy_style = '@';
 		}
