@@ -20,6 +20,7 @@ has named_names     => (is => 'ro', default => sub { +[] });
 has as_string       => (is => 'ro');
 has position        => (is => 'rwp');
 has default         => (is => 'ro');
+has default_type    => (is => 'ro');
 has ID              => (is => 'rwp');
 has traits          => (is => 'ro', default => sub { +{} });
 
@@ -120,7 +121,7 @@ sub parse
 	
 	$rest =~ s/\A\s+//;
 	
-	my (@constraints, $default);
+	my (@constraints, $default, $default_type);
 	
 	while ($rest =~ /\Awhere/)
 	{
@@ -139,9 +140,10 @@ sub parse
 		$rest =~ s/\A\s+//;
 	}
 	
-	if ($rest =~ m{\A(//)?=})
+	if ($rest =~ m{\A((?://|\|\|)?=)})
 	{
-		$rest =~ s{\A(//)?=}{};
+		$default_type = $1;
+		substr($rest, 0, length($default_type), '');
 		$default = $rest;
 		$rest = '';
 	}
@@ -157,6 +159,7 @@ sub parse
 		named          => $named,
 		named_names    => [ $paramname ],
 		default        => $default,
+		default_type   => $default_type,
 		traits         => \%traits,
 	);
 }
@@ -174,6 +177,7 @@ sub sanity_check
 
 ### XXX - an "alias" trait
 ### XXX - the @_ and %_ special slurpies
+### XXX - the //= and ||= default types
 
 sub injection
 {

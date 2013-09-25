@@ -84,6 +84,7 @@ sub parse
 	return $self;
 }
 
+# XXX - check not allowed optional parameters and named parameters in same sig
 sub sanity_check
 {
 	my $self = shift;
@@ -135,6 +136,9 @@ sub sanity_check
 	}
 	
 	$_->sanity_check($self) for @{ $self->params };
+	
+	use Data::Dumper;
+	print Dumper($self);
 	
 	();
 }

@@ -6,7 +6,7 @@ use Data::Dumper;
 method bar (
 	$self:
 	Int $x where { $_ % 2 == 1 },
-	$y = foo(1,2),
+	$y ||= foo(1,2),
 	HashRef :www($w),
 	HashRef $z is slurpy,
 ) :($;@) :method {
