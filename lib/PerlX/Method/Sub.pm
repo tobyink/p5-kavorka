@@ -11,7 +11,7 @@ our $VERSION   = '0.001';
 
 use Text::Balanced qw( extract_codeblock extract_bracketed );
 
-use Moo;
+use Moo::Role;
 
 has signature_class => (is => 'ro', default => sub { 'PerlX::Method::Signature' });
 has package         => (is => 'ro');
@@ -58,8 +58,6 @@ sub handle_keyword
 		$sig->injections,
 		("\n" x ($self->{skipped_lines}||0)),
 	);
-	
-	warn $$ref;
 }
 
 sub default_attributes

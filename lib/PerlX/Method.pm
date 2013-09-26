@@ -3,7 +3,8 @@ use strict;
 use warnings;
 
 use Keyword::Simple ();
-use PerlX::Method::Sub ();
+use PerlX::Method::Sub::Method ();
+use PerlX::Method::Sub::Fun ();
 
 package PerlX::Method;
 
@@ -17,7 +18,11 @@ sub import
 	my $class = shift;
 	
 	Keyword::Simple::define method => sub {
-		'PerlX::Method::Sub'->handle_keyword($_[0], scalar(ccstash));
+		'PerlX::Method::Sub::Method'->handle_keyword($_[0], scalar(ccstash));
+	};
+	
+	Keyword::Simple::define fun => sub {
+		'PerlX::Method::Sub::Fun'->handle_keyword($_[0], scalar(ccstash));
 	};
 }
 
