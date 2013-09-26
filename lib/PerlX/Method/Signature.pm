@@ -31,11 +31,12 @@ sub parse
 	my $doc = 'PPI::Document'->new(\$str);
 	my $st  = $doc->find_first('PPI::Statement');
 	#require PPI::Dumper; PPI::Dumper->new($st)->print;
+	my @tokens = $st ? $st->children : ();
 	
 	my $saw_invocant;
 	my $last_token;
 	my @arr;
-	for my $tok ($st->children)
+	for my $tok (@tokens)
 	{
 		next if $tok->isa('PPI::Token::Comment');
 		
@@ -47,7 +48,15 @@ sub parse
 			push @arr, '';
 			next;
 		}
-		
+
+		if ($tok->isa('PPI::Token::Symbol') and $tok eq '$:' and not $saw_invocant)
+		{
+			$saw_invocant++;
+			$arr[-1] .= '$ :';
+			push @arr, '';
+			next;
+		}
+
 		if ($tok->isa('PPI::Token::Operator') and $tok eq ',')
 		{
 			push @arr, '';
@@ -75,7 +84,7 @@ sub parse
 	@arr = map s/(\A\s+)|(\s+\z)//rgsm, grep /\S/, @arr;
 		
 	my $self = $class->new(%args, as_string => $_[0]);
-	if ($arr[-1] =~ /\A\.{3,}\z/)
+	if (@arr and $arr[-1] =~ /\A\.{3,}\z/)
 	{
 		$self->_set_yadayada(1);
 		pop(@arr);

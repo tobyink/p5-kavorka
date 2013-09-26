@@ -182,7 +182,6 @@ sub sanity_check
 	die if $self->invocant && $self->optional;
 	die if $self->invocant && $self->named;
 	die if $self->invocant && $self->slurpy;
-	die if $self->optional && $self->slurpy;
 	die if $self->named && $self->slurpy;
 }
 
@@ -309,6 +308,8 @@ sub injection
 		($slurpy_style eq '%') ? sprintf('for (values $var) { %s }', $condition, $self->_inject_type_check('$_')) :
 		($condition eq '1')    ? sprintf('%s;', $self->_inject_type_check($var)) :
 		sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
+	
+	$type = '' if $type =~ /\{  \}\z/;
 	
 	$dummy ? "{ $ass$type }" : "$ass$type";
 }

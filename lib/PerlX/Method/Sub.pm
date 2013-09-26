@@ -28,7 +28,9 @@ sub handle_keyword
 	my $class = shift;
 	local $ref    = $_[0];
 	local $caller = $_[1];
-	
+
+#	warn "====================\n".$$ref;
+
 	my $self = $class->new(package => $caller);
 	
 	$self->_strip_space;
@@ -48,7 +50,7 @@ sub handle_keyword
 	substr($$ref, 0, 0) = sprintf(
 		'sub %s %s %s { %s %s;;',
 		($subname // ''),
-		($proto ? "($proto)" : ''),
+		defined($proto) ? "($proto)" : '',
 		join(' ', map {
 			my ($attr, $attr_p) = @$_;
 			defined($attr_p)
@@ -58,6 +60,8 @@ sub handle_keyword
 		$sig->injections,
 		("\n" x ($self->{skipped_lines}||0)),
 	);
+	
+#	die "====================\n".$$ref;
 }
 
 sub default_attributes
@@ -103,7 +107,7 @@ sub _strip_name
 		return $name;
 	}
 	
-	();
+	undef;
 }
 
 sub _strip_signature
@@ -120,7 +124,7 @@ sub _strip_signature
 		return $sig;
 	}
 	
-	undef;
+	return $self->signature_class->parse('...', package => $self->package);
 }
 
 sub _strip_prototype
@@ -131,7 +135,8 @@ sub _strip_prototype
 	
 	if ( $$ref =~ / \A \: \s* \( /xsm )
 	{
-		$$ref =~ s/\A\:\s*//;
+		$$ref =~ s/\A\://;
+		$self->_strip_space;
 		
 		my $extracted = extract_bracketed($$ref, '()');
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
