@@ -188,7 +188,6 @@ sub sanity_check
 
 ### XXX - an "alias" trait
 ### XXX - the @_ and %_ special slurpies
-### XXX - the //= and ||= default types
 
 sub injection
 {
@@ -300,7 +299,7 @@ sub injection
 	
 	my $ass = sprintf(
 		'%s %s = %s;',
-		($var eq '$_' || $var eq '$.' ? 'local' : 'my'),
+		$var =~ /\A[\$\@\%](\W|_\z)/ ? 'local' : 'my',
 		$var,
 		$val,
 	);

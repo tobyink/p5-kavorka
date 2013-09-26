@@ -87,7 +87,7 @@ sub _strip_space
 		
 		$self->{skipped_lines} += $X==2
 			? 1
-			: (my @tmp = split /\n/, $1)-1;
+			: (my @tmp = split /\n/, $1, -1)-1;
 	}
 	
 	();
