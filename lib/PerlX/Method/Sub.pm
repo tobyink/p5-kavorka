@@ -57,6 +57,16 @@ sub parse
 	
 	my $code = parse_block(!!$subname);
 	&Scalar::Util::set_prototype($code, $self->prototype);
+	if (@$attrs)
+	{
+		require attributes;
+		no warnings;
+		attributes->import(
+			compiling_package,
+			$code,
+			map($_->[0], @$attrs),
+		);
+	}
 	$self->_set_body($code);
 
 	$self->forward_declare if !!$subname;

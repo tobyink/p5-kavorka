@@ -12,15 +12,9 @@ with 'PerlX::Method::Sub';
 
 sub forward_declare
 {
-	my $self  = shift;
-	my $proto = $self->prototype;
-	my $name  = $self->qualified_name;
-	
-	eval(
-		defined($proto)
-			? sprintf("sub %s (%s);", $name, $proto)
-			: sprintf("sub %s;", $name)
-	);
+	my $self = shift;
+	my $name = $self->qualified_name;
+	eval sprintf("sub %s %s;", $name, $self->inject_prototype) if defined $name;
 }
 
 1;
