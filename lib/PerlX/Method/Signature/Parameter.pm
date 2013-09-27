@@ -107,7 +107,7 @@ sub parse
 	
 	$rest =~ s/\A\s+//;
 	
-	$traits{slurpy} = 1 if $varname =~ /\A[\@\%]/;
+	$traits{slurpy} = 1 if defined($varname) && $varname =~ /\A[\@\%]/;
 	
 	if ($rest =~ /\A\:/)
 	{
