@@ -2,28 +2,48 @@ use 5.014;
 use strict;
 use warnings;
 
-use Keyword::Simple ();
-use PerlX::Method::Sub::Method ();
-use PerlX::Method::Sub::Fun ();
-
 package PerlX::Method;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
 use Devel::Pragma qw( ccstash );
+use Exporter qw( import );
 
-sub import
+use Parse::Keyword {
+	method   => sub { unshift @_, 'PerlX::Method::Sub::Method'; goto \&_parse },
+	fun      => sub { unshift @_, 'PerlX::Method::Sub::Fun'; goto \&_parse },
+};
+
+our @EXPORT = qw( fun method );
+
+sub _parse
 {
-	my $class = shift;
+	my $parser = shift;
+	eval "require $parser";
 	
-	Keyword::Simple::define method => sub {
-		'PerlX::Method::Sub::Method'->handle_keyword($_[0], scalar(ccstash));
-	};
+	use Time::Limit '4';
+	my $str = '';
 	
-	Keyword::Simple::define fun => sub {
-		'PerlX::Method::Sub::Fun'->handle_keyword($_[0], scalar(ccstash));
-	};
+	LOOP: {
+		my $chunk = lex_peek(1000);
+		if (length $chunk)
+		{
+			lex_read(length $chunk);
+			$str .= $chunk;
+			redo LOOP;
+		}
+	}
+	
+	my $sub = $parser->handle_keyword(\$str, scalar(ccstash));
+	lex_stuff($str);
+
+	my $codereffer;# = parse_listexpr;
+	
+	return(
+		sub { $sub, $codereffer },
+		!!$sub->declared_name,
+	);
 }
 
 1;

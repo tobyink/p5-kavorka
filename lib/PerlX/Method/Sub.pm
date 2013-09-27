@@ -46,10 +46,9 @@ sub handle_keyword
 	
 	$self->_strip_space;
 	$$ref =~ s/\A\{// or die "expected block!";
-	
+
 	substr($$ref, 0, 0) = sprintf(
-		'sub %s %s %s { %s %s;;',
-		($subname // ''),
+		'sub %s %s { %s %s;;',
 		defined($proto) ? "($proto)" : '',
 		join(' ', map {
 			my ($attr, $attr_p) = @$_;
@@ -60,8 +59,8 @@ sub handle_keyword
 		$sig->injections,
 		("\n" x ($self->{skipped_lines}||0)),
 	);
-	
-#	die "====================\n".$$ref;
+
+	return $self;
 }
 
 sub default_attributes
