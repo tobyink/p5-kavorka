@@ -20,30 +20,33 @@ our @EXPORT = qw( fun method );
 sub _parse
 {
 	my $parser = shift;
-	eval "require $parser";
+	eval "require $parser;" or die($@);
+	my $sub = $parser->parse;
 	
-	use Time::Limit '4';
-	my $str = '';
-	
-	LOOP: {
-		my $chunk = lex_peek(1000);
-		if (length $chunk)
-		{
-			lex_read(length $chunk);
-			$str .= $chunk;
-			redo LOOP;
-		}
-	}
-	
-	my $sub = $parser->handle_keyword(\$str, scalar(ccstash));
-	lex_stuff($str);
-
-	my $codereffer;# = parse_listexpr;
-	
-	return(
-		sub { $sub, $codereffer },
-		!!$sub->declared_name,
+	return (
+		sub { $sub },
+		!! $sub->declared_name,
 	);
+}
+
+no strict 'refs';
+
+use Data::Dumper;
+
+{
+	sub method
+	{
+		my ($sub) = @_;
+		*{ $sub->qualified_name } = $sub->body;
+		();
+	}
+
+	sub fun
+	{
+		my ($sub) = @_;
+		*{ $sub->qualified_name } = $sub->body;
+		();
+	}
 }
 
 1;

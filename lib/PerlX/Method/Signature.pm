@@ -2,7 +2,6 @@ use 5.014;
 use strict;
 use warnings;
 
-use PPI::Document ();
 use PerlX::Method::Signature::Parameter ();
 
 package PerlX::Method::Signature;
@@ -10,11 +9,14 @@ package PerlX::Method::Signature;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
+use Parse::Keyword {};
+use Parse::KeywordX;
+
 use Moo;
+use namespace::sweep;
 
 has package         => (is => 'ro');
-has as_string       => (is => 'ro');
-has params          => (is => 'rwp', default => sub { +[] });
+has params          => (is => 'ro',  default => sub { +[] });
 has has_invocants   => (is => 'rwp', default => sub { +undef });
 has has_named       => (is => 'rwp', default => sub { +undef });
 has has_slurpy      => (is => 'rwp', default => sub { +undef });
@@ -25,72 +27,54 @@ has last_position   => (is => 'lazy');
 sub parse
 {
 	my $class = shift;
-	my ($str, %args) = @_;
+	my $self = $class->new(@_);
 	
-	# PPI genuinely seems to be the best solution here.
-	my $doc = 'PPI::Document'->new(\$str);
-	my $st  = $doc->find_first('PPI::Statement');
-	#require PPI::Dumper; PPI::Dumper->new($st)->print;
-	my @tokens = $st ? $st->children : ();
+	lex_read_space;
 	
-	my $saw_invocant;
-	my $last_token;
-	my @arr;
-	for my $tok (@tokens)
+	my $found_colon = 0;
+	while (lex_peek ne ')')
 	{
-		next if $tok->isa('PPI::Token::Comment');
-		
-		@arr = '' unless @arr;
-		
-		if ($tok->isa('PPI::Token::Symbol') and $tok eq '$,')
+		if (lex_peek(3) eq '...')
 		{
-			$arr[-1] .= '$';
-			push @arr, '';
-			next;
-		}
-
-		if ($tok->isa('PPI::Token::Symbol') and $tok eq '$:' and not $saw_invocant)
-		{
-			$saw_invocant++;
-			$arr[-1] .= '$ :';
-			push @arr, '';
-			next;
-		}
-
-		if ($tok->isa('PPI::Token::Operator') and $tok eq ',')
-		{
-			push @arr, '';
+			$self->_set_yadayada(1);
+			lex_read(3);
+			lex_read_space;
+			die "After yada-yada, expected right parenthesis" unless lex_peek eq ")";
 			next;
 		}
 		
-		if ($tok->isa('PPI::Token::Operator')
-		and $tok eq ':'
-		and $last_token->isa('PPI::Token::Symbol')
-		and $last_token =~ /\A\$/
-		and not $saw_invocant)
+		push @{$self->params}, $self->parameter_class->parse(package => $self->package);
+		lex_read_space;
+		
+		my $peek = lex_peek;
+		if ($found_colon and $peek eq ':')
 		{
-			$saw_invocant++;
-			
-			$arr[-1] .= $tok;
-			push @arr, '';
-			next;
+			die "Cannot have two sets of invocants - unexpected colon!";
+		}
+		elsif ($peek eq ':')
+		{
+			$_->traits->{invocant} = 1 for @{$self->params};
+			$_->_set_has_invocants( scalar @{$self->params} );
+			lex_read(1);
+		}
+		elsif ($peek eq ',')
+		{
+			lex_read(1);
+		}
+		elsif (lex_peek eq ')')
+		{
+			last;
+		}
+		else
+		{
+			die "Unexpected!! [$peek]"
 		}
 		
-		$arr[-1] .= $tok;
-		$last_token = $tok unless $tok->isa('PPI::Token::Whitespace');
+		lex_read_space;
 	}
 	
-	# canonicalize
-	@arr = map s/(\A\s+)|(\s+\z)//rgsm, grep /\S/, @arr;
-		
-	my $self = $class->new(%args, as_string => $_[0]);
-	if (@arr and $arr[-1] =~ /\A\.{3,}\z/)
-	{
-		$self->_set_yadayada(1);
-		pop(@arr);
-	}
-	$self->_set_params([map $self->parameter_class->parse($_, $self), @arr]);
 	$self->sanity_check;
+	
 	return $self;
 }
 
@@ -184,7 +168,7 @@ sub injections
 		unless (@slurpy or $self->yadayada)
 		{
 			$str .= sprintf('{ my %%OK = (%s); ', map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
-			$str .= '$OK{$_}||die("Unknown named parameter: $_") for sort keys %_ };';
+			$str .= '$OK{$_}||Carp::croak("Unknown named parameter: $_") for sort keys %_ };';
 		}
 	}
 	elsif (not ($self->yadayada || @slurpy))
@@ -192,8 +176,8 @@ sub injections
 		my $min = scalar(@req_positional);
 		my $max = scalar(@req_positional) + scalar(@opt_positional);
 		$str .= $min==$max
-			? sprintf('die("Expected %d parameters") unless @_ == %d;', $min, $min)
-			: sprintf('die("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min, $max, $min, $max);
+			? sprintf('Carp::croak("Expected %d parameters") unless @_ == %d;', $min, $min)
+			: sprintf('Carp::croak("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min, $max, $min, $max);
 	}
 	$str .= join qq[], map($_->injection($self), @named), q[];
 	

@@ -8,16 +8,19 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
 use Text::Balanced qw( extract_codeblock extract_bracketed );
+use Parse::Keyword {};
+use Parse::KeywordX;
 
 use Moo;
+use namespace::sweep;
 
+has package         => (is => 'ro');
 has type            => (is => 'ro');
 has name            => (is => 'ro');
 has constraints     => (is => 'ro', default => sub { +[] });
 has named           => (is => 'ro', default => sub { 0 });
 has named_names     => (is => 'ro', default => sub { +[] });
 
-has as_string       => (is => 'ro');
 has position        => (is => 'rwp');
 has default         => (is => 'ro');
 has default_when    => (is => 'ro');
@@ -45,125 +48,121 @@ sub BUILD
 
 sub parse
 {
-	my $class = shift;
-	my ($str, $sig, %args) = @_;
+	state $deparse = do { require B::Deparse; 'B::Deparse'->new };
 	
-	$str =~ s/\A\s+//;
+	my $class = shift;
+	my %args = @_;
+	
+	lex_read_space;
 	
 	my %traits = (
 		invocant  => 0,
 		_optional => 1,
 	);
 	
-	if ($str =~ /\A(slurpy\s+)/)
+	if (lex_peek(6) eq 'slurpy')
 	{
-		substr($str, 0, length($1), '');
+		lex_read(6);
+		lex_read_space;
 		$traits{slurpy} = 1;
 	}
 	
-	my ($type, $rest);
-	if ($str =~ /\A[^\W0-9]/)
+	my $type;
+	my $peek = lex_peek(1000);
+	if ($peek =~ /\A[^\W0-9]/)
 	{
-		$sig->{registry} ||= do {
+		my $reg = do {
 			require Type::Registry;
 			require Type::Utils;
 			my $tmp = 'Type::Registry::DWIM'->new;
-			$tmp->{'~~chained'} = $sig->{package};
+			$tmp->{'~~chained'} = $args{package};
 			$tmp->{'~~assume'}  = 'Type::Tiny::Class';
 			$tmp;
 		};
 		
 		require Type::Parser;
-		($type, $rest) = Type::Parser::extract_type($str, $sig->{registry});
-		$rest =~ s/\A\s+//;
-	}
-	else
-	{
-		($type, $rest) = (undef, $str);
+		($type, my($remaining)) = Type::Parser::extract_type($peek, $reg);
+		my $len = length($peek) - length($remaining);
+		lex_read($len);
+		lex_read_space;
 	}
 	
 	my ($named, $varname, $paramname) = 0;
+	$peek = lex_peek(1000);
 	
-	if ($rest =~ /\A(\:(\w+)\(\s*([\$\%\@]\w*)\s*\))/)
+	if ($peek =~ /\A(\:(\w+)\(\s*([\$\%\@]\w*)\s*\))/)
 	{
 		$named     = 1;
 		$paramname = $2;
 		$varname   = $3;
-		substr($rest, 0, length($1), '');
+		lex_read(length($1));
+		lex_read_space;
 	}
-	elsif ($rest =~ /\A(\:([\$\%\@]\w*))/)
+	elsif ($peek =~ /\A(\:([\$\%\@]\w*))/)
 	{
 		$named     = 1;
 		$paramname = substr($2, 1);
 		$varname   = $2;
-		substr($rest, 0, length($1), '');
+		lex_read(length($1));
+		lex_read_space;
 	}
-	elsif ($rest =~ /\A([\$\%\@]\w*)/)
+	elsif ($peek =~ /\A([\$\%\@]\w*)/)
 	{
 		$varname   = $1;
 		$traits{_optional} = 0;
-		substr($rest, 0, length($1), '');
+		lex_read(length($1));
+		lex_read_space;
 	}
 	
-	$rest =~ s/\A\s+//;
+	undef($peek);
 	
 	$traits{slurpy} = 1 if defined($varname) && $varname =~ /\A[\@\%]/;
 	
-	if ($rest =~ /\A\:/)
+	if (lex_peek eq '!')
 	{
 		$traits{optional} = 0;
-		$traits{invocant} = 1;
-		substr($rest, 0, 1, '');
+		lex_read(1);
+		lex_read_space;
 	}
-	elsif ($rest =~ /\A\!/)
-	{
-		$traits{optional} = 0;
-		substr($rest, 0, 1, '');
-	}
-	elsif ($rest =~ /\A\?/)
+	elsif (lex_peek eq '?')
 	{
 		$traits{optional} = 1;
-		substr($rest, 0, 1, '');
+		lex_read(1);
+		lex_read_space;
 	}
-	
-	$rest =~ s/\A\s+//;
 	
 	my (@constraints, $default, $default_when);
 	
-	while ($rest =~ /\Awhere/)
+	while (lex_peek(5) eq 'where')
 	{
-		substr($rest, 0, 5, '');
-		my $constraint = extract_codeblock($rest, '(){}[]<>', undef, '{}') or die;
-		$constraint =~ s/\A\s*\{//;
-		$constraint =~ s/}\s*\z//;
-		push @constraints, $constraint;
-		$rest =~ s/\A\s+//;
+		lex_read(1);
+		lex_read_space;
+		push @constraints, 'do' . $deparse->coderef2text(parse_block);
 	}
 	
-	while ($rest =~ /\A((?:is|does)\s+(\w+))/sm)
+	$peek = lex_peek(1000);
+	while ($peek =~ /\A((?:is|does)\s+(\w+))/sm)
 	{
 		$traits{"$2"} = 1;
-		substr($rest, 0, length($1), '');
-		$rest =~ s/\A\s+//;
+		lex_read(length($1));
+		lex_read_space;
+		$peek = lex_peek(1000);
 	}
 	
-	if ($rest =~ m{\A((?://|\|\|)?=)})
+	if ($peek =~ m{\A((?://|\|\|)?=)})
 	{
 		$default_when = $1;
-		substr($rest, 0, length($default_when), '');
-		$default = $rest;
-		$rest = '';
+		lex_read(length($1));
+		lex_read_space;
+		$default = 'do'.$deparse->coderef2text(parse_arithexpr);
 		$traits{_optional} = 1;
 	}
 	
 	$traits{optional} //= $traits{_optional};
 	delete($traits{_optional});
 	
-	die if length $rest;
-	
 	return $class->new(
 		%args,
-		as_string      => $_[0],
 		type           => $type,
 		name           => $varname,
 		constraints    => \@constraints,
@@ -249,7 +248,7 @@ sub injection
 		my $defaultish =
 			length($default) ? $default :
 			$self->optional  ? 'undef'  :
-			sprintf('die(sprintf("Named parameter `%%s` is required", %s))', B::perlstring $self->named_names->[0]);
+			sprintf('Carp::croak(sprintf("Named parameter `%%s` is required", %s))', B::perlstring $self->named_names->[0]);
 		
 		no warnings 'uninitialized';
 		my $when = +{
@@ -270,7 +269,7 @@ sub injection
 	}
 	elsif ($self->invocant)
 	{
-		my $defaultish = sprintf('die(q/Invocant %s is required/)', $self->name);
+		my $defaultish = sprintf('Carp::croak(q/Invocant %s is required/)', $self->name);
 		$val = sprintf('@_ ? shift(@_) : (%s)', $defaultish);
 		$condition = 1;
 	}
@@ -280,7 +279,7 @@ sub injection
 		my $defaultish =
 			length($default) ? $default :
 			$self->optional  ? 'undef'  :
-			sprintf('die("Positional parameter %d is required")', $pos);
+			sprintf('Carp::croak("Positional parameter %d is required")', $pos);
 		
 		no warnings 'uninitialized';
 		my $when = +{
@@ -304,8 +303,8 @@ sub injection
 	);
 	
 	my $type = 
-		($slurpy_style eq '@') ? sprintf('for ($var) { %s }', $condition, $self->_inject_type_check('$_')) :
-		($slurpy_style eq '%') ? sprintf('for (values $var) { %s }', $condition, $self->_inject_type_check('$_')) :
+		($slurpy_style eq '@') ? sprintf('for (%s) { %s }', $var, $self->_inject_type_check('$_')) :
+		($slurpy_style eq '%') ? sprintf('for (values %s) { %s }', $var, $self->_inject_type_check('$_')) :
 		($condition eq '1')    ? sprintf('%s;', $self->_inject_type_check($var)) :
 		sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
 	
@@ -364,7 +363,7 @@ sub _inject_type_check
 	for my $constraint (@{ $self->constraints })
 	{
 		$check .= sprintf(
-			'do { local $_ = %s; %s } or die(sprintf("%%s failed constraint {%%s}", %s, %s));',
+			'do { local $_ = %s; %s } or Carp::croak(sprintf("%%s failed constraint {%%s}", %s, %s));',
 			$var,
 			$constraint,
 			B::perlstring($var),

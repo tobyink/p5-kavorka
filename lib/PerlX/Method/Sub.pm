@@ -10,8 +10,12 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
 use Text::Balanced qw( extract_codeblock extract_bracketed );
+use Parse::Keyword {};
+use Parse::KeywordX;
+use Devel::Pragma qw( fqname );
 
 use Moo::Role;
+use namespace::sweep;
 
 has signature_class => (is => 'ro', default => sub { 'PerlX::Method::Signature' });
 has package         => (is => 'ro');
@@ -19,46 +23,43 @@ has declared_name   => (is => 'rwp');
 has signature       => (is => 'rwp');
 has prototype       => (is => 'rwp');
 has attributes      => (is => 'ro', default => sub { +[] });
+has body            => (is => 'rwp');
+has qualified_name  => (is => 'rwp');
 
-our $ref;
-our $caller;
-
-sub handle_keyword
+sub parse
 {
 	my $class = shift;
-	local $ref    = $_[0];
-	local $caller = $_[1];
 
-#	warn "====================\n".$$ref;
-
-	my $self = $class->new(package => $caller);
+	my $self = $class->new(package => compiling_package);
 	
-	$self->_strip_space;
+	lex_read_space;
 	
-	my $subname = $self->_set_declared_name($self->_strip_name);
-	my $sig     = $self->_set_signature($self->_strip_signature);
-	my $proto   = $self->_set_prototype($self->_strip_prototype);	
-	my $attrs   ; push @{$attrs = $self->attributes}, $self->_strip_attributes;
+	my $subname = $self->_set_declared_name( (lex_peek =~ /\w/) ? parse_name('subroutine', 1) : undef );
+	my $sig     = $self->_set_signature( $self->parse_signature );
+	my $proto   = $self->_set_prototype( $self->parse_prototype );	
+	my $attrs   ; push @{$attrs = $self->attributes}, $self->parse_attributes;
 	
 	push @$attrs, $self->default_attributes;
-	unshift @{$sig->params}, $self->default_invocant
-		unless $sig->has_invocants;
+	unless ($sig->has_invocants)
+	{
+		unshift @{$sig->params}, $self->default_invocant;
+		$sig->_set_has_invocants(1);
+	}
+	if (!!$subname)
+	{
+		$self->_set_qualified_name(scalar fqname($subname));
+	}
 	
-	$self->_strip_space;
-	$$ref =~ s/\A\{// or die "expected block!";
+	lex_read_space;
+	lex_peek(1) eq '{' or die "expected block!";
+	lex_read(1);
+	lex_stuff(sprintf("{ %s", $self->inject_signature));
+	
+	my $code = parse_block(!!$subname);
+	&Scalar::Util::set_prototype($code, $self->prototype);
+	$self->_set_body($code);
 
-	substr($$ref, 0, 0) = sprintf(
-		'sub %s %s { %s %s;;',
-		defined($proto) ? "($proto)" : '',
-		join(' ', map {
-			my ($attr, $attr_p) = @$_;
-			defined($attr_p)
-				? sprintf(':%s(%s)', $attr, $attr_p)
-				: sprintf(':%s', $attr)
-		} @$attrs),
-		$sig->injections,
-		("\n" x ($self->{skipped_lines}||0)),
-	);
+	$self->forward_declare if !!$subname;
 
 	return $self;
 }
@@ -73,71 +74,60 @@ sub default_invocant
 	return;
 }
 
-sub _strip_space
+sub forward_declare
 {
-	my $self = shift;
-	
-	my $X;
-	while (
-		($$ref =~ m{\A( \s+ )}xsm and $X = 1)
-		or ($$ref =~ m{\A\#} and $X = 2)
-	) {
-		$X==2
-			? ($$ref =~ s{\A\#.+?\n}{}sm)
-			: substr($$ref, 0, length($1), '');
-		
-		$self->{skipped_lines} += $X==2
-			? 1
-			: (my @tmp = split /\n/, $1, -1)-1;
-	}
-	
-	();
+	return;
 }
 
-sub _strip_name
+sub inject_attributes
 {
 	my $self = shift;
-	$self->_strip_space;
-	
-	if ( $$ref =~ / \A ((?:\w|::)+) /x )
-	{
-		my $name = $1;
-		substr($$ref, 0, length($name), '');
-		return $name;
-	}
-	
-	undef;
+	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
 }
 
-sub _strip_signature
+sub inject_prototype
+{
+	my $self  = shift;
+	my $proto = $self->prototype;
+	defined($proto) ? "($proto)" : "";
+}
+
+sub inject_signature
+{
+	my $self = shift;
+	$self->signature->injections;
+}
+
+sub parse_signature
 {
 	my $self = shift;	
-	$self->_strip_space;
+	lex_read_space;
 	
-	if ( $$ref =~ / \A \( /x )
-	{
-		my $extracted = extract_codeblock($$ref, '(){}[]<>', undef, '()');
-		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
-		my $sig = $self->signature_class->parse($extracted, package => $self->package);
-		$self->{skipped_lines} += scalar(my @tmp = split /\n/, $sig->as_string) - 1;
-		return $sig;
-	}
+	# default signature
+	lex_stuff('(...)') unless lex_peek eq '(';
 	
-	return $self->signature_class->parse('...', package => $self->package);
+	lex_read(1);
+	my $sig = $self->signature_class->parse(package => $self->package);
+	lex_peek eq ')' or die;
+	lex_read(1);
+	lex_read_space;
+	return $sig;
 }
 
-sub _strip_prototype
+sub parse_prototype
 {
 	my $self = shift;
+	lex_read_space;
 	
-	$self->_strip_space;
-	
-	if ( $$ref =~ / \A \: \s* \( /xsm )
+	my $peek = lex_peek(1000);
+	if ($peek =~ / \A \: \s* \( /xsm )
 	{
-		$$ref =~ s/\A\://;
-		$self->_strip_space;
+		lex_read(1);
+		lex_read_space;
+		$peek = lex_peek(1000);
 		
-		my $extracted = extract_bracketed($$ref, '()');
+		my $extracted = extract_bracketed($peek, '()');
+		lex_read(length $extracted);
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
 		return $extracted;
 	}
@@ -145,15 +135,15 @@ sub _strip_prototype
 	undef;
 }
 
-sub _strip_attributes
+sub parse_attributes
 {
-	my $self = shift;	
-	$self->_strip_space;
+	my $self = shift;
+	lex_read_space;
 	
-	if ($$ref =~ /\A:/)
+	if (lex_peek eq ':')
 	{
-		substr($$ref, 0, 1, '');
-		$self->_strip_space;
+		lex_read(1);
+		lex_read_space;
 	}
 	else
 	{
@@ -162,24 +152,27 @@ sub _strip_attributes
 	
 	my @attrs;
 	
-	while ($$ref =~ /\A([^\W0-9]\w+)/)
+	my $peek;
+	while ($peek = lex_peek(1000) and $peek =~ /\A([^\W0-9]\w+)/)
 	{
 		my $name = $1;
-		substr($$ref, 0, length($name), '');
-		$self->_strip_space;
+		lex_read(length $name);
+		lex_read_space;
 		
 		my $extracted;
-		if ($$ref =~ /\A\(/)
+		if (lex_peek eq '(')
 		{
-			$extracted = extract_codeblock($$ref, '(){}[]<>', undef, '()');
+			$peek = lex_peek(1000); 
+			$extracted = extract_codeblock($peek, '(){}[]<>', undef, '()');
+			lex_read(length $extracted);
+			lex_read_space;
 			$extracted =~ s/(?: \A\( | \)\z )//xgsm;
-			$self->_strip_space;
 		}
 		
-		if ($$ref =~ /\A:/)
+		if (lex_peek eq ':')
 		{
-			substr($$ref, 0, 1, '');
-			$self->_strip_space;
+			lex_read(1);
+			lex_read_space;
 		}
 		
 		push @attrs, [ $name => $extracted ];

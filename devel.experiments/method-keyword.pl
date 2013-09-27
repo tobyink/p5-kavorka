@@ -3,20 +3,14 @@ use warnings;
 use PerlX::Method;
 use Data::Dumper;
 
-method bar (
-	Int $x where { $_ % 2 == 1 },
-	$y ||= foo(1,2),
-	Ref :www($w) = 1,
-	slurpy HashRef[Int] $z,
-) {
-	$Data::Dumper::Sortkeys = 1;
-	print Dumper({
-		'$self'   => $self,
-		'$w'      => $w,
-		'$x'      => $x,
-		'$y'      => $y,
-		'$z'      => $z,
-	});
+method foo (Int $x, $y, :www($w), Int %z) {
+	print Dumper +{
+		'$self'    => $self,
+		'$x'       => $x,
+		'$y'       => $y,
+		'$w'       => $w,
+		'%z'       => \%z,
+	};
 }
 
-__PACKAGE__->bar( 123, "hiya", 'bum' => 999, 'www' => {} );
+__PACKAGE__->foo( 123, "hiya", 'bum' => 999, 'www' => {} );
