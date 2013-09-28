@@ -69,8 +69,8 @@ sub parse
 	}
 	$self->_set_body($code);
 
-	$self->forward_declare if !!$subname;
-
+	$self->forward_declare_sub if !!$subname;
+	
 	return $self;
 }
 
@@ -84,9 +84,20 @@ sub default_invocant
 	return;
 }
 
-sub forward_declare
+sub forward_declare_sub
 {
 	return;
+}
+
+sub install_sub
+{
+	my $self = shift;
+	my $name = $self->qualified_name;
+	my $code = $self->body;
+	
+	no strict 'refs';
+	*{$name} = $code if defined $name;
+	return $code;
 }
 
 sub inject_attributes

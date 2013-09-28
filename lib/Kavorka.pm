@@ -2,55 +2,60 @@ use 5.014;
 use strict;
 use warnings;
 
+use Carp ();
+use Exporter::Tiny ();
+use Parse::Keyword ();
+use Module::Runtime ();
+use Sub::Name ();
+
 package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
-use Devel::Pragma qw( ccstash );
-use Exporter qw( import );
-
-use Parse::Keyword {
-	method   => sub { unshift @_, 'Kavorka::Sub::Method'; goto \&_parse },
-	fun      => sub { unshift @_, 'Kavorka::Sub::Fun'; goto \&_parse },
-};
-
+our @ISA    = qw( Exporter::Tiny );
 our @EXPORT = qw( fun method );
 
-sub _parse
+our %IMPLEMENTATION = (
+	after     => 'Kavorka::Sub::After',
+	around    => 'Kavorka::Sub::Around',
+	before    => 'Kavorka::Sub::Before',
+	fun       => 'Kavorka::Sub::Fun',
+	func      => 'Kavorka::Sub::Fun',
+	function  => 'Kavorka::Sub::Fun',
+	method    => 'Kavorka::Sub::Method',
+);
+
+sub _exporter_expand_sub
 {
-	my $parser = shift;
-	eval "require $parser;" or die($@);
-	my $sub = $parser->parse;
+	my $me = shift;
+	my ($name, $args, $globals) = @_;
 	
-	return (
-		sub { $sub },
-		!! $sub->declared_name,
+	my $implementation =
+		$args->{'implementation'}
+		// $IMPLEMENTATION{$name}
+		// $me;
+	
+	Module::Runtime::use_package_optimistically($implementation)->can('parse')
+		or Carp::croak("No suitable implementation for keyword '$name'");
+	
+	no warnings 'void';
+	my $code = Sub::Name::subname(
+		"$me\::$name",
+		sub { $name; shift->install_sub },  # close over name to prevent optimization
 	);
-}
-
-{
-	no strict 'refs';
 	
-	sub method
-	{
-		my ($sub) = @_;
-		my $name = $sub->qualified_name;
-		my $code = $sub->body;
-		
-		*{$name} = $code if defined $name;
-		return $code;
-	}
-
-	sub fun
-	{
-		my ($sub) = @_;
-		my $name = $sub->qualified_name;
-		my $code = $sub->body;
-		
-		*{$name} = $code if defined $name;
-		return $code;
-	}
+	Parse::Keyword::install_keyword_handler(
+		$code => sub {
+			my $subroutine = $implementation->parse;
+			return (
+				sub { ($subroutine, $args) },
+				!! $subroutine->declared_name,
+			);
+		},
+	);
+	
+	return ($name => $code);
 }
 
 1;

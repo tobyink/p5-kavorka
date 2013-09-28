@@ -54,7 +54,7 @@ sub parse
 		elsif ($peek eq ':')
 		{
 			$_->traits->{invocant} = 1 for @{$self->params};
-			$_->_set_has_invocants( scalar @{$self->params} );
+			$self->_set_has_invocants( scalar @{$self->params} );
 			lex_read(1);
 		}
 		elsif ($peek eq ',')

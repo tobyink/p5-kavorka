@@ -46,6 +46,8 @@ sub BUILD
 	$PARAMS[$id] = $self;
 }
 
+my $variable_re = qr{ [\$\%\@] (?: \{\^[A-Z]+\} | \w* ) }x;
+
 sub parse
 {
 	state $deparse = do { require B::Deparse; 'B::Deparse'->new };
@@ -90,7 +92,8 @@ sub parse
 	my ($named, $varname, $paramname) = 0;
 	$peek = lex_peek(1000);
 	
-	if ($peek =~ /\A(\:(\w+)\(\s*([\$\%\@]\w*)\s*\))/)
+	# :foo( $foo )
+	if ($peek =~ /\A(\:(\w+)\(\s*($variable_re)\s*\))/)
 	{
 		$named     = 1;
 		$paramname = $2;
@@ -98,7 +101,8 @@ sub parse
 		lex_read(length($1));
 		lex_read_space;
 	}
-	elsif ($peek =~ /\A(\:([\$\%\@]\w*))/)
+	# :$foo
+	elsif ($peek =~ /\A(\:($variable_re))/)
 	{
 		$named     = 1;
 		$paramname = substr($2, 1);
@@ -106,7 +110,8 @@ sub parse
 		lex_read(length($1));
 		lex_read_space;
 	}
-	elsif ($peek =~ /\A([\$\%\@]\w*)/)
+	# $foo
+	elsif ($peek =~ /\A($variable_re)/)
 	{
 		$varname   = $1;
 		$traits{_optional} = 0;
