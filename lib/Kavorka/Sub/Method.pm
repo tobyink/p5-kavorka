@@ -2,15 +2,15 @@ use 5.014;
 use strict;
 use warnings;
 
-use PerlX::Method::Signature::Parameter ();
+use Kavorka::Signature::Parameter ();
 
-package PerlX::Method::Sub::Method;
+package Kavorka::Sub::Method;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
 use Moo;
-with 'PerlX::Method::Sub';
+with 'Kavorka::Sub';
 
 sub default_attributes
 {
@@ -23,7 +23,7 @@ sub default_invocant
 {
 	my $self = shift;
 	return (
-		'PerlX::Method::Signature::Parameter'->new(
+		'Kavorka::Signature::Parameter'->new(
 			as_string => '$self:',
 			name      => '$self',
 			traits    => { invocant => 1 },

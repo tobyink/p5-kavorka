@@ -1,6 +1,6 @@
 use v5.14;
 use warnings;
-use PerlX::Method;
+use Kavorka;
 use Data::Dumper;
 
 method foo (Int $x, $y, :www($w), Int %z) {

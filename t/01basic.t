@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Test that PerlX::Method compiles.
+Test that Kavorka compiles.
 
 =head1 AUTHOR
 
@@ -24,7 +24,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use_ok('PerlX::Method');
+use_ok('Kavorka');
 
 done_testing;
 

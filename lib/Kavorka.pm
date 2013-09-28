@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-package PerlX::Method;
+package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
@@ -11,8 +11,8 @@ use Devel::Pragma qw( ccstash );
 use Exporter qw( import );
 
 use Parse::Keyword {
-	method   => sub { unshift @_, 'PerlX::Method::Sub::Method'; goto \&_parse },
-	fun      => sub { unshift @_, 'PerlX::Method::Sub::Fun'; goto \&_parse },
+	method   => sub { unshift @_, 'Kavorka::Sub::Method'; goto \&_parse },
+	fun      => sub { unshift @_, 'Kavorka::Sub::Fun'; goto \&_parse },
 };
 
 our @EXPORT = qw( fun method );
@@ -59,7 +59,7 @@ __END__
 
 =head1 NAME
 
-PerlX::Method - a module that does something-or-other
+Kavorka - a module that does something-or-other
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ PerlX::Method - a module that does something-or-other
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Method>.
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SEE ALSO
 

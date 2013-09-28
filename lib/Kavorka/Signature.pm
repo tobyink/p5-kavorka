@@ -2,9 +2,9 @@ use 5.014;
 use strict;
 use warnings;
 
-use PerlX::Method::Signature::Parameter ();
+use Kavorka::Signature::Parameter ();
 
-package PerlX::Method::Signature;
+package Kavorka::Signature;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
@@ -21,7 +21,7 @@ has has_invocants   => (is => 'rwp', default => sub { +undef });
 has has_named       => (is => 'rwp', default => sub { +undef });
 has has_slurpy      => (is => 'rwp', default => sub { +undef });
 has yadayada        => (is => 'rwp', default => sub { 0 });
-has parameter_class => (is => 'ro',  default => sub { 'PerlX::Method::Signature::Parameter' });
+has parameter_class => (is => 'ro',  default => sub { 'Kavorka::Signature::Parameter' });
 has last_position   => (is => 'lazy');
 
 sub parse

@@ -2,9 +2,9 @@ use 5.014;
 use strict;
 use warnings;
 
-use PerlX::Method::Signature ();
+use Kavorka::Signature ();
 
-package PerlX::Method::Sub;
+package Kavorka::Sub;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
@@ -17,7 +17,7 @@ use Devel::Pragma qw( fqname );
 use Moo::Role;
 use namespace::sweep;
 
-has signature_class => (is => 'ro', default => sub { 'PerlX::Method::Signature' });
+has signature_class => (is => 'ro', default => sub { 'Kavorka::Signature' });
 has package         => (is => 'ro');
 has declared_name   => (is => 'rwp');
 has signature       => (is => 'rwp');

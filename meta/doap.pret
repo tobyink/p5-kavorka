@@ -2,12 +2,12 @@
 
 @prefix : <http://usefulinc.com/ns/doap#>.
 
-`PerlX-Method`
+`Kavorka`
 	:programming-language "Perl" ;
 	:shortdesc            "a module that does something-or-other";
-	:homepage             <https://metacpan.org/release/PerlX-Method>;
-	:download-page        <https://metacpan.org/release/PerlX-Method>;
-	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Method>;
+	:homepage             <https://metacpan.org/release/Kavorka>;
+	:download-page        <https://metacpan.org/release/Kavorka>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>;
 #	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-perlx-method> ];
 	:created              2013-09-23;
 	:license              <http://dev.perl.org/licenses/>;

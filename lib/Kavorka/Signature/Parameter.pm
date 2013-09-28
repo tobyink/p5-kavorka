@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-package PerlX::Method::Signature::Parameter;
+package Kavorka::Signature::Parameter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
