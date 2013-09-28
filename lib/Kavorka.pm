@@ -29,23 +29,27 @@ sub _parse
 	);
 }
 
-no strict 'refs';
-
-use Data::Dumper;
-
 {
+	no strict 'refs';
+	
 	sub method
 	{
 		my ($sub) = @_;
-		*{ $sub->qualified_name } = $sub->body;
-		();
+		my $name = $sub->qualified_name;
+		my $code = $sub->body;
+		
+		*{$name} = $code if defined $name;
+		return $code;
 	}
 
 	sub fun
 	{
 		my ($sub) = @_;
-		*{ $sub->qualified_name } = $sub->body;
-		();
+		my $name = $sub->qualified_name;
+		my $code = $sub->body;
+		
+		*{$name} = $code if defined $name;
+		return $code;
 	}
 }
 
@@ -59,9 +63,10 @@ __END__
 
 =head1 NAME
 
-Kavorka - a module that does something-or-other
+Kavorka - function signatures with the lure of the animal
 
 =head1 SYNOPSIS
+
 
 =head1 DESCRIPTION
 
