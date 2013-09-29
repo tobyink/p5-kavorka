@@ -67,6 +67,7 @@ sub parse
 			map($_->[0], @$attrs),
 		);
 	}
+	
 	$self->_set_body($code);
 
 	$self->forward_declare_sub if !!$subname;

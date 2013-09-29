@@ -131,5 +131,20 @@ is_deeply(
 	'an empty function body returns nothing',
 );
 
+my @functions;
+for my $i (0..2) {
+	push @functions, fun ($x) { $i };
+}
+
+{
+	local $TODO = 'broken closures';
+	
+	is_deeply(
+		[ $functions[0]->(7), $functions[1]->(7), $functions[2]->(7) ],
+		[ 0 .. 2 ],
+		'closures work for anonymous functions',
+	);
+}
+
 done_testing;
 

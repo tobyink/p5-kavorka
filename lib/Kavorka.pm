@@ -4,8 +4,10 @@ use warnings;
 
 use Carp ();
 use Exporter::Tiny ();
+use PadWalker ();
 use Parse::Keyword ();
 use Module::Runtime ();
+use Scalar::Util ();
 use Sub::Name ();
 
 package Kavorka;
@@ -13,18 +15,32 @@ package Kavorka;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.001';
 
-our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( fun method );
+our @ISA         = qw( Exporter::Tiny );
+our @EXPORT      = qw( fun method );
+our %EXPORT_TAGS = (
+	modifiers => [qw( after around before )],
+);
 
 our %IMPLEMENTATION = (
-	after     => 'Kavorka::Sub::After',
-	around    => 'Kavorka::Sub::Around',
-	before    => 'Kavorka::Sub::Before',
-	fun       => 'Kavorka::Sub::Fun',
-	func      => 'Kavorka::Sub::Fun',
-	function  => 'Kavorka::Sub::Fun',
-	method    => 'Kavorka::Sub::Method',
+	after        => 'Kavorka::Sub::After',
+	around       => 'Kavorka::Sub::Around',
+	before       => 'Kavorka::Sub::Before',
+	classmethod  => 'Kavorka::Sub::ClassMethod',
+	fun          => 'Kavorka::Sub::Fun',
+	func         => 'Kavorka::Sub::Fun',
+	function     => 'Kavorka::Sub::Fun',
+	method       => 'Kavorka::Sub::Method',
+	objectmethod => 'Kavorka::Sub::ObjectMethod',
 );
+
+our %INFO;
+
+sub info
+{
+	my $me = shift;
+	my $code = $_[0];
+	$INFO{$code};
+}
 
 sub _exporter_expand_sub
 {
@@ -42,7 +58,20 @@ sub _exporter_expand_sub
 	no warnings 'void';
 	my $code = Sub::Name::subname(
 		"$me\::$name",
-		sub { $name; shift->install_sub },  # close over name to prevent optimization
+		sub {
+			$name; # close over name to prevent optimization
+			my $subroutine = shift;
+			$INFO{ $subroutine->body } = $subroutine;
+			my @r = wantarray ? $subroutine->install_sub : scalar($subroutine->install_sub);
+			Scalar::Util::weaken($subroutine->{body}) unless Scalar::Util::isweak($subroutine->{body});
+			
+			my $closed_over = PadWalker::closed_over($subroutine->{body});
+			my $caller_vars = PadWalker::peek_my(1);
+			$closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
+			PadWalker::set_closed_over($subroutine->{body}, $closed_over);
+			
+			wantarray ? @r : $r[0];
+		},
 	);
 	
 	Parse::Keyword::install_keyword_handler(

@@ -172,7 +172,7 @@ sub parse
 		name           => $varname,
 		constraints    => \@constraints,
 		named          => $named,
-		named_names    => [ $paramname ],
+		named_names    => [ defined($paramname) ? $paramname : () ],
 		default        => $default,
 		default_when   => $default_when,
 		traits         => \%traits,
