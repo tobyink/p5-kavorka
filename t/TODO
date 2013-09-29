@@ -1,0 +1,23 @@
+Named functions
+Anonymous functions
+Named methods
+Anonymous methods
+Method modifiers - before, around, after, override
+Renaming the invocant - $self, $class, $_ and ${^SELF}
+Anonymous modifiers ought to throw an exception
+Type constraints
+Type constraints for slurpy parameters
+Positional arguments
+Optional positional arguments - via explicit '?', or implicitly optional
+Named arguments
+Required named arguments
+Defaults - =, //= and ||=
+Slurpy arrays
+Slurpy hashes
+Slurpy arrayrefs
+Slurpy hashrefs
+Type constraints
+Multiple invocants
+Traits
+Introspection API
+Check empty functions and methods return nothing
