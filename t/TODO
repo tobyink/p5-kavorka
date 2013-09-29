@@ -1,8 +1,9 @@
-Named functions
-Anonymous functions
-Named methods
-Anonymous methods
+Named methods - including empty bodies
+Anonymous methods - including empty bodies
 Method modifiers - before, around, after, override
+Method modifiers in Moose
+Method modifiers in Mouse
+Method modifiers in Role::Tiny
 Renaming the invocant - $self, $class, $_ and ${^SELF}
 Anonymous modifiers ought to throw an exception
 Type constraints
@@ -16,8 +17,7 @@ Slurpy arrays
 Slurpy hashes
 Slurpy arrayrefs
 Slurpy hashrefs
-Type constraints
+Type constraints, including for slurpies
 Multiple invocants
 Traits
 Introspection API
-Check empty functions and methods return nothing

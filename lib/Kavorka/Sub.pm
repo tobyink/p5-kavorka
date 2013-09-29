@@ -34,7 +34,7 @@ sub parse
 	
 	lex_read_space;
 	
-	my $subname = $self->_set_declared_name( (lex_peek =~ /\w/) ? parse_name('subroutine', 1) : undef );
+	my $subname = $self->_set_declared_name( (lex_peek =~ /\w|:/) ? parse_name('subroutine', 1) : undef );
 	my $sig     = $self->_set_signature( $self->parse_signature );
 	my $proto   = $self->_set_prototype( $self->parse_prototype );	
 	my $attrs   ; push @{$attrs = $self->attributes}, $self->parse_attributes;

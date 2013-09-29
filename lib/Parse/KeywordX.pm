@@ -63,7 +63,8 @@ sub parse_name
 	}
 
 	die("Not a valid $what name: " . read_tokenish) unless length $name;
-	return $name;
+	
+	($name =~ /\A::/) ? "main$name" : $name;
 }
 
 1;
