@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Kavorka::Signature::Parameter ();
+use Role::Tiny ();
 
 my $DETECT_OO = do {
 	my %_detect_oo; # memoize
@@ -11,8 +12,8 @@ my $DETECT_OO = do {
 		
 		return $_detect_oo{$pkg} if exists $_detect_oo{$pkg};
 		
-		# Use metaclass to determine the OO framework in use.
-		# 
+		return $_detect_oo{$pkg} = "Role::Tiny"
+			if 'Role::Tiny'->is_role($pkg);
 		return $_detect_oo{$pkg} = ""
 			unless $pkg->can("meta");
 		return $_detect_oo{$pkg} = "Moo"
@@ -71,6 +72,12 @@ sub install_sub
 		require Mouse::Util;
 		my $installer = sprintf('add_%s_method_modifier', $modification);
 		return Mouse::Util::find_meta($package)->$installer($method, $code);
+	}
+	
+	if ($OO eq 'Role::Tiny')
+	{
+		push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
+		return;
 	}
 	
 	if ($OO eq 'Moo')
