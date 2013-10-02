@@ -215,23 +215,242 @@ called C<< ${^NEXT} >> and C<< $self >>.
 
 =head3 Positional parameters
 
-=head3 Named parameters
+Parameters which are not explicitly named, slurpy or invocants, are
+positional. For example:
 
-=head3 Optional and required parameters
+   method foo ( $x, $y ) { ... }
 
-=head3 Slurpy parameters
+Is roughly equivalent to:
+
+   sub foo {
+      my $self = shift;
+      die "Expected two parameters" unless @_ == 2;
+      my ($x, $y) = @_;
+      ...
+   }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
 
 =head3 Invocants
 
+Invocants are a type of positional parameter, which instead of being
+copied from the C<< @_ >> array are shifted off it.
+
+Invocants are always required, and cannot have defaults. Some keywords
+(such as C<< method >> and C<< classmethod >>) provide a standard
+invocant for you (respectively C<< $self >> and C<< $class >>).
+
+You may specify invocants in the signature manually, in which case the
+default provided by the keyword is ignored.
+
+   # The invocant is called $me instead of $self
+   method ($me: $x, $y?) { ... }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>. Unique to Kavorka is the ability to specify
+multiple invocants.
+
+=head3 Named parameters
+
+Parameters can be named by preceding them with a colon:
+
+   method foo ( :$x, :$y ) { ... }
+
+The method would be called like this:
+
+   $object->foo( x => 1, y => 2 );
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+Positional parameters (if any) must precede named parameters.
+
+If you have any named parameters, they will also be made available in
+the magic global hash C<< %_ >>.
+
+=head3 Long name parameters
+
+Named parameters can be given a different name "inside" and "outside"
+the function:
+
+   fun bar ( :public_house($pub) ) { ... }
+
+The function would be called like this:
+
+   bar( public_house => "Rose & Crown" );
+
+... But within the function, the variable would be named C<< $pub >>.
+
+This feature is shared with Perl 6 signatures.
+
+=head3 Optional and required parameters
+
+A trailing exclamation mark makes an attribute required. A trailing
+question mark makes an attribute optional.
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+In the absence of explicit indicators, positional parameters will be
+required unless a default is provided for them, and named parameters
+will be optional.
+
+You can not use named parameters and optional positional parameters in
+the same signature.
+
+=head3 Slurpy parameters
+
+The final parameter in the signature may be an array or hash, which
+will consume all remaining arguments:
+
+   fun foo ( $x, $y, %z ) { ... }
+   
+   foo(1..4);  # %z is (3 => 4)
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+A slurpy array may not be used if the signature contains any named
+parameters.
+
+Unique to Kavorka is the ability to specify slurpy arrayrefs or
+hashrefs.
+
+   fun foo ( $x, $y, slurpy HashRef $z ) { ... }
+   
+   foo(1..4);  # $z is { 3 => 4 }
+
+For slurpy references you should specify a type constraint (see
+L</Type Constraints>) so that Kavorka can create the correct type of
+reference.
+
 =head3 Type constraints
+
+Type constraints may be specified for each parameter in the signature:
+
+   fun foo ( Int $x, HTTP::Tiny $y ) { ... }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+Type constraints are parsed as per C<dwim_type> from L<Type::Utils>,
+which should mostly do what you mean.
+
+Type constraints for slurpy hashes and arrays are applied to each value
+in the hash or each item in the array. Type constraints for slurpy
+references are instead applied to the reference as a whole. Therefore
+the following are roughly equivalent:
+
+   fun foo ( Str %z ) { my $z = \%z; ... }
+   fun foo ( slurpy HashRef[Str] $z ) { ... }
 
 =head3 Value constraints
 
+Value constraints can be used to further constrain values. Value
+constraints are specified using the C<where> keyword followed by a
+block.
+
+   fun foo ( Int $even where { $_ % 2 == 0 } )
+
+Multiple C<where> blocks may be provided:
+
+   fun foo ( Int $even where { $_ % 2 == 0 } where { $_ > 0 } )
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+The non-block form of C<where> supported by L<Method::Signatures> is
+not supported by Kavorka, but can be emulated using L<match::simple>:
+
+   # Method::Signatures allows this (performing smart match):
+   #
+   method foo ( Int $x where $y ) {
+      ...
+   }
+   
+   # For Kavorka, try this:
+   #
+   method foo ( Int $x where { match($_, $y) } ) {
+      ...
+   }
+
 =head3 Defaults
+
+Defaults may be provided using an equals sign:
+
+   fun foo ( $greeting = "Hello world" ) {
+      ...
+   }
+
+This feature is shared with Perl 6 signatures, L<Function::Parameters>,
+and L<Method::Signatures>.
+
+Kavorka will use the default if the argument is not given when the
+function is invoked. If an explicit undef is passed to the function
+when it is called, this is accepted as the value for the parameter, and
+the default is not used.
+
+If instead you want the default to take effect when an explicit undef
+is passed to the function, use C<< //= >>:
+
+   fun foo ( $greeting //= "Hello world" ) {
+      ...
+   }
+
+This feature is shared with L<Method::Signatures>. Kavorka doesn't
+support Method::Signatures' C<when> keyword.
+
+Slurpy parameters may take defaults:
+
+   fun foo ( @bar = (1, 2, 3) ) { ... }
+
+For slurpy references, the syntax is a little unintuitive:
+
+   fun foo ( slurpy ArrayRef $bar = (1, 2, 3) ) { ... }
 
 =head3 Traits
 
+Traits may be added to each parameter using the C<is> keyword:
+
+   fun foo ( $greeting is polite = "Hello world" ) { ... }
+   
+   fun bar ( $baz is quux is xyzzy ) { ... }
+
+The keyword C<does> is also available which acts as an alias for C<is>.
+
+This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+You can use pretty much any word you like as a trait; Kavorka doesn't
+check that they're "valid" or anything. Choosing random words of course
+won't do anything, but the traits are available through the
+introspection API.
+
+The traits Kavorka understands natively are:
+
+=over
+
+=item *
+
+C<optional> (yes, the C<?> and C<!> syntax is just a shortcut for a
+trait)
+
+=item *
+
+C<slurpy> (again, the slurpy prefix to the type constraint is just a
+shortcut for a trait)
+
+=item *
+
+C<coerce>
+
+=back
+
 =head3 Type coercion
+
+Coercion can be enabled for a parameter using the C<coerce> constraint.
+
+   use Types::Path::Tiny qw(AbsPath);
+   
+   method print_to_file ( AbsFile $file does coerce ) { ... }
 
 =head2 The Prototype
 
@@ -245,7 +464,7 @@ attributes.
 
 =head2 The Attributes
 
-Attributes are currently parsed but ignored. Due to a limitation in
+Attributes are currently parsed, but ignored. Due to a limitation in
 current versions of L<Parse::Keyword>, there's little we can do with
 them.
 
