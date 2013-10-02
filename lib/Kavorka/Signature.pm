@@ -159,11 +159,23 @@ sub injections
 	my (@req_positional, @opt_positional, @req_named, @opt_named);
 	push @{ $_->optional ? \@opt_positional : \@req_positional }, $_ for @positional;
 	push @{ $_->optional ? \@opt_named : \@req_named }, $_ for @named;
-	my @allowed_names = map +($_=>1), map @{$_->named_names}, @named;
-	
+
+	unless (@named or $self->yadayada or @slurpy)
+	{
+		my $min = scalar(@req_positional);
+		my $max = scalar(@req_positional) + scalar(@opt_positional);
+		my $invs = grep $_->invocant, @req_positional;
+		
+		$str .= $min==$max
+			? sprintf('Carp::croak("Expected %d parameters") unless @_ == %d;', $min - $invs, $min)
+			: sprintf('Carp::croak("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min - $invs, $max - $invs, $min, $max);
+	}
+
 	$str .= join qq[], map($_->injection($self), @positional), q[];
+	
 	if (@named)
 	{
+		my @allowed_names = map +($_=>1), map @{$_->named_names}, @named;
 		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $self->last_position).qq[];
 		unless (@slurpy or $self->yadayada)
 		{
@@ -171,14 +183,7 @@ sub injections
 			$str .= '$OK{$_}||Carp::croak("Unknown named parameter: $_") for sort keys %_ };';
 		}
 	}
-	elsif (not ($self->yadayada || @slurpy))
-	{
-		my $min = scalar(@req_positional);
-		my $max = scalar(@req_positional) + scalar(@opt_positional);
-		$str .= $min==$max
-			? sprintf('Carp::croak("Expected %d parameters") unless @_ == %d;', $min, $min)
-			: sprintf('Carp::croak("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min, $max, $min, $max);
-	}
+	
 	$str .= join qq[], map($_->injection($self), @named), q[];
 	
 	if (@slurpy > 1)
