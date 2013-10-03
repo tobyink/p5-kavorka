@@ -87,7 +87,7 @@ like(
 #line 88
 like(
 	exception { $baz->(1) },
-	qr{\APositional parameter 1 is required},
+	qr{\AExpected 2 parameters},
 	'anon function with positional parameters throws exception if passed too few arguments',
 );
 

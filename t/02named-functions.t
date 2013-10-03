@@ -87,7 +87,7 @@ like(
 #line 88
 like(
 	exception { Example2::baz(1) },
-	qr{\APositional parameter 1 is required at \S+ line 89},
+	qr{\AExpected 2 parameters at \S+ line 89},
 	'named function with positional parameters throws exception if passed too few arguments',
 );
 
