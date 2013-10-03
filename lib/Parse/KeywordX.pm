@@ -2,11 +2,16 @@ use 5.014;
 use strict;
 use warnings;
 
+use Exporter::Tiny ();
+
 package Parse::KeywordX;
 
-use Exporter 'import';
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.000_01';
+
 use Parse::Keyword {};
 
+our @ISA    = qw( Exporter::Tiny );
 our @EXPORT = qw( parse_name parse_stuff_with_values );
 
 #### From p5-mop-redux
