@@ -307,7 +307,7 @@ sub injection
 		$val,
 	);
 	
-	my $type = 
+	my $type =
 		($slurpy_style eq '@') ? sprintf('for (%s) { %s }', $var, $self->_inject_type_check('$_')) :
 		($slurpy_style eq '%') ? sprintf('for (values %s) { %s }', $var, $self->_inject_type_check('$_')) :
 		($condition eq '1')    ? sprintf('%s;', $self->_inject_type_check($var)) :
