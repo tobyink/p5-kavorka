@@ -95,6 +95,8 @@ __END__
 
 =encoding utf-8
 
+=for stopwords invocant invocants lexicals unintuitive
+
 =head1 NAME
 
 Kavorka - function signatures with the lure of the animal
@@ -116,7 +118,7 @@ Kavorka - function signatures with the lure of the animal
 =head1 STATUS
 
 Kavorka is still at a very early stage of development; there are likely
-to be many bugs that still need to be shaked out. Certain syntax
+to be many bugs that still need to be shaken out. Certain syntax
 features are a little odd and may need to be changed in incompatible
 ways.
 
