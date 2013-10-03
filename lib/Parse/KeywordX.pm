@@ -12,7 +12,7 @@ our $VERSION   = '0.000_01';
 use Parse::Keyword {};
 
 our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( parse_name parse_stuff_with_values );
+our @EXPORT = qw( parse_name );
 
 #### From p5-mop-redux
 sub read_tokenish ()
