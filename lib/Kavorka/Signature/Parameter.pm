@@ -346,7 +346,7 @@ sub _inject_type_check
 				$var,
 			);
 		}
-	}		
+	}
 	
 	if ($type->can_be_inlined)
 	{
