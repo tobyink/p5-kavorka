@@ -326,6 +326,11 @@ sub _inject_type_check
 	my $check = '';
 	return $check unless my $type = $self->type;
 	
+	my $can_xs =
+		$INC{'Mouse/Util.pm'}
+		&& Mouse::Util::MOUSE_XS()
+		&& ($type->{_is_core} or $type->is_parameterized && $type->parent->{_is_core});
+	
 	if ($self->coerce and $type->has_coercion)
 	{
 		if ($type->coercion->can_be_inlined)
@@ -339,7 +344,7 @@ sub _inject_type_check
 		else
 		{
 			$check .= sprintf(
-				'%s = %s::PARAMS[%d]->type->coerce(%s);',
+				'%s = $%s::PARAMS[%d]->type->coerce(%s);',
 				$var,
 				__PACKAGE__,
 				$self->ID,
@@ -348,7 +353,7 @@ sub _inject_type_check
 		}
 	}
 	
-	if ($type->can_be_inlined)
+	if (!$can_xs and $type->can_be_inlined)
 	{
 		$check .= sprintf(
 			'%s;',
@@ -358,7 +363,7 @@ sub _inject_type_check
 	else
 	{
 		$check .= sprintf(
-			'%s::PARAMS[%d]->assert_valid(%s);',
+			'$%s::PARAMS[%d]->type->assert_valid(%s);',
 			__PACKAGE__,
 			$self->ID,
 			$var,
