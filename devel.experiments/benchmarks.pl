@@ -24,7 +24,7 @@ package Using_Kavorka {
 	}
 }
 
-package Using_MS_Moose {
+package Using_MS {
 	use Moose;
 	use Method::Signatures;
 	method foo ( Int $x, ArrayRef[Int] $y ) {
@@ -54,14 +54,27 @@ cmpthese(-3, {
 	map {
 		my $class = "Using_$_";
 		$_ => qq[ $class\->foo(0, [1..10]) ];
-	} qw( FP_Moose FP_TT Kavorka TParams MS_Moose MXMS )
+	} qw( FP_Moose FP_TT Kavorka TParams MS MXMS )
 });
 
 __END__
-            Rate     MXMS MS_Moose FP_Moose    FP_TT  TParams  Kavorka
-MXMS       814/s       --     -91%     -92%     -93%     -95%     -96%
-MS_Moose  9455/s    1061%       --      -8%     -15%     -42%     -48%
-FP_Moose 10320/s    1168%       9%       --      -8%     -36%     -43%
-FP_TT    11164/s    1271%      18%       8%       --     -31%     -38%
-TParams  16171/s    1886%      71%      57%      45%       --     -11%
-Kavorka  18095/s    2122%      91%      75%      62%      12%       --
+
+$ perl -Ilib devel.experiments/benchmarks.pl
+
+            Rate     MXMS       MS FP_Moose    FP_TT  TParams  Kavorka
+MXMS       777/s       --     -91%     -92%     -93%     -95%     -96%
+MS        8980/s    1055%       --      -8%     -13%     -43%     -49%
+FP_Moose  9732/s    1152%       8%       --      -6%     -38%     -45%
+FP_TT    10367/s    1233%      15%       7%       --     -34%     -41%
+TParams  15756/s    1927%      75%      62%      52%       --     -10%
+Kavorka  17598/s    2164%      96%      81%      70%      12%       --
+
+$ perl -mAny::Moose -Ilib devel.experiments/benchmarks.pl
+
+            Rate     MXMS FP_Moose  TParams  Kavorka       MS    FP_TT
+MXMS       774/s       --     -92%     -95%     -96%     -98%     -98%
+FP_Moose 10255/s    1224%       --     -35%     -42%     -74%     -77%
+TParams  15663/s    1923%      53%       --     -11%     -61%     -64%
+Kavorka  17657/s    2180%      72%      13%       --     -56%     -60%
+MS       39938/s    5058%     289%     155%     126%       --      -9%
+FP_TT    43671/s    5540%     326%     179%     147%       9%       --
