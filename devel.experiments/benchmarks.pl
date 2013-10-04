@@ -71,10 +71,10 @@ Kavorka  17598/s    2164%      96%      81%      70%      12%       --
 
 $ perl -mAny::Moose -Ilib devel.experiments/benchmarks.pl
 
-            Rate     MXMS FP_Moose  TParams  Kavorka       MS    FP_TT
-MXMS       774/s       --     -92%     -95%     -96%     -98%     -98%
-FP_Moose 10255/s    1224%       --     -35%     -42%     -74%     -77%
-TParams  15663/s    1923%      53%       --     -11%     -61%     -64%
-Kavorka  17657/s    2180%      72%      13%       --     -56%     -60%
-MS       39938/s    5058%     289%     155%     126%       --      -9%
-FP_TT    43671/s    5540%     326%     179%     147%       9%       --
+            Rate     MXMS FP_Moose  TParams  Kavorka    FP_TT       MS
+MXMS       798/s       --     -92%     -95%     -98%     -98%     -98%
+FP_Moose 10083/s    1163%       --     -37%     -73%     -74%     -75%
+TParams  15937/s    1897%      58%       --     -58%     -59%     -60%
+Kavorka  37716/s    4626%     274%     137%       --      -3%      -5%
+FP_TT    38862/s    4770%     285%     144%       3%       --      -2%
+MS       39656/s    4869%     293%     149%       5%       2%       --
