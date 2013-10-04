@@ -4,3 +4,11 @@
 	issued  2013-10-03;
 	label   "Preview release".
 
+`Kavorka 0.000_02 cpan:TOBYINK`
+	issued  2013-10-04;
+	changeset [
+		item "Fix syntax error compiling functions using non-inlinable type constraints in the signature."^^Bugfix;
+		item "Fix error finding the position to start slurping from in signatures that have a slurpy after zero positional parameters."^^Bugfix;
+		item "Add some rudimentary tests for type constraints."^^Tests;
+		item "Include benchmarking script as an example."^^Documentation;
+	].

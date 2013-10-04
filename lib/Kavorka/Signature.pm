@@ -7,7 +7,7 @@ use Kavorka::Signature::Parameter ();
 package Kavorka::Signature;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_01';
+our $VERSION   = '0.000_02';
 
 use Parse::Keyword {};
 use Parse::KeywordX;
