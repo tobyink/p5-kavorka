@@ -62,8 +62,13 @@ sub _exporter_expand_sub
 			$name; # close over name to prevent optimization
 			my $subroutine = shift;
 			$INFO{ $subroutine->body } = $subroutine;
-			my @r = wantarray ? $subroutine->install_sub : scalar($subroutine->install_sub);
-			Scalar::Util::weaken($subroutine->{body}) unless Scalar::Util::isweak($subroutine->{body});
+			
+			my @r = wantarray
+				? $subroutine->install_sub
+				: scalar($subroutine->install_sub);
+			
+			Scalar::Util::weaken($subroutine->{body})
+				unless Scalar::Util::isweak($subroutine->{body});
 			
 			my $closed_over = PadWalker::closed_over($subroutine->{body});
 			my $caller_vars = PadWalker::peek_my(1);

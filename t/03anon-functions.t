@@ -132,8 +132,10 @@ is_deeply(
 );
 
 my @functions;
+my @subs;
 for my $i (0..2) {
 	push @functions, fun ($x) { $i };
+	push @subs,      sub      { $i };
 }
 
 {
@@ -141,7 +143,7 @@ for my $i (0..2) {
 	
 	is_deeply(
 		[ $functions[0]->(7), $functions[1]->(7), $functions[2]->(7) ],
-		[ 0 .. 2 ],
+		[ $subs[0]->(7),      $subs[1]->(7),      $subs[2]->(7) ],
 		'closures work for anonymous functions',
 	);
 }
