@@ -140,6 +140,7 @@ sub _build_last_position
 {
 	my $self = shift;
 	my ($last) = grep !$_->named && !$_->slurpy, reverse @{$self->params};
+	return -1 unless $last;
 	return $last->position;
 }
 
