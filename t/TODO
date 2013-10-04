@@ -6,8 +6,6 @@ Method modifiers in Mouse
 Method modifiers in Role::Tiny
 Renaming the invocant - $self, $class, $_ and ${^SELF}
 Anonymous modifiers ought to throw an exception
-Type constraints
-Type constraints for slurpy parameters
 Positional arguments
 Optional positional arguments - via explicit '?', or implicitly optional
 Named arguments
@@ -17,7 +15,8 @@ Slurpy arrays
 Slurpy hashes
 Slurpy arrayrefs
 Slurpy hashrefs
-Type constraints, including for slurpies
 Multiple invocants
 Traits
 Introspection API
+Coercions (incl non-inlinable)
+Non-inlinable type constraints
