@@ -31,7 +31,7 @@ my $DETECT_OO = do {
 package Kavorka::MethodModifier;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_02';
+our $VERSION   = '0.000_03';
 
 use Moo::Role;
 with 'Kavorka::Sub';

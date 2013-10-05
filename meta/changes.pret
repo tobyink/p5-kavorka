@@ -12,3 +12,11 @@
 		item "Add some rudimentary tests for type constraints."^^Tests;
 		item "Include benchmarking script as an example."^^Documentation;
 	].
+
+`Kavorka 0.000_03 cpan:TOBYINK`
+	issued  2013-10-05;
+	changeset [
+		item "The `default` attribute of Kavorka::Signature::Parameter is now a coderef rather than a string."^^Change;
+		item "Add tests for the `method` keyword."^^Tests;
+		item "Add tests for positional parameters."^^Tests;
+	].
