@@ -127,20 +127,16 @@ itself.
 
 Running C<< perl -mAny::Moose -Ilib examples/benchmarks.pl >>:
 
-             Rate     MXMS FP_Moose  TParams  Kavorka    FP_TT       MS
- MXMS       798/s       --     -92%     -95%     -98%     -98%     -98%
- FP_Moose 10083/s    1163%       --     -37%     -73%     -74%     -75%
- TParams  15937/s    1897%      58%       --     -58%     -59%     -60%
- Kavorka  37716/s    4626%     274%     137%       --      -3%      -5%
- FP_TT    38862/s    4770%     285%     144%       3%       --      -2%
- MS       39656/s    4869%     293%     149%       5%       2%       --
+             Rate     MXMS FP_Moose  TParams       MS  Kavorka    FP_TT
+ MXMS       817/s       --     -92%     -95%     -98%     -98%     -98%
+ FP_Moose 10353/s    1168%       --     -36%     -75%     -76%     -77%
+ TParams  16236/s    1888%      57%       --     -61%     -63%     -64%
+ MS       41684/s    5005%     303%     157%       --      -5%      -8%
+ Kavorka  43689/s    5250%     322%     169%       5%       --      -4%
+ FP_TT    45373/s    5457%     338%     179%       9%       4%       --
 
-Kavorka is not as fast as the L<Function::Parameters> + L<Type::Tiny>
-combination, and L<Method::Signatures> comes out at the front of the
-pack.
-
-But Kavorka still performs well, and clearly benefits from the XSUB
-boost.
+Kavorka, L<Function::Parameters>+L<Type::Tiny>, and L<Method::Signatures>
+perform at comparable speed, clearly benefiting from the XSUB boost.
 
 =head1 AUTHOR
 

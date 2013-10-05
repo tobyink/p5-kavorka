@@ -254,7 +254,7 @@ sub injection
 		my $defaultish =
 			length($default) ? $default :
 			$self->optional  ? 'undef'  :
-			sprintf('Carp::croak(sprintf("Named parameter `%%s` is required", %s))', B::perlstring $self->named_names->[0]);
+			sprintf('Carp::croak(sprintf q/Named parameter `%%s` is required/, %s)', B::perlstring $self->named_names->[0]);
 		
 		no warnings 'uninitialized';
 		my $when = +{
@@ -285,7 +285,7 @@ sub injection
 		my $defaultish =
 			length($default) ? $default :
 			$self->optional  ? 'undef'  :
-			sprintf('Carp::croak("Positional parameter %d is required")', $pos);
+			sprintf('Carp::croak(q/Positional parameter %d is required/)', $pos);
 		
 		no warnings 'uninitialized';
 		my $when = +{
@@ -345,7 +345,7 @@ sub _inject_type_check
 		else
 		{
 			$check .= sprintf(
-				'%s = $%s::PARAMS[%d]->type->coerce(%s);',
+				'%s = $%s::PARAMS[%d]->{type}->coerce(%s);',
 				$var,
 				__PACKAGE__,
 				$self->ID,
@@ -364,7 +364,7 @@ sub _inject_type_check
 	else
 	{
 		$check .= sprintf(
-			'$%s::PARAMS[%d]->type->assert_valid(%s);',
+			'$%s::PARAMS[%d]->{type}->assert_valid(%s);',
 			__PACKAGE__,
 			$self->ID,
 			$var,
