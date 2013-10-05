@@ -291,6 +291,9 @@ The function would be called like this:
 
 This feature is shared with Perl 6 signatures.
 
+Long named parameters will be available in C<< %_ >> under their
+"outside" name, not their "inside" name.
+
 =head3 Optional and required parameters
 
 A trailing exclamation mark makes an attribute required. A trailing

@@ -180,7 +180,7 @@ sub injections
 		$str .= sprintf('local %%_ = @_[ %d .. $#_ ];', 1 + $self->last_position).qq[];
 		unless (@slurpy or $self->yadayada)
 		{
-			$str .= sprintf('{ my %%OK = (%s); ', map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
+			$str .= sprintf('{ my %%OK = (%s); ', join q[,], map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
 			$str .= '$OK{$_}||Carp::croak("Unknown named parameter: $_") for sort keys %_ };';
 		}
 	}
