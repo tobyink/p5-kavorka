@@ -21,4 +21,5 @@
 		item "Add tests for the `method` keyword."^^Tests;
 		item "Add tests for positional parameters."^^Tests;
 		item "Add tests for named parameters."^^Tests;
+		item "Include my TODO file."^^Documentation;
 	].
