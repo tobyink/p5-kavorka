@@ -2,13 +2,11 @@ Method modifiers - before, around, after, override
 Method modifiers in Moose
 Method modifiers in Mouse
 Method modifiers in Role::Tiny
-Renaming the invocant - $self, $class, $_ and ${^SELF}
 Anonymous modifiers ought to throw an exception
 Slurpy arrays
 Slurpy hashes
 Slurpy arrayrefs
 Slurpy hashrefs
-Multiple invocants
 Traits
 Introspection API
 Coercions (incl non-inlinable)
