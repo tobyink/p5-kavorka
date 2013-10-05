@@ -4,7 +4,6 @@ Method modifiers in Mouse
 Method modifiers in Role::Tiny
 Renaming the invocant - $self, $class, $_ and ${^SELF}
 Anonymous modifiers ought to throw an exception
-Named arguments - optional/required, defaults, long names, %_
 Slurpy arrays
 Slurpy hashes
 Slurpy arrayrefs

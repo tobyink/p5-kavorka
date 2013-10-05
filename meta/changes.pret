@@ -16,7 +16,9 @@
 `Kavorka 0.000_03 cpan:TOBYINK`
 	issued  2013-10-05;
 	changeset [
+		item "Error message for unknown named parameters isn't unintentionally always thrown for all named parameters except the first."^^Bugfix;
 		item "The `default` attribute of Kavorka::Signature::Parameter is now a coderef rather than a string."^^Change;
 		item "Add tests for the `method` keyword."^^Tests;
 		item "Add tests for positional parameters."^^Tests;
+		item "Add tests for named parameters."^^Tests;
 	].
