@@ -200,9 +200,9 @@ sub injection
 	
 	my $var = $self->name;
 	my $dummy = 0;
-	if ($var eq '$')
+	if (length($var) == 1)
 	{
-		$var = '$tmp';
+		$var .= 'tmp';
 		$dummy = 1;
 	}
 	
