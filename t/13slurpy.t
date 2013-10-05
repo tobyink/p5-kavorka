@@ -35,13 +35,13 @@ use Test::Fatal;
 	fun bar ($, %z) {
 		return { '@_' => \@_, '%_' => \%_, '%z' => \%z, };
 	}
-
+	
 	fun baz (:$x, :$y, %z) {
 		return { '@_' => \@_, '%_' => \%_, '$x' => $x, '$y' => $y, '%z' => \%z };
 	}
 	
 	fun quux ($x, %) {
-		return { '@_' => \@_, '%_' => \%_, '$x' => $x, };		
+		return { '@_' => \@_, '%_' => \%_, '$x' => $x, };
 	}
 }
 
@@ -86,7 +86,7 @@ is_deeply(
 	fun bar ($, slurpy HashRef $z) {
 		return { '@_' => \@_, '%_' => \%_, '$z' => $z, };
 	}
-
+	
 	fun baz (:$x, :$y, slurpy HashRef $z) {
 		return { '@_' => \@_, '%_' => \%_, '$x' => $x, '$y' => $y, '$z' => $z };
 	}
