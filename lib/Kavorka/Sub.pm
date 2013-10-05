@@ -55,7 +55,7 @@ sub parse
 	lex_read(1);
 	lex_stuff(sprintf("{ %s", $self->inject_signature));
 	
-	my $code = parse_block(!!$subname);
+	my $code = parse_block(!!$subname) or die "cannot parse block!";
 	&Scalar::Util::set_prototype($code, $self->prototype);
 	if (@$attrs)
 	{

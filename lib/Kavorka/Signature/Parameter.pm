@@ -151,15 +151,16 @@ sub parse
 		$traits{"$2"} = 1;
 		lex_read(length($1));
 		lex_read_space;
-		$peek = lex_peek(1000);
+		$peek = lex_peek(4);
 	}
 	
-	if ($peek =~ m{\A((?://|\|\|)?=)})
+	if ($peek =~ m{ \A ( (?: [/]{2} | [|]{2} )?= ) }x)
 	{
 		$default_when = $1;
 		lex_read(length($1));
 		lex_read_space;
-		$default = 'do'.$deparse->coderef2text(parse_arithexpr);
+		$default = parse_arithexpr;
+		lex_read_space;
 		$traits{_optional} = 1;
 	}
 	
@@ -207,7 +208,7 @@ sub injection
 	
 	my $condition;
 	my $val;
-	my $default = $self->default;
+	my $default = $self->default ? sprintf('$%s::PARAMS[%d]->{default}->()', __PACKAGE__, $self->ID) : '';
 	my $slurpy_style = '';
 	
 	if ($self->slurpy)
@@ -275,7 +276,7 @@ sub injection
 	elsif ($self->invocant)
 	{
 		my $defaultish = sprintf('Carp::croak(q/Invocant %s is required/)', $self->name);
-		$val = sprintf('@_ ? shift(@_) : (%s)', $defaultish);
+		$val = sprintf('@_ ? shift(@_) : %s', $defaultish);
 		$condition = 1;
 	}
 	else
@@ -290,10 +291,10 @@ sub injection
 		my $when = +{
 			'//='   => 'defined($_[%d])',
 			'||='   => '!!($_[%d])',
-			'='     => '$#_ >= %d',
-		}->{ $self->default_when } || '$#_ >= %d';
+			'='     => '($#_ >= %d)',
+		}->{ $self->default_when } || '($#_ >= %d)';
 		
-		$val = sprintf($when.' ? $_[%d] : (%s)', $pos, $pos, $defaultish);
+		$val = sprintf($when.' ? $_[%d] : %s', $pos, $pos, $defaultish);
 		
 		$condition = sprintf($when, $self->position);
 	}
@@ -314,7 +315,7 @@ sub injection
 		sprintf('if (%s) { %s }', $condition, $self->_inject_type_check($var));
 	
 	$type = '' if $type =~ /\{  \}\z/;
-	
+
 	$dummy ? "{ $ass$type }" : "$ass$type";
 }
 
