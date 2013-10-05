@@ -8,7 +8,7 @@ use Types::Standard ();
 package Kavorka::Sub::ObjectMethod;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_03';
+our $VERSION   = '0.000_04';
 
 use Moo;
 extends 'Kavorka::Sub::Method';

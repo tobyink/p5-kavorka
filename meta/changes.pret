@@ -23,3 +23,13 @@
 		item "Add tests for named parameters."^^Tests;
 		item "Include my TODO file."^^Documentation;
 	].
+
+`Kavorka 0.000_04 cpan:TOBYINK`
+	issued  2013-10-06;
+	changeset [
+		item "Allow anonymous slurpy parameters."^^Change;
+		item "Minor speed-ups."^^Change;
+		item "Also populate the %_ hash for functions with a hash(ref) slurpy but zero named parameters."^^Change;
+		item "Add tests for invocants."^^Tests;
+		item "Add tests for slurpy parameters."^^Tests;
+	].

@@ -3,10 +3,6 @@ Method modifiers in Moose
 Method modifiers in Mouse
 Method modifiers in Role::Tiny
 Anonymous modifiers ought to throw an exception
-Slurpy arrays
-Slurpy hashes
-Slurpy arrayrefs
-Slurpy hashrefs
 Traits
 Introspection API
 Coercions (incl non-inlinable)
