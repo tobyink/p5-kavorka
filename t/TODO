@@ -6,4 +6,3 @@ Anonymous modifiers ought to throw an exception
 Traits
 Introspection API
 Coercions (incl non-inlinable)
-Non-inlinable type constraints
