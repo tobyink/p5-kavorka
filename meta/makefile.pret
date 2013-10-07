@@ -18,6 +18,12 @@
 	:runtime-requirement    [ :on "namespace::sweep 0.006"^^:CpanId ];
 	:test-requirement       [ :on "Test::More 0.96"^^:CpanId ];
 	:test-requirement       [ :on "Test::Fatal"^^:CpanId ];
+	:test-requirement       [ :on "Test::Requires"^^:CpanId ];
+	:test-recommendation    [ :on "Moose 2.0000"^^:CpanId ];
+	:test-recommendation    [ :on "Mouse 1.00"^^:CpanId ];
+	:test-recommendation    [ :on "Class::Tiny"^^:CpanId ];
+	:test-recommendation    [ :on "Role::Tiny 1.003000"^^:CpanId ];
+	:test-recommendation    [ :on "Class::Method::Modifiers 2.03"^^:CpanId ];
 	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
 	.
 

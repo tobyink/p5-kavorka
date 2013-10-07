@@ -1,7 +1,3 @@
-Method modifiers - before, around, after, override
-Method modifiers in Moose
-Method modifiers in Mouse
-Method modifiers in Role::Tiny
 Anonymous modifiers ought to throw an exception
 Traits
 Introspection API
