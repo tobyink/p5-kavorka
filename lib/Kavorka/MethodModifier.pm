@@ -12,18 +12,26 @@ my $DETECT_OO = do {
 		
 		return $_detect_oo{$pkg} if exists $_detect_oo{$pkg};
 		
+		if ($pkg->can("meta"))
+		{
+			my $meta = $pkg->meta;
+			
+			return $_detect_oo{$pkg} = "Moo::Role"
+				if 'Role::Tiny'->is_role($pkg)
+				&& ref($meta) eq "Moo::HandleMoose::FakeMetaClass";
+			return $_detect_oo{$pkg} = "Moo"
+				if ref($meta) eq "Moo::HandleMoose::FakeMetaClass";
+			return $_detect_oo{$pkg} = "Mouse"
+				if $meta->isa("Mouse::Meta::Module");
+			return $_detect_oo{$pkg} = "Moose"
+				if $meta->isa("Moose::Meta::Class");
+			return $_detect_oo{$pkg} = "Moose"
+				if $meta->isa("Moose::Meta::Role");
+		}
+		
 		return $_detect_oo{$pkg} = "Role::Tiny"
 			if 'Role::Tiny'->is_role($pkg);
-		return $_detect_oo{$pkg} = ""
-			unless $pkg->can("meta");
-		return $_detect_oo{$pkg} = "Moo"
-			if ref($pkg->meta) eq "Moo::HandleMoose::FakeMetaClass";
-		return $_detect_oo{$pkg} = "Mouse"
-			if $pkg->meta->isa("Mouse::Meta::Module");
-		return $_detect_oo{$pkg} = "Moose"
-			if $pkg->meta->isa("Moose::Meta::Class");
-		return $_detect_oo{$pkg} = "Moose"
-			if $pkg->meta->isa("Moose::Meta::Role");
+		
 		return $_detect_oo{$pkg} = "";
 	}
 };
@@ -76,8 +84,16 @@ sub install_sub
 	
 	if ($OO eq 'Role::Tiny')
 	{
+		require Class::Method::Modifiers;
 		push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
 		return;
+	}
+	
+	if ($OO eq 'Moo::Role')
+	{
+		require Class::Method::Modifiers;
+		push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
+		return $OO->_maybe_reset_handlemoose($package);
 	}
 	
 	if ($OO eq 'Moo')
