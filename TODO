@@ -7,4 +7,5 @@ Implement a 'lambda' keyword for creating coderefs using Keyword::Simple or a le
 Document Kavorka::Sub
 Document Kavorka::Signature
 Document Kavorka::Signature::Parameter
+Document the yadayada
 See also t/TODO
