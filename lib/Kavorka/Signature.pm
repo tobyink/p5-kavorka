@@ -179,7 +179,7 @@ sub injections
 	or @slurpy && $slurpy[0]->name =~ /\A\$/ && $slurpy[0]->type->is_a_type_of(Types::Standard::HashRef()))
 	{
 		my @allowed_names = map +($_=>1), map @{$_->named_names}, @named;
-		$str .= sprintf('local %%_ = do { use warnings FATAL => qw(all); @_[ %d .. $#_ ] };', 1 + $self->last_position).qq[];
+		$str .= sprintf('local %%_; { use warnings FATAL => qw(all); %%_ = @_[ %d .. $#_ ] };', 1 + $self->last_position).qq[];
 		unless (@slurpy or $self->yadayada)
 		{
 			$str .= sprintf('{ my %%OK = (%s); ', join q[,], map sprintf('%s=>1,', B::perlstring $_), @allowed_names);

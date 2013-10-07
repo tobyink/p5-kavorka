@@ -55,7 +55,7 @@ sub parse
 	lex_read(1);
 	lex_stuff(sprintf("{ %s", $self->inject_signature));
 	
-#	warn lex_peek(1000) if $subname eq 'baz_arrayref';;
+#	warn lex_peek(1000) if $subname eq 'bar';;
 	
 	my $code = parse_block(!!$subname) or die "cannot parse block!";
 	&Scalar::Util::set_prototype($code, $self->prototype);
