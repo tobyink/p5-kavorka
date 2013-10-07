@@ -42,3 +42,13 @@
 		item "Fix off-by-one bug failing to populate a slurpy array/arrayref if it would only have one item."^^Bugfix;
 		item "Fix warning assigning odd number of items to %_ which should have been fatal instead."^^Bugfix;
 	].
+
+`Kavorka 0.000_06 cpan:TOBYINK`
+	issued  2013-10-07;
+	changeset [
+		item "Add tests for method modifiers in Moo."^^Tests;
+		item "Add tests for method modifiers in Mouse."^^Tests;
+		item "Add tests for method modifiers in Moose."^^Tests;
+		item "Add tests for method modifiers in Class::Tiny/Role::Tiny."^^Tests;
+		item "Fix installing of method modifiers into Moo::Role roles."^^Bugfix;
+	].
