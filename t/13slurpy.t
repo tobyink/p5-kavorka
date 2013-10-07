@@ -52,6 +52,24 @@ is_deeply(
 );
 
 is_deeply(
+	Example::foo(1),
+	{ '@_' => [1], '$x' => 1, '$y' => undef, '@z' => [] },
+	'function with leading positional parameters and array slurpy - empty slurpy'
+);
+
+is_deeply(
+	Example::foo(1,2),
+	{ '@_' => [1,2], '$x' => 1, '$y' => 2, '@z' => [] },
+	'function with leading positional parameters and array slurpy - empty slurpy'
+);
+
+is_deeply(
+	Example::foo(1..3),
+	{ '@_' => [1..3], '$x' => 1, '$y' => 2, '@z' => [3] },
+	'function with leading positional parameters and array slurpy - only one item in slurpy'
+);
+
+is_deeply(
 	Example::bar(0, 1..4),
 	{ '@_' => [0..4], '%_' => +{1..4}, '%z' => +{1..4} },
 	'function with leading positional parameter and hash slurpy'

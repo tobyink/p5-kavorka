@@ -234,7 +234,7 @@ sub injection
 		{
 			die "Cannot have a slurpy array for a function with named parameters" if $sig->has_named;
 			$val = sprintf(
-				'($#_ > %d) ? @_[ %d .. $#_ ] : (%s)',
+				'($#_ >= %d) ? @_[ %d .. $#_ ] : (%s)',
 				$sig->last_position + 1,
 				$sig->last_position + 1,
 				($default // ''),
