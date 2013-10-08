@@ -549,12 +549,14 @@ The coderef for any sub created by Kavorka can be passed to the
 C<< Kavorka->info >> method. This returns a blessed object that
 does the L<Kavorka::Sub> role.
 
-   fun foo { }
+   fun foo (:$x, :$y) { }
    
    my $info = Kavorka->info(\&foo);
    
    my $function_name = $info->qualified_name;
-   my @named_params  = grep $_->named, @{$info->signature->params};
+   my @named_params  = $info->signature->named_params;
+   
+   say $named_params[0]->named_names->[0];   # says 'x'
 
 See L<Kavorka::Sub>, L<Kavorka::Signature> and
 L<Kavorka::Signature::Parameter> for further details.

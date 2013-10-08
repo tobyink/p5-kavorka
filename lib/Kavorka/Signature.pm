@@ -230,7 +230,6 @@ sub invocants
 
 1;
 
-
 __END__
 
 =pod
@@ -259,8 +258,6 @@ which returns parameters, returns an instance of
 L<Kavorka::Signature::Parameter>.
 
 =over
-
-=item 
 
 =item C<package>
 
