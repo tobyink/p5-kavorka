@@ -4,6 +4,7 @@
 
 `Kavorka`
 	:runtime-requirement    [ :on "perl 5.014"^^:CpanId ];
+	:runtime-requirement    [ :on "Data::Alias"^^:CpanId ];
 	:runtime-requirement    [ :on "Devel::Pragma 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Exporter::Tiny 0.026"^^:CpanId ];
 	:runtime-requirement    [ :on "Module::Runtime 0"^^:CpanId ];
