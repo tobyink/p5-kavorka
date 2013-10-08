@@ -53,7 +53,9 @@ sub parse
 	lex_read_space;
 	lex_peek(1) eq '{' or die "expected block!";
 	lex_read(1);
-	lex_stuff(sprintf("{ %s", $self->inject_signature));
+	
+	lex_stuff(sprintf("{ %s", $self->signature->injection));
+	$self->_set_signature(undef) if $sig->_is_dummy;
 	
 #	warn lex_peek(1000) if $subname eq 'bar';;
 	
@@ -69,8 +71,6 @@ sub parse
 			map($_->[0], @$attrs),
 		);
 	}
-	
-	$self->_set_signature(undef) if $sig->_is_dummy;
 	
 	$self->_set_body($code);
 	$self->forward_declare_sub if !!$subname;
@@ -104,24 +104,18 @@ sub install_sub
 	return $code;
 }
 
-sub inject_attributes
-{
-	my $self = shift;
-	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
-}
-
-sub inject_prototype
-{
-	my $self  = shift;
-	my $proto = $self->prototype;
-	defined($proto) ? "($proto)" : "";
-}
-
-sub inject_signature
-{
-	my $self = shift;
-	$self->signature->injection;
-}
+#sub inject_attributes
+#{
+#	my $self = shift;
+#	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
+#}
+#
+#sub inject_prototype
+#{
+#	my $self  = shift;
+#	my $proto = $self->prototype;
+#	defined($proto) ? "($proto)" : "";
+#}
 
 sub parse_signature
 {
@@ -208,3 +202,148 @@ sub parse_attributes
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive
+
+=head1 NAME
+
+Kavorka::Sub - a function that has been declared
+
+=head1 DESCRIPTION
+
+Kavorka::Sub is a role which represents a function declared using
+L<Kavorka>. Classes implementing this role are used to parse functions,
+and also to inject Perl code into them.
+
+Instances of classes implementing this role are also returned by
+Kavorka's function introspection API.
+
+=head2 Introspection API
+
+A function instance has the following methods.
+
+=over
+
+=item C<keyword>
+
+The keyword (e.g. C<method>) used to declare the function.
+
+=item C<package>
+
+Returns the package name the parameter was declared in. Not necessarily
+the package it will be installed into...
+
+   package Foo;
+   fun UNIVERSAL::quux { ... }  # will be installed into UNIVERSAL
+
+=item C<declared_name>
+
+The declared name of the function (if any).
+
+=item C<qualified_name>
+
+The name the function will be installed as, based on the package and
+declared name.
+
+=item C<signature>
+
+An instance of L<Kavorka::Signature>, or undef.
+
+=item C<prototype>
+
+The function prototype as a string.
+
+=item C<attributes>
+
+The function attributes. The structure returned by this method is
+subject to change.
+
+=item C<body>
+
+The function body as a coderef. Note that this coderef I<will> have had
+the signature code injected into it.
+
+=back
+
+=head2 Other Methods
+
+=over
+
+=item C<parse>, C<parse_attributes>, C<parse_prototype>, C<parse_signature>
+
+Internal methods used to parse a signature. It only makes sense to use
+these within a L<Parse::Keyword> parser.
+
+=item C<signature_class>
+
+A class to use for signatures.
+
+=item C<default_attributes>
+
+Returns a list of attributes to add to the sub when it is parsed.
+It would make sense to override this in classes implementing this role,
+however attributes don't currently work properly anyway.
+
+The implementation defined in this role returns the empty list.
+
+=item C<default_invocant>
+
+Returns a list invocant parameters to add to the signature if no
+invocants are specified in the signature. It makes sense to override
+this for keywords which have implicit invocants, such as C<method>.
+(See L<Kavorka::Sub::Method> for an example.)
+
+The implementation defined in this role returns the empty list.
+
+=item C<forward_declare_sub>
+
+Method called at compile time to forward-declare the sub, if that
+behaviour is desired.
+
+The implementation defined in this role does nothing, but
+L<Kavorka::Sub::Fun> actually does some forward declaration.
+
+=item C<install_sub>
+
+Method called at run time to install the sub into the symbol table.
+
+This makes sense to override if the sub shouldn't be installed in the
+normal Perlish way. For example L<Kavorka::MethodModifier> overrides
+it.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<http://perlcabal.org/syn/S06.html>,
+L<Kavorka>,
+L<Kavorka::Signature::Parameter>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
