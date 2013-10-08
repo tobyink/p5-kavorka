@@ -17,6 +17,7 @@ use Devel::Pragma qw( fqname );
 use Moo::Role;
 use namespace::sweep;
 
+has keyword         => (is => 'ro');
 has signature_class => (is => 'ro', default => sub { 'Kavorka::Signature' });
 has package         => (is => 'ro');
 has declared_name   => (is => 'rwp');
@@ -29,8 +30,7 @@ has qualified_name  => (is => 'rwp');
 sub parse
 {
 	my $class = shift;
-
-	my $self = $class->new(package => compiling_package);
+	my $self  = $class->new(@_, package => compiling_package);
 	
 	lex_read_space;
 	
