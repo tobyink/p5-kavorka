@@ -533,9 +533,11 @@ attributes.
 
 =head2 The Attributes
 
-Attributes are currently parsed, but ignored. Due to a limitation in
-current versions of L<Parse::Keyword>, there's little we can do with
-them.
+Attributes are parsed as per L<perlsub/Subroutine Attributes>.
+
+For anonymous functions, some attributes (e.g. C<:lvalue>) may be
+applied too late to take effect. Attributes should mostly work for
+named functions though.
 
 =head2 The Function Body
 
