@@ -519,3 +519,177 @@ sub _injection_type_check
 
 
 1;
+
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive
+
+=head1 NAME
+
+Kavorka::Signature::Parameter - a single parameter in a function signature
+
+=head1 DESCRIPTION
+
+Kavorka::Signature::Parameter is a class where each instance represents
+a parameter in a function signature. This class is used to help parse
+the function signature, and also to inject Perl code into the final
+function.
+
+Instances of this class are also returned by Kavorka's function
+introspection API.
+
+=head2 Introspection API
+
+A parameter instance has the following methods:
+
+=over
+
+=item C<ID>
+
+An opaque numeric identifier for this parameter.
+
+=item C<package>
+
+Returns the package name the parameter was declared in.
+
+=item C<type>
+
+A L<Type::Tiny> object representing the type constraint for the
+parameter, or undef.
+
+=item C<name>
+
+The name of the variable associated with this parameter, including
+its sigil.
+
+=item C<constraints>
+
+An arrayref of additional constraints upon the value. Currently these
+are given as strings of Perl code, but this is subject to change.
+
+=item C<named>
+
+A boolean indicating whether this is a named parameter.
+
+=item C<named_names>
+
+An arrayref of names for this named parameter.
+
+=item C<position>
+
+The position for a positional parameter.
+
+=item C<default>
+
+A coderef supplying the default value for this parameter.
+
+=item C<default_when>
+
+The string "=", "//=" or "||=".
+
+=item C<traits>
+
+A hashref, where the keys represent names of parameter traits, and
+the values are booleans.
+
+=item C<sigil>
+
+The sigil of the variable for this parameter.
+
+=item C<global>
+
+Indicates whether the variable for this parameter is a global. The
+only globals supported within function signatures are C<< $_ >> and
+variables named like C<< ${^XXXX} >> for any name "XXXX".
+
+=item C<readonly>, C<ro>
+
+A boolean indicating whether this variable will be read-only.
+
+=item C<rw>
+
+A boolean indicating whether this variable will be read-write.
+
+=item C<locked>
+
+A boolean indicating whether this variable is a locked hash(ref).
+
+=item C<alias>
+
+A boolean indicating whether this variable will be an alias.
+
+=item C<copy>
+
+A boolean indicating whether this variable will be a copy (non-alias).
+
+=item C<slurpy>
+
+A boolean indicating whether this variable is slurpy.
+
+=item C<optional>
+
+A boolean indicating whether this variable is optional.
+
+=item C<invocant>
+
+A boolean indicating whether this variable is an invocant.
+
+=item C<coerce>
+
+A boolean indicating whether this variable should coerce.
+
+=back
+
+=head2 Other Methods
+
+=over
+
+=item C<parse>
+
+An internal method used to parse a parameter. Only makes sense to use
+within a L<Parse::Keyword> parser.
+
+=item C<injection>
+
+The string of Perl code to inject for this parameter.
+
+=item C<sanity_check>
+
+Tests that the parameter is sane. (For example it would not be sane to
+have an invocant that is an optional parameter.)
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<http://perlcabal.org/syn/S06.html>,
+L<Kavorka>,
+L<Kavorka::Signature>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
