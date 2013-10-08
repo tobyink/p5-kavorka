@@ -286,7 +286,7 @@ sub _injection_conditional_type_check
 		($condition eq '1')    ? sprintf('%s;', $self->_injection_type_check($var)) :
 		sprintf('if (%s) { %s }', $condition, $self->_injection_type_check($var));
 	
-	return '' if $type =~ /\{  \}\z/;	
+	return '' if $type =~ /\{  \}\z/;
 	return $type;
 }
 
