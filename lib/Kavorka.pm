@@ -101,7 +101,7 @@ __END__
 
 =encoding utf-8
 
-=for stopwords invocant invocants lexicals unintuitive
+=for stopwords invocant invocants lexicals unintuitive yada
 
 =head1 NAME
 
