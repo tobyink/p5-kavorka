@@ -521,6 +521,28 @@ Coercion can be enabled for a parameter using the C<coerce> constraint.
       $file->spew(@lines);
    }
 
+=head3 The Yada Yada
+
+Normally passing additional parameters to a function declared with a
+signature will throw an exception:
+
+   fun foo ($x) {
+      return $x;
+   }
+   
+   foo(1, 2);    # error - too many arguments
+
+Adding the yada yada operator to the end of the signature allows the
+function to accept extra trailing parameters:
+
+   fun foo ($x, ...) {
+      return $x;
+   }
+   
+   foo(1, 2);    # ok
+
+See also L<http://en.wikipedia.org/wiki/The_Yada_Yada>.
+
 =head2 The Prototype
 
 Like with the L<sub|perlsub> keyword, a prototype may be provided for
@@ -574,6 +596,12 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 L<http://perlcabal.org/syn/S06.html>,
 L<Function::Parameters>,
 L<Method::Signatures>.
+
+L<Kavorka::Sub>,
+L<Kavorka::Signature>,
+L<Kavorka::Signature::Parameter>.
+
+L<http://en.wikipedia.org/wiki/The_Conversion_(Seinfeld)>.
 
 =head1 AUTHOR
 

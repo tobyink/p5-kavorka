@@ -84,4 +84,5 @@
 		item "Tests for lvalue subs."^^Tests;
 		item "Better support for subroutine attributes."^^Change;
 		item "Change parsing technique for named subs."^^Change;
+		item "Document the yadayada operator."^^Documentation;
 	].
