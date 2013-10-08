@@ -64,3 +64,16 @@
 		item "Documented an 'rw' trait which is just a no-op."^^Documentation;
 		item "Long overdue refactoring of the code-generating internals of Kavorka::Signature::Parameter."^^Change;
 	].
+
+`Kavorka 0.000_08 cpan:TOBYINK`
+	issued  2013-10-08;
+	changeset [
+		item "Add tests for introspection API."^^Tests;
+		item "Documented Kavorka::Signature::Parameter."^^Documentation;
+		item "Documented Kavorka::Signature."^^Documentation;
+		item "Documented Kavorka::Sub."^^Documentation;
+		item "Improve 'Introspection API' section of documentation for Kavorka.pm itself."^^Documentation;
+		item "Tidy up the Kavorka::Sub API."^^Change;
+		item "Tidy up and improve the Kavorka::Signature API."^^Change;
+		item "Function objects doing the Kavorka::Sub role now keep track of which keyword they were declared with."^^Change;
+	].
