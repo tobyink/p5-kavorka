@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::Signature::Parameter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_06';
+our $VERSION   = '0.000_07';
 
 use Text::Balanced qw( extract_codeblock extract_bracketed );
 use Parse::Keyword {};

@@ -52,3 +52,15 @@
 		item "Add tests for method modifiers in Class::Tiny/Role::Tiny."^^Tests;
 		item "Fix installing of method modifiers into Moo::Role roles."^^Bugfix;
 	].
+
+`Kavorka 0.000_07 cpan:TOBYINK`
+	issued  2013-10-08;
+	changeset [
+		item "Add tests for various traits."^^Tests;
+		item "Implemented the 'alias' trait."^^Change;
+		item "Implemented the 'ro' trait."^^Change;
+		item "Implemented the 'locked' trait."^^Change;
+		item "Documented traits better."^^Documentation;
+		item "Documented an 'rw' trait which is just a no-op."^^Documentation;
+		item "Long overdue refactoring of the code-generating internals of Kavorka::Signature::Parameter."^^Change;
+	].
