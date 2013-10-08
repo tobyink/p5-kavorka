@@ -3,4 +3,3 @@ Better sanity checking of signatures
 Anonymous modifiers ought to throw an exception
 Implement a 'lambda' keyword for creating coderefs using Keyword::Simple or a lex_stuff technique; then disallow anonymous fun/method/etc??? This might fix closures?
 Document the yadayada
-Write tests for introspection API
