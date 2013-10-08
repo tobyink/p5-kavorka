@@ -66,5 +66,26 @@ is(Example2::foo($y), 4);
 is(Example2::bar($y), 5);
 is($y, 5);
 
+{
+	package Example3;
+	use Kavorka;
+	
+	fun foo (:$z is alias) {
+		++$z;
+	}
+	
+	fun bar (Int :$z is alias) {
+		++$z;
+	}
+}
+
+my $z = 1;
+
+is(Example3::foo(z => $z), 2);
+is(Example3::bar(z => $z), 3);
+is(Example3::foo(z => $z), 4);
+is(Example3::bar(z => $z), 5);
+is($z, 5);
+
 done_testing;
 

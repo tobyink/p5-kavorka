@@ -77,7 +77,7 @@ is_deeply(
 
 like(
 	exception { Example::bar(0, 1..5) },
-	qr{^Odd number of elements in hash assignment},
+	qr{^Odd number of elements},
 	'exception passing odd number of items to slurpy hash',
 );
 
@@ -124,7 +124,7 @@ is_deeply(
 
 like(
 	exception { Example2::bar(0, 1..5) },
-	qr{^Odd number of elements in hash assignment},
+	qr{^Odd number of elements},
 	'exception passing odd number of items to slurpy hashref',
 );
 

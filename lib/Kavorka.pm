@@ -440,7 +440,8 @@ The traits Kavorka understands natively are:
 
 =item *
 
-C<alias> - only likely to work properly with positional parameters.
+C<alias> - makes your lexical variable into an alias for an item within
+the C<< @_ >> array.
 
    fun increment (Int $i) { ++$i }
    
@@ -450,9 +451,11 @@ C<alias> - only likely to work properly with positional parameters.
    increment($count);
    say $count;          # says 3
 
+But please don't use this for parameters with coercions!
+
 =item *
 
-C<coerce> - see below.
+C<coerce> - see L</Type coercion> below.
 
 =item *
 

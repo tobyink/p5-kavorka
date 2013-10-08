@@ -376,15 +376,26 @@ sub _injection_extract_value
 			and $self->type
 			and do { require Types::Standard; $self->type->is_a_type_of(Types::Standard::HashRef()) }))
 		{
-			$val = sprintf(
-				'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp ? %%tmp : (%s) }',
-				$sig->last_position + 1,
-				join(
-					q[,],
-					map B::perlstring($_), map(@{$_->named ? $_->named_names : []}, @{$sig->params}),
-				),
-				($default // ''),
-			);
+			my @names = map(@{$_->named ? $_->named_names : []}, @{$sig->params});
+			if (@names)
+			{
+				die "Cannot has aliased slurpy hash for a function with named parameters" if $self->alias;
+				$val = sprintf(
+					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp ? %%tmp : (%s) }',
+					$sig->last_position + 1,
+					join(q[,], map B::perlstring($_), @names),
+					($default // ''),
+				);
+			}
+			else
+			{
+				$val = sprintf(
+					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; %%tmp ? @_[ %d .. $#_ ] : (%s) }',
+					$sig->last_position + 1,
+					$sig->last_position + 1,
+					($default // ''),
+				);
+			}
 			$condition = 1;
 			$slurpy_style = '%';
 		}
