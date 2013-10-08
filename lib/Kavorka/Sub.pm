@@ -90,7 +90,7 @@ sub parse
 		$self->_set_body($code);
 	}
 
-	$self->forward_declare_sub if !!$subname;	
+	$self->forward_declare_sub if !!$subname;
 	$self->_set_signature(undef) if $sig->_is_dummy;
 	return $self;
 }
