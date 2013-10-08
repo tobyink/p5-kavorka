@@ -39,6 +39,7 @@ sub slurpy    { !!shift->traits->{slurpy} }
 sub optional  { !!shift->traits->{optional} }
 sub invocant  { !!shift->traits->{invocant} }
 sub coerce    { !!shift->traits->{coerce} }
+sub locked    { !!shift->traits->{locked} }
 
 our @PARAMS;
 sub BUILD
@@ -234,7 +235,43 @@ sub _injection_assignment
 	}
 	
 	my $decl = $self->global ? 'local' : 'my';
-	return sprintf('%s %s = %s;', $decl, $var, $val);
+	my $assignment = sprintf('%s %s = %s;', $decl, $var, $val);
+	
+	if ($self->locked)
+	{
+		require Hash::Util;
+		require Types::Standard;
+		
+		state $_FIND_KEYS = sub {
+			return unless $_[0];
+			my ($dict) = grep {
+				$_->is_parameterized
+				and $_->has_parent
+				and $_->parent->strictly_equals(Types::Standard::Dict())
+			} $_[0], $_[0]->parents;
+			return unless $dict;
+			my @keys = sort keys %{ +{ @{ $dict->parameters } } };
+			return unless @keys;
+			\@keys;
+		};
+		
+		my $legal_keys  = $_FIND_KEYS->($self->type);
+		my $quoted_keys = $legal_keys ? join(q[,], q[], map B::perlstring($_), @$legal_keys) : '';
+		my $ref_var     = $self->sigil eq '$' ? $var : "\\$var";
+		
+		$assignment .= "&Hash::Util::unlock_hash($ref_var);";
+		$assignment .= "&Hash::Util::lock_keys($ref_var $quoted_keys);";
+	}
+	
+	if ($self->ro)
+	{
+		$assignment .= sprintf(
+			'&Internals::SvREADONLY(\\%s, 1);',
+			$var,
+		);
+	}
+	
+	return $assignment;
 }
 
 sub _injection_conditional_type_check

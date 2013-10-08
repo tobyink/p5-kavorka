@@ -440,13 +440,13 @@ The traits Kavorka understands natively are:
 
 =item *
 
-C<optional> (yes, the C<?> and C<!> syntax is just a shortcut for a
-trait)
+C<optional> - yes, the C<?> and C<!> syntax is just a shortcut for a
+trait.
 
 =item *
 
-C<slurpy> (again, the slurpy prefix to the type constraint is just a
-shortcut for a trait)
+C<slurpy> - again, the slurpy prefix to the type constraint is just a
+shortcut for a trait.
 
 =item *
 
@@ -454,7 +454,27 @@ C<coerce>
 
 =item *
 
-C<alias> (only likely to work properly with positional parameters)
+C<alias> - only likely to work properly with positional parameters.
+
+=item *
+
+C<ro> - makes the parameter a (shallow) read-only variable.
+
+=item *
+
+C<rw> - this is the default, so is a no-op, but if you have a mixture
+of read-only and read-write variables, it may aid clarity to explicitly
+add C<is rw> to the read-write ones.
+
+=item *
+
+C<locked> - locks hash(ref) keys - see L<Hash::Util>. For references
+this trait has the unfortunate side-effect of leaving the hashref
+locked I<outside> the function too!
+
+This trait has special support for the C<Dict> type constraint from
+L<Types::Standard>, including optional keys in the list of allowed
+keys.
 
 =back
 
