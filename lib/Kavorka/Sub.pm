@@ -54,28 +54,47 @@ sub parse
 	lex_peek(1) eq '{' or die "expected block!";
 	lex_read(1);
 	
-	lex_stuff(sprintf("{ %s", $self->signature->injection));
+	state $i = 0;
+	lex_stuff(
+		sprintf(
+			"sub Kavorka::Temp::f%d %s { %s",
+			++$i,
+			$self->inject_attributes,
+			$self->signature->injection,
+		)
+	);
 	$self->_set_signature(undef) if $sig->_is_dummy;
 	
-#	warn lex_peek(1000) if $subname eq 'bar';;
+	$self->{argh} = "Kavorka::Temp::f$i";
 	
-	my $code = parse_block(!!$subname) or die "cannot parse block!";
-	&Scalar::Util::set_prototype($code, $self->prototype);
-	if (@$attrs)
-	{
-		require attributes;
-		no warnings;
-		attributes->import(
-			compiling_package,
-			$code,
-			map($_->[0], @$attrs),
-		);
-	}
-	
-	$self->_set_body($code);
 	$self->forward_declare_sub if !!$subname;
 	
 	return $self;
+}
+
+sub _post_parse
+{
+	no strict 'refs';
+	my $self = shift;
+	my $code = \&{ delete $self->{argh} };
+
+#	if (@$attrs)
+#	{
+#		require attributes;
+#		no warnings;
+#		attributes->import(
+#			compiling_package,
+#			$code,
+#			map($_->[0], @$attrs),
+#		);
+#	}
+
+	$code = Sub::Name::subname(
+		$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
+		$code,
+	);
+	&Scalar::Util::set_prototype($code, $self->prototype);
+	$self->_set_body($code);
 }
 
 sub default_attributes
@@ -104,12 +123,12 @@ sub install_sub
 	return $code;
 }
 
-#sub inject_attributes
-#{
-#	my $self = shift;
-#	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
-#}
-#
+sub inject_attributes
+{
+	my $self = shift;
+	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
+}
+
 #sub inject_prototype
 #{
 #	my $self  = shift;

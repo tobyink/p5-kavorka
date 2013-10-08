@@ -61,6 +61,7 @@ sub _exporter_expand_sub
 		sub {
 			$name; # close over name to prevent optimization
 			my $subroutine = shift;
+			$subroutine->_post_parse();
 			$INFO{ $subroutine->body } = $subroutine;
 			
 			my @r = wantarray

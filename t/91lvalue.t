@@ -24,11 +24,6 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-BEGIN {
-	plan skip_all => "currently broken"
-		unless $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} || $ENV{EXTENDED_TESTING};
-};
-
 {
 	package Example;
 	use Kavorka;
@@ -41,8 +36,6 @@ $Example::FOO = 42;
 is(Example::foo(), 42);
 
 Example::foo()++;
-
-local $TODO = "lvalue attributes do not work yet";
 
 is(Example::foo(), 43);
 is($Example::FOO, 43);
