@@ -70,8 +70,9 @@ sub parse
 		);
 	}
 	
+	$self->_set_signature(undef) if $sig->_is_dummy;
+	
 	$self->_set_body($code);
-
 	$self->forward_declare_sub if !!$subname;
 	
 	return $self;
@@ -119,7 +120,7 @@ sub inject_prototype
 sub inject_signature
 {
 	my $self = shift;
-	$self->signature->injections;
+	$self->signature->injection;
 }
 
 sub parse_signature
@@ -128,10 +129,11 @@ sub parse_signature
 	lex_read_space;
 	
 	# default signature
-	lex_stuff('(...)') unless lex_peek eq '(';
+	my $dummy = 0;
+	$dummy = 1 && lex_stuff('(...)') if lex_peek ne '(';
 	
 	lex_read(1);
-	my $sig = $self->signature_class->parse(package => $self->package);
+	my $sig = $self->signature_class->parse(package => $self->package, _is_dummy => $dummy);
 	lex_peek eq ')' or die;
 	lex_read(1);
 	lex_read_space;

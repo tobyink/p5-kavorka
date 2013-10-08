@@ -16,6 +16,7 @@ use Moo;
 use namespace::sweep;
 
 has package         => (is => 'ro');
+has _is_dummy       => (is => 'ro');
 has params          => (is => 'ro',  default => sub { +[] });
 has has_invocants   => (is => 'rwp', default => sub { +undef });
 has has_named       => (is => 'rwp', default => sub { +undef });
@@ -139,12 +140,12 @@ sub sanity_check
 sub _build_last_position
 {
 	my $self = shift;
-	my ($last) = grep !$_->named && !$_->slurpy, reverse @{$self->params};
+	my ($last) = reverse( $self->positional_params );
 	return -1 unless $last;
 	return $last->position;
 }
 
-sub injections
+sub injection
 {
 	my $self = shift;
 	my $str;
@@ -202,4 +203,150 @@ sub injections
 	return "$str; ();";
 }
 
+sub named_params
+{
+	my $self = shift;
+	grep $_->named, @{$self->params};
+}
+
+sub positional_params
+{
+	my $self = shift;
+	grep !$_->named && !$_->invocant && !$_->slurpy, @{$self->params};
+}
+
+sub slurpy_param
+{
+	my $self = shift;
+	my ($s) = grep $_->slurpy, @{$self->params};
+	$s;
+}
+
+sub invocants
+{
+	my $self = shift;
+	grep $_->invocant, @{$self->params};
+}
+
 1;
+
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive
+
+=head1 NAME
+
+Kavorka::Signature - a function signature
+
+=head1 DESCRIPTION
+
+Kavorka::Signature is a class where each instance represents a function
+signature. This class is used to parse the function signature, and also
+to inject Perl code into the final function.
+
+Instances of this class are also returned by Kavorka's function
+introspection API.
+
+=head2 Introspection API
+
+A signature instance has the following methods. Each method
+which returns parameters, returns an instance of
+L<Kavorka::Signature::Parameter>.
+
+=over
+
+=item 
+
+=item C<package>
+
+Returns the package name the parameter was declared in.
+
+=item C<params>
+
+Returns an arrayref of parameters.
+
+=item C<has_invocants>, C<invocants>
+
+Returns a boolean/list of invocant parameters.
+
+=item C<positional_params>
+
+Returns a list of positional parameters.
+
+=item C<has_named>, C<named_params>
+
+Returns a boolean/list of named parameters.
+
+=item C<has_slurpy>, C<slurpy>
+
+Returns a boolean indicating whether there is a slurpy parameter
+in this signature / returns the slurpy parameter.
+
+=item C<yadayada>
+
+Indicates whether the yadayada operator was encountered in the
+signature.
+
+=item C<last_position>
+
+The numeric index of the last positional parameter.
+
+=back
+
+=head2 Other Methods
+
+=over
+
+=item C<parse>
+
+An internal method used to parse a signature. Only makes sense to use
+within a L<Parse::Keyword> parser.
+
+=item C<parameter_class>
+
+A class to use for parameters when parsing the signature.
+
+=item C<injection>
+
+The string of Perl code to inject for this signature.
+
+=item C<sanity_check>
+
+Tests that the signature is sane. (For example it would not be sane to
+have a slurpy parameter prior to a positional one.)
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<http://perlcabal.org/syn/S06.html>,
+L<Kavorka>,
+L<Kavorka::Signature::Parameter>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
