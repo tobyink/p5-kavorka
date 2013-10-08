@@ -440,31 +440,19 @@ The traits Kavorka understands natively are:
 
 =item *
 
-C<optional> - yes, the C<?> and C<!> syntax is just a shortcut for a
-trait.
-
-=item *
-
-C<slurpy> - again, the slurpy prefix to the type constraint is just a
-shortcut for a trait.
-
-=item *
-
-C<coerce>
-
-=item *
-
 C<alias> - only likely to work properly with positional parameters.
 
+   fun increment (Int $i) { ++$i }
+   
+   my $count = 0;
+   increment($count);
+   increment($count);
+   increment($count);
+   say $count;          # says 3
+
 =item *
 
-C<ro> - makes the parameter a (shallow) read-only variable.
-
-=item *
-
-C<rw> - this is the default, so is a no-op, but if you have a mixture
-of read-only and read-write variables, it may aid clarity to explicitly
-add C<is rw> to the read-write ones.
+C<coerce> - see below.
 
 =item *
 
@@ -476,6 +464,47 @@ This trait has special support for the C<Dict> type constraint from
 L<Types::Standard>, including optional keys in the list of allowed
 keys.
 
+   fun foo (HashRef $x is locked) {
+      $x->{foo} = 1;
+   }
+   
+   my $var1 = { foo => 42 };
+   foo($var1);
+   say $var1->{foo};           # says 1
+   
+   my $var2 = { bar => 42 };
+   foo($var2);                 # dies
+
+=item *
+
+C<optional> - yes, the C<?> and C<!> syntax is just a shortcut for a
+trait.
+
+   fun foo ($x is optional) { ... }            # These two declarations
+   fun foo ($x?) { ... }                       # are equivalent.
+
+=item *
+
+C<ro> - makes the parameter a (shallow) read-only variable.
+
+   fun foo ($x is ro) { $x++ }
+   
+   foo(42);   # dies
+
+=item *
+
+C<rw> - this is the default, so is a no-op, but if you have a mixture
+of read-only and read-write variables, it may aid clarity to explicitly
+add C<is rw> to the read-write ones.
+
+=item *
+
+C<slurpy> - the slurpy prefix to the type constraint is just a shortcut
+for a trait.
+
+   fun foo ( ArrayRef $bar is slurpy ) { ... } # These two declarations
+   fun foo ( slurpy ArrayRef $bar ) { ... }    # are equivalant
+
 =back
 
 =head3 Type coercion
@@ -484,7 +513,9 @@ Coercion can be enabled for a parameter using the C<coerce> constraint.
 
    use Types::Path::Tiny qw(AbsPath);
    
-   method print_to_file ( AbsFile $file does coerce ) { ... }
+   method print_to_file ( AbsFile $file does coerce, @lines ) {
+      $file->spew(@lines);
+   }
 
 =head2 The Prototype
 
