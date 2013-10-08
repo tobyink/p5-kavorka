@@ -219,6 +219,20 @@ sub _injection_assignment
 	my $self = shift;
 	my ($sig, $var, $val) = @_;
 	
+	if ($self->alias)
+	{
+		if ($self->global)
+		{
+			(my $glob = $var) =~ s/\A./*/;
+			return sprintf('local %s = \\do { %s };', $glob, $val);
+		}
+		else
+		{
+			require Data::Alias;
+			return sprintf('Data::Alias::alias(my %s = do { %s });', $var, $val);
+		}
+	}
+	
 	my $decl = $self->global ? 'local' : 'my';
 	return sprintf('%s %s = %s;', $decl, $var, $val);
 }

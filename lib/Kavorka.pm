@@ -452,6 +452,10 @@ shortcut for a trait)
 
 C<coerce>
 
+=item *
+
+C<alias> (only likely to work properly with positional parameters)
+
 =back
 
 =head3 Type coercion

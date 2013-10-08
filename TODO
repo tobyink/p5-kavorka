@@ -1,4 +1,3 @@
-Trait: 'alias'
 Trait: 'ro'
 Trait: 'locked'
 Support @_ and %_ as slurpies provided they are used correctly
