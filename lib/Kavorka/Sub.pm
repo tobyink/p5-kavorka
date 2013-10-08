@@ -54,47 +54,62 @@ sub parse
 	lex_peek(1) eq '{' or die "expected block!";
 	lex_read(1);
 	
-	state $i = 0;
-	lex_stuff(
-		sprintf(
-			"sub Kavorka::Temp::f%d %s { %s",
-			++$i,
-			$self->inject_attributes,
-			$self->signature->injection,
-		)
-	);
+	if ($subname)
+	{
+		state $i = 0;
+		lex_stuff(
+			sprintf(
+				"sub Kavorka::Temp::f%d %s { %s",
+				++$i,
+				$self->inject_attributes,
+				$self->signature->injection,
+			)
+		);
+		$self->{argh} = "Kavorka::Temp::f$i";
+	}
+	else
+	{
+		lex_stuff(sprintf("{ %s", $self->signature->injection));
+		
+		my $code = parse_block(!!$subname) or die "cannot parse block!";
+		&Scalar::Util::set_prototype($code, $self->prototype);
+		$code = Sub::Name::subname(
+			$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
+			$code,
+		);
+		if (@$attrs)
+		{
+			require attributes;
+			no warnings;
+			attributes->import(
+				$self->package,
+				$code,
+				map($_->[0], @$attrs),
+			);
+		}
+		$self->_set_body($code);
+	}
+
+	$self->forward_declare_sub if !!$subname;	
 	$self->_set_signature(undef) if $sig->_is_dummy;
-	
-	$self->{argh} = "Kavorka::Temp::f$i";
-	
-	$self->forward_declare_sub if !!$subname;
-	
 	return $self;
 }
 
 sub _post_parse
 {
-	no strict 'refs';
 	my $self = shift;
-	my $code = \&{ delete $self->{argh} };
-
-#	if (@$attrs)
-#	{
-#		require attributes;
-#		no warnings;
-#		attributes->import(
-#			compiling_package,
-#			$code,
-#			map($_->[0], @$attrs),
-#		);
-#	}
-
-	$code = Sub::Name::subname(
-		$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
-		$code,
-	);
-	&Scalar::Util::set_prototype($code, $self->prototype);
-	$self->_set_body($code);
+	
+	if ($self->{argh})
+	{
+		no strict 'refs';
+		my $code = \&{ delete $self->{argh} };
+		Sub::Name::subname(
+			$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
+			$code,
+		);
+		&Scalar::Util::set_prototype($code, $self->prototype);
+		$self->_set_body($code);
+	}
 }
 
 sub default_attributes
