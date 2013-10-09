@@ -92,6 +92,18 @@ sub parse
 		lex_read($len);
 		lex_read_space;
 	}
+	elsif ($peek =~ /\A\(/)
+	{
+		lex_read(1);
+		lex_read_space;
+		my $expr = parse_listexpr;
+		lex_read_space;
+		lex_peek eq ')' or die "Expected ')' after type constraint expression";
+		lex_read(1);
+		lex_read_space;
+		$type = $expr->();
+		$type->isa('Type::Tiny') or die "Type constraint expression did not return a blessed type constraint object";
+	}
 	
 	my ($named, $varname, $paramname) = 0;
 	$peek = lex_peek(1000);

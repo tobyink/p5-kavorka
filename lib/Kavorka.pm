@@ -355,6 +355,19 @@ the following are roughly equivalent:
    fun foo ( Str %z ) { my $z = \%z; ... }
    fun foo ( slurpy HashRef[Str] $z ) { ... }
 
+Type constraints may be surrounded with parentheses, in which case,
+instead of parsing them with C<dwim_type>, they'll be evaluated (at
+compile time) as an expression which is expected to return a blessed
+L<Type::Tiny> object:
+
+   use Types::Standard qw( LaxNum StrictNum );
+   
+   fun foo ( ($ENV{AUTOMATED_TESTING} ? StrictNum : LaxNum) $x ) {
+      ...;
+   }
+
+This feature is shared with L<Function::Parameters>.
+
 =head3 Value constraints
 
 Value constraints can be used to further constrain values. Value
