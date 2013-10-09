@@ -101,14 +101,14 @@ MooseX::KavorkaInfo - make Kavorka->info available through Moose meta objects
    package Foo {
       use Moose;
       use MooseX::KavorkaInfo;
-      use Kavorka;
+      use Kavorka qw( -default -modifiers );
       method xxx (Int $x) { return $x ** 3 }
    }
    
    package Foo::Verbose {
       use Moose;
       use MooseX::KavorkaInfo;
-      use Kavorka;
+      use Kavorka qw( -default -modifiers );
       extends "Foo";
       before xxx { warn "Called xxx" }
    }
