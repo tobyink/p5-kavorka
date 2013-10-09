@@ -86,3 +86,11 @@
 		item "Change parsing technique for named subs."^^Change;
 		item "Document the yadayada operator."^^Documentation;
 	].
+
+`Kavorka 0.000_10 cpan:TOBYINK`
+	issued  2013-10-09;
+	changeset [
+		item "Minor documentation improvements."^^Documentation;
+		item "MooseX::KavorkaInfo provides Kavorka->info data through Moose meta objects."^^Addition;
+		item "Allow Function::Parameters-style type constraint expressions."^^Change;
+	].

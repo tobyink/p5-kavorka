@@ -39,7 +39,7 @@ my $DETECT_OO = do {
 package Kavorka::MethodModifier;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_09';
+our $VERSION   = '0.000_10';
 
 use Moo::Role;
 with 'Kavorka::Sub';
