@@ -94,3 +94,13 @@
 		item "MooseX::KavorkaInfo provides Kavorka->info data through Moose meta objects."^^Addition;
 		item "Allow Function::Parameters-style type constraint expressions."^^Change;
 	].
+
+`Kavorka 0.000_11 cpan:TOBYINK`
+	issued  2013-10-09;
+	changeset [
+		item "Fix MooseX::KavorkaInfo SYNOPSIS."^^Documentation;
+		item "Provide an example script using MooseX::KavorkaInfo."^^Documentation;
+		item "Document Kavorka's exports."^^Documentation;
+		item "Throw an exception if people use method modifier keywords to define anonymous functions."^^Change;
+		item "Check that it's possible to define a method called `method`."^^Tests;
+	].
