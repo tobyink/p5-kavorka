@@ -133,5 +133,18 @@ is_deeply(
 	'an empty method body returns nothing',
 );
 
+{
+	package Example4;
+	use Kavorka;
+	use namespace::sweep;
+	method method { 42 }
+}
+
+is_deeply(
+	Example4->method,
+	42,
+	'can define a method called "method"',
+);
+
 done_testing;
 
