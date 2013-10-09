@@ -467,6 +467,8 @@ the C<< @_ >> array.
 
 But please don't use this for parameters with coercions!
 
+This feature is shared with L<Method::Signatures>.
+
 =item *
 
 C<coerce> - see L</Type coercion> below.
@@ -508,6 +510,8 @@ C<ro> - makes the parameter a (shallow) read-only variable.
    
    foo(42);   # dies
 
+This feature is shared with Perl 6 signatures.
+
 =item *
 
 C<rw> - this is the default, so is a no-op, but if you have a mixture
@@ -534,6 +538,8 @@ Coercion can be enabled for a parameter using the C<coerce> constraint.
       $file->spew(@lines);
    }
 
+This feature is shared with L<Method::Signatures>.
+
 =head3 The Yada Yada
 
 Normally passing additional parameters to a function declared with a
@@ -553,6 +559,8 @@ function to accept extra trailing parameters:
    }
    
    foo(1, 2);    # ok
+
+This feature is shared with L<Method::Signatures>.
 
 See also L<http://en.wikipedia.org/wiki/The_Yada_Yada>.
 
