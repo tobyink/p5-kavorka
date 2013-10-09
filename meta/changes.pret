@@ -104,3 +104,7 @@
 		item "Throw an exception if people use method modifier keywords to define anonymous functions."^^Change;
 		item "Check that it's possible to define a method called `method`."^^Tests;
 	].
+
+`Kavorka 0.001 cpan:TOBYINK`
+	issued  2013-10-09;
+	label   "First public release".

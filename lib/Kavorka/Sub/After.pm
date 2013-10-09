@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::Sub::After;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_11';
+our $VERSION   = '0.001';
 
 use Moo;
 with 'Kavorka::MethodModifier';

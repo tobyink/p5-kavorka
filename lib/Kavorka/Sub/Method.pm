@@ -7,7 +7,7 @@ use Kavorka::Signature::Parameter ();
 package Kavorka::Sub::Method;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.000_11';
+our $VERSION   = '0.001';
 
 use Moo;
 with 'Kavorka::Sub';
