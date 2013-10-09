@@ -17,6 +17,7 @@ our $VERSION   = '0.000_10';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );
+our @EXPORT_OK   = qw( fun method after around before classmethod objectmethod );
 our %EXPORT_TAGS = (
 	modifiers => [qw( after around before )],
 );
@@ -606,6 +607,56 @@ does the L<Kavorka::Sub> role.
 
 See L<Kavorka::Sub>, L<Kavorka::Signature> and
 L<Kavorka::Signature::Parameter> for further details.
+
+=head2 Exports
+
+=over
+
+=item C<< -default >>
+
+Exports C<fun> and C<method>.
+
+=item C<< -modifiers >>
+
+Exports C<before>, C<after>, and C<around>.
+
+=item C<< -all >>
+
+Exports C<fun>, C<method>, C<before>, C<after>, C<around>,
+C<classmethod>, and C<objectmethod>.
+
+=back
+
+For example:
+
+   # Everything except objectmethod...
+   use Kavorka qw( -default -modifiers classmethod );
+
+You can rename imported functions (see L<Exporter::Tiny>):
+
+   use Kavorka method => { -as => 'meth' };
+
+You can provide alternative implementations:
+
+   # use My::Sub::Method instead of Kavorka::Sub::Method
+   use Kavorka method => { implementation => 'My::Sub::Method' };
+
+=head1 CAVEATS
+
+As noted above, subroutine attributes don't work for anonymous
+functions.
+
+If importing Kavorka's method modifiers into Moo/Mouse/Moose classes,
+pay attention to load order:
+
+   use Moose;
+   use Kavorka -all;   # ok
+
+If you do it this way, Moose's C<before>, C<after>, and C<around>
+keywords will stomp on top of Kavorka's...
+
+   use Kavorka -all;
+   use Moose;          # STOMP, STOMP, STOMP!  :-(
 
 =head1 BUGS
 
