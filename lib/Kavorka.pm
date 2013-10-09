@@ -608,6 +608,9 @@ does the L<Kavorka::Sub> role.
 See L<Kavorka::Sub>, L<Kavorka::Signature> and
 L<Kavorka::Signature::Parameter> for further details.
 
+If you're using Moose, consider using L<MooseX::KavorkaInfo> to expose
+Kavorka method signatures via the meta object protocol.
+
 =head2 Exports
 
 =over
