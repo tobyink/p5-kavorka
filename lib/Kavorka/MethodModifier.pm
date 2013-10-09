@@ -46,6 +46,8 @@ with 'Kavorka::Sub';
 
 requires 'method_modifier';
 
+sub allow_anonymous { 0 }
+
 sub default_invocant
 {
 	my $self = shift;

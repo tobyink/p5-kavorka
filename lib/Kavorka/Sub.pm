@@ -27,6 +27,8 @@ has attributes      => (is => 'ro', default => sub { +[] });
 has body            => (is => 'rwp');
 has qualified_name  => (is => 'rwp');
 
+sub allow_anonymous { 1 }
+
 sub parse
 {
 	my $class = shift;
@@ -34,7 +36,12 @@ sub parse
 	
 	lex_read_space;
 	
-	my $subname = $self->_set_declared_name( (lex_peek =~ /\w|:/) ? parse_name('subroutine', 1) : undef );
+	my $has_name = (lex_peek(2) =~ /\A(?:\w|::)/);
+	$has_name
+		or $self->allow_anonymous
+		or die "Keyword '${\ $self->keyword }' does not support defining anonymous subs";
+	
+	my $subname = $self->_set_declared_name( $has_name ? parse_name('subroutine', 1) : undef );
 	my $sig     = $self->_set_signature( $self->parse_signature );
 	my $proto   = $self->_set_prototype( $self->parse_prototype );
 	my $attrs   ; push @{$attrs = $self->attributes}, $self->parse_attributes;
@@ -313,6 +320,13 @@ the signature code injected into it.
 
 Internal methods used to parse a signature. It only makes sense to use
 these within a L<Parse::Keyword> parser.
+
+=item C<allow_anonymous>
+
+Returns a boolean indicating whether this keyword allows functions to be
+anonymous.
+
+The implementation defined in this role returns true.
 
 =item C<signature_class>
 
