@@ -108,3 +108,10 @@
 `Kavorka 0.001 cpan:TOBYINK`
 	issued  2013-10-09;
 	label   "First public release".
+
+`Kavorka 0.002 cpan:TOBYINK`
+	issued  2013-10-11;
+	changeset [
+		item "Refactor some of the code generation in Kavorka::Signature."^^Change;
+		item "Kavorka::Signature now provides args_min and args_max methods."^^Addition;
+	].
