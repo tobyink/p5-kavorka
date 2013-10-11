@@ -247,19 +247,19 @@ sub _injection_invocants
 
 sub _injection_positional_params
 {
-	my $self = shift;	
+	my $self = shift;
 	map($_->injection($self), $self->positional_params);
 }
 
 sub _injection_named_params
 {
-	my $self = shift;	
+	my $self = shift;
 	map($_->injection($self), $self->named_params);
 }
 
 sub _injection_slurpy_param
 {
-	my $self = shift;	
+	my $self = shift;
 	map($_->injection($self), grep defined, $self->slurpy_param);
 }
 
