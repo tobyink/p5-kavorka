@@ -114,7 +114,7 @@ is(
 #line 115
 like(
 	exception { main->quux(1) },
-	qr{\APositional parameter 1 is required at \S+ line 116},
+	qr{\AExpected at least 2 parameters at \S+ line 116},
 	'named method with positional parameters and yadayada throws exception if passed too few arguments',
 );
 

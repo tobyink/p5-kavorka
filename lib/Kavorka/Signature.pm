@@ -24,6 +24,8 @@ has has_slurpy      => (is => 'rwp', default => sub { +undef });
 has yadayada        => (is => 'rwp', default => sub { 0 });
 has parameter_class => (is => 'ro',  default => sub { 'Kavorka::Signature::Parameter' });
 has last_position   => (is => 'lazy');
+has args_min        => (is => 'lazy');
+has args_max        => (is => 'lazy');
 
 sub parse
 {
@@ -148,59 +150,117 @@ sub _build_last_position
 sub injection
 {
 	my $self = shift;
-	my $str;
-	
-	my (@positional, @named, @slurpy);
-	for my $p (@{$self->params})
-	{
-		if ($p->slurpy)     { push @slurpy, $p }
-		elsif ($p->named)   { push @named, $p }
-		else                { push @positional, $p }
-	}
-	
-	my (@req_positional, @opt_positional, @req_named, @opt_named);
-	push @{ $_->optional ? \@opt_positional : \@req_positional }, $_ for @positional;
-	push @{ $_->optional ? \@opt_named : \@req_named }, $_ for @named;
+	join q[] => (
+		$self->_injection_invocants,
+		$self->_injection_parameter_count,
+		$self->_injection_positional_params,
+		$self->_injection_hash_underscore,
+		$self->_injection_named_params,
+		$self->_injection_slurpy_param,
+		'();',
+	);
+}
 
-	unless (@named or $self->yadayada or @slurpy)
-	{
-		my $min = scalar(@req_positional);
-		my $max = scalar(@req_positional) + scalar(@opt_positional);
-		my $invs = grep $_->invocant, @req_positional;
-		
-		$str .= $min==$max
-			? sprintf('Carp::croak("Expected %d parameters") unless @_ == %d;', $min - $invs, $min)
-			: sprintf('Carp::croak("Expected between %d and %d parameters") unless @_ >= %d && @_ <= %d;', $min - $invs, $max - $invs, $min, $max);
-	}
-
-	$str .= join qq[], map($_->injection($self), @positional), q[];
+sub _injection_parameter_count
+{
+	my $self = shift;
 	
-	if (@named
-	or @slurpy && $slurpy[0]->name =~ /\A\%/
-	or @slurpy && $slurpy[0]->name =~ /\A\$/ && $slurpy[0]->type->is_a_type_of(Types::Standard::HashRef()))
+	my $min = $self->args_min;
+	my $max = $self->args_max;
+	
+	my @lines;
+	
+	return sprintf(
+		'Carp::croak("Expected %d parameter%s") unless @_ == %d;',
+		$min,
+		$min==1 ? '' : 's',
+		$min,
+	) if defined($min) && defined($max) && $min==$max;
+	
+	push @lines, sprintf(
+		'Carp::croak("Expected at least %d parameter%s") if @_ < %d;',
+		$min,
+		$min==1 ? '' : 's',
+		$min,
+	) if defined $min;
+	
+	push @lines, sprintf(
+		'Carp::croak("Expected at most %d parameter%s") if @_ > %d;',
+		$max,
+		$max==1 ? '' : 's',
+		$max,
+	) if defined $max;
+	
+	return @lines;
+}
+
+sub _build_args_min
+{
+	my $self = shift;
+	0 + scalar grep !$_->optional, $self->positional_params;
+}
+
+sub _build_args_max
+{
+	my $self = shift;
+	return if $self->has_named || $self->has_slurpy || $self->yadayada;
+	0 + scalar $self->positional_params;
+}
+
+sub _injection_hash_underscore
+{
+	my $self = shift;
+	
+	my $slurpy = $self->slurpy_param;
+	
+	if ($self->has_named
+	or $slurpy && $slurpy->name =~ /\A\%/
+	or $slurpy && $slurpy->name =~ /\A\$/ && $slurpy->type->is_a_type_of(Types::Standard::HashRef()))
 	{
 		require Data::Alias;
-		my @allowed_names = map +($_=>1), map @{$_->named_names}, @named;
-		$str .= sprintf('local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = @_[ %d .. $#_ ]) };', 1 + $self->last_position).qq[];
-		unless (@slurpy or $self->yadayada)
+		my $str = sprintf(
+			'local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = @_[ %d .. $#_ ]) };',
+			1 + $self->last_position,
+		);
+		
+		unless ($slurpy or $self->yadayada)
 		{
-			$str .= sprintf('{ my %%OK = (%s); ', join q[,], map sprintf('%s=>1,', B::perlstring $_), @allowed_names);
+			my @allowed_names = map +($_=>1), map @{$_->named_names}, $self->named_params;
+			$str .= sprintf(
+				'{ my %%OK = (%s); ',
+				join(q[,], map(sprintf('%s=>1,', B::perlstring $_), @allowed_names)),
+			);
 			$str .= '$OK{$_}||Carp::croak("Unknown named parameter: $_") for sort keys %_ };';
 		}
+		
+		return $str;
 	}
 	
-	$str .= join qq[], map($_->injection($self), @named), q[];
-	
-	if (@slurpy > 1)
-	{
-		die "Too much slurping!";
-	}
-	elsif (@slurpy)
-	{
-		$str .= $slurpy[0]->injection($self);
-	}
-	
-	return "$str; ();";
+	return;
+}
+
+sub _injection_invocants
+{
+	my $self = shift;
+	map($_->injection($self), $self->invocants);
+}
+
+sub _injection_positional_params
+{
+	my $self = shift;	
+	map($_->injection($self), $self->positional_params);
+}
+
+sub _injection_named_params
+{
+	my $self = shift;	
+	map($_->injection($self), $self->named_params);
+}
+
+sub _injection_slurpy_param
+{
+	my $self = shift;	
+	map($_->injection($self), grep defined, $self->slurpy_param);
 }
 
 sub named_params

@@ -114,7 +114,7 @@ is(
 #line 115
 like(
 	exception { __PACKAGE__->$quux(1) },
-	qr{\APositional parameter 1 is required},
+	qr{\AExpected at least 2 parameters},
 	'anon method with positional parameters and yadayada throws exception if passed too few arguments',
 );
 
