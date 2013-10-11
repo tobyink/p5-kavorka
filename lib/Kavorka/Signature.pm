@@ -353,6 +353,13 @@ signature.
 
 The numeric index of the last positional parameter.
 
+=item C<args_min>, C<args_max>
+
+The minimum/maximum number of arguments expected by the function.
+Invocants are not counted. If there are any named or slurpy arguments,
+of the yada yada operator was used in the signature, then C<args_max>
+will be undef.
+
 =back
 
 =head2 Other Methods
@@ -376,13 +383,6 @@ The string of Perl code to inject for this signature.
 
 Tests that the signature is sane. (For example it would not be sane to
 have a slurpy parameter prior to a positional one.)
-
-=item C<args_min>, C<args_max>
-
-The minimum/maximum number of arguments expected by the function.
-Invocants are not counted. If there are any named or slurpy arguments,
-of the yada yada operator was used in the signature, then C<args_max>
-will be undef.
 
 =back
 
