@@ -6,7 +6,9 @@ package Kavorka::Signature::Parameter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.002';
+our @CARP_NOT  = qw( Kavorka::Signature Kavorka::Sub Kavorka );
 
+use Carp qw( croak );
 use Text::Balanced qw( extract_codeblock extract_bracketed );
 use Parse::Keyword {};
 use Parse::KeywordX;
@@ -98,11 +100,11 @@ sub parse
 		lex_read_space;
 		my $expr = parse_listexpr;
 		lex_read_space;
-		lex_peek eq ')' or die "Expected ')' after type constraint expression";
+		lex_peek eq ')' or croak("Expected ')' after type constraint expression");
 		lex_read(1);
 		lex_read_space;
 		$type = $expr->();
-		$type->isa('Type::Tiny') or die "Type constraint expression did not return a blessed type constraint object";
+		$type->isa('Type::Tiny') or croak("Type constraint expression did not return a blessed type constraint object");
 	}
 	
 	my ($named, $varname, $paramname) = 0;
@@ -200,10 +202,23 @@ sub sanity_check
 {
 	my $self = shift;
 	
-	die if $self->invocant && $self->optional;
-	die if $self->invocant && $self->named;
-	die if $self->invocant && $self->slurpy;
-	die if $self->named && $self->slurpy;
+	my $traits = $self->traits;
+	my $name   = $self->name;
+	
+	if ($self->named)
+	{
+		length($_) || croak("Bad name for parameter $name")
+			for @{ $self->named_names or die };
+		
+		croak("Bad parameter $name") if $self->invocant;
+		croak("Bad parameter $name") if $self->slurpy;
+	}
+	
+	croak("Bad parameter $name") if $self->invocant && $self->optional;
+	croak("Bad parameter $name") if $self->invocant && $self->slurpy;
+	croak("Parameter $name cannot be an alias and coerce") if $traits->{alias} && $traits->{coerce};
+	croak("Parameter $name cannot be an alias and a copy") if $traits->{alias} && $traits->{copy};
+	croak("Parameter $name cannot be rw and ro") if $traits->{ro} && $traits->{rw};
 }
 
 sub injection
@@ -309,11 +324,11 @@ sub _injection_extract_and_coerce_value
 	
 	$self->coerce
 		or return $self->_injection_extract_value(@_);
-
+	
 	my $type = $self->type
-		or die("Cannot coerce without a type constraint");
+		or croak("Parameter ${\ $self->name } cannot coerce without a type constraint");
 	$type->has_coercion
-		or die("Cannot coerce because type constraint has no coercions defined");
+		or croak("Parameter ${\ $self->name } cannot coerce because type constraint has no coercions defined");
 	
 	my ($val, $condition) = $self->_injection_extract_value(@_);
 	
@@ -391,7 +406,8 @@ sub _injection_extract_value
 			my @names = map(@{$_->named ? $_->named_names : []}, @{$sig->params});
 			if (@names)
 			{
-				die "Cannot has aliased slurpy hash for a function with named parameters" if $self->alias;
+				croak("Cannot alias slurpy hash for a function with named parameters")
+					if $self->alias;
 				$val = sprintf(
 					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp ? %%tmp : (%s) }',
 					$sig->last_position + 1,
@@ -413,7 +429,8 @@ sub _injection_extract_value
 		}
 		else
 		{
-			die "Cannot have a slurpy array for a function with named parameters" if $sig->has_named;
+			croak("Cannot have a slurpy array for a function with named parameters")
+				if $sig->has_named;
 			$val = sprintf(
 				'($#_ >= %d) ? @_[ %d .. $#_ ] : (%s)',
 				$sig->last_position + 1,

@@ -82,13 +82,17 @@ sub _exporter_expand_sub
 	);
 	
 	Parse::Keyword::install_keyword_handler(
-		$code => sub {
-			my $subroutine = $implementation->parse(keyword => $name);
-			return (
-				sub { ($subroutine, $args) },
-				!! $subroutine->declared_name,
-			);
-		},
+		$code => Sub::Name::subname(
+			"$me\::parse_$name",
+			sub {
+				local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+				my $subroutine = $implementation->parse(keyword => $name);
+				return (
+					sub { ($subroutine, $args) },
+					!! $subroutine->declared_name,
+				);
+			},
+		),
 	);
 	
 	return ($name => $code);
