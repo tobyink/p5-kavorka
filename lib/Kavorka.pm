@@ -554,7 +554,7 @@ for a trait.
 
 =head3 Type coercion
 
-Coercion can be enabled for a parameter using the C<coerce> constraint.
+Coercion can be enabled for a parameter using the C<coerce> trait.
 
    use Types::Path::Tiny qw(AbsPath);
    
