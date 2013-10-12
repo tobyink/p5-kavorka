@@ -340,6 +340,25 @@ For slurpy references you should specify a type constraint (see
 L</Type Constraints>) so that Kavorka can create the correct type of
 reference.
 
+The variables C<< @_ >> and C<< %_ >> I<< may >> be used as slurpy
+parameters, I<< but only if their use as a parameter does not interfere
+with their usual meaning >>.
+
+   # ok
+   fun foo ( @_ ) {
+      ...;
+   }
+   
+   # disallowed because the @_ array would usually include $x
+   fun bar ( $x, @_ ) {
+      ...;
+   }
+   
+   # ok because the invocant $x would usually be shifted off @_
+   fun baz ( $x: @_ ) {
+      ...;
+   }
+
 =head3 Type constraints
 
 Type constraints may be specified for each parameter in the signature:
