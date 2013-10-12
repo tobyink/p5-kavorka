@@ -115,3 +115,10 @@
 		item "Refactor some of the code generation in Kavorka::Signature."^^Change;
 		item "Kavorka::Signature now provides args_min and args_max methods."^^Addition;
 	].
+
+`Kavorka 0.003 cpan:TOBYINK`
+	issued  2013-10-12;
+	changeset [
+		item "Improve sanity checking for signatures."^^Change;
+		item "Allow @_ and %_ to be used in signatures."^^Change;
+	].
