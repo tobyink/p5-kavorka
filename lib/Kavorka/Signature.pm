@@ -109,6 +109,8 @@ sub sanity_check
 	$self->_set_has_named($has_named);
 	$self->_set_has_slurpy($has_slurpy);
 	
+	croak("Cannot have more than one slurpy parameter") if $has_slurpy > 1;
+	
 	my $i    = 0;
 	my $zone = 'invocant';
 	my %already;
@@ -126,6 +128,12 @@ sub sanity_check
 		my $name = $p->name;
 		croak("Parameter $name occurs twice in signature")
 			if length($name) > 1 && $already{$name}++;
+		
+		if ($name eq '@_')
+		{
+			croak("Cannot have slurpy named \@_ after positional parameters") if $self->positional_params;
+			croak("Cannot have slurpy named \@_ after named parameters")      if $self->named_params;
+		}
 		
 		next if $p_type eq $zone;
 		

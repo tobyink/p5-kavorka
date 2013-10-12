@@ -1,2 +1,0 @@
-Support @_ and %_ as slurpies provided they are used correctly
-Implement a 'lambda' keyword for creating coderefs using Keyword::Simple or a lex_stuff technique; then disallow anonymous fun/method/etc??? This might fix closures?

@@ -408,10 +408,15 @@ sub _injection_extract_value
 			{
 				croak("Cannot alias slurpy hash for a function with named parameters")
 					if $self->alias;
-				$val = sprintf(
-					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; delete $tmp{$_} for (%s); %%tmp ? %%tmp : (%s) }',
-					$sig->last_position + 1,
+				
+				my $delete = $_->name eq '%_' ? '' : sprintf(
+					'delete $tmp{$_} for (%s);',
 					join(q[,], map B::perlstring($_), @names),
+				);
+				$val = sprintf(
+					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; %s %%tmp ? %%tmp : (%s) }',
+					$sig->last_position + 1,
+					$delete,
 					($default // ''),
 				);
 			}
