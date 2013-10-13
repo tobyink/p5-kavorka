@@ -63,14 +63,21 @@ use Test::Fatal;
 
 is( Example->foo({}), 'HashRef' );
 is( Example->foo([]), 'ArrayRef' );
-ok( exception { Example->foo(\1) } );
+like(
+	exception { Example->foo(\1) },
+	qr{^Arguments to Example::foo did not match any known signature for multi sub},
+);
 
 is( Example2->foo({}), 'HashRef' );
 is( Example2->foo([]), 'ArrayRef' );
 is( Example2->foo(\1), 'ScalarRef' );
 
 is( Example2::bar(\1), 'bar:ScalarRef' );
-ok( exception{ Example2::bar({}) }, 'bar is a function; should not inherit multis' );
+like(
+	exception{ Example2::bar({}) },
+	qr{^Arguments to Example2::bar did not match any known signature for multi sub},
+	'bar is a function; should not inherit multis',
+);
 
 is( Example2::bar_sr(\1), 'bar:ScalarRef', 'can call function via long name' );
 
