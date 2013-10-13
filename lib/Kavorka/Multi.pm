@@ -94,7 +94,8 @@ my $DISPATCH = sub
 	else
 	{
 		require mro;
-		@candidates = map @{$DISPATCH_TABLE{$_}{$subname} || [] }, @{ $pkg->mro::get_linear_isa };
+		my $invocant = ref($_[0]) || $_[0];
+		@candidates  = map @{$DISPATCH_TABLE{$_}{$subname} || [] }, @{ $invocant->mro::get_linear_isa };
 	}
 	
 	for my $c (@candidates)

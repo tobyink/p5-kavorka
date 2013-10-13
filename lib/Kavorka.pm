@@ -655,13 +655,6 @@ If the C<invocation_style> is "method" (like L<Kavorka::Sub::Method>),
 then if no successful candidate is found in the current class,
 candidates in superclasses are also considered.
 
-(The situation with multiple inheritance is complicated, and may change
-in a future version. If class A multi-inherits from class B and class
-C, and class A does not define a multimethod called "foo", but classes
-B and C each do, then C<< A->foo >> will only dispatch to candidates in
-B. But if A defined one or more candidate methods, candidates in both
-B and C can be dispatched to.)
-
 =head3 Long names
 
 It is possible to define alternative "long names" for the candidates
