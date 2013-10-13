@@ -634,7 +634,8 @@ current package are considered.
 
 This feature is shared with Perl 6 signatures, though Kavorka does
 not support some of Perl 6's more advanced features such as multi
-method prototypes. Kavorka includes both type constraints and value
+method prototypes. (Though method modifiers should more or less work
+with multi methods!) Kavorka includes both type constraints and value
 constraints in the dispatch decision, while Perl 6 only uses type
 constraints.
 
