@@ -122,3 +122,10 @@
 		item "Improve sanity checking for signatures."^^Change;
 		item "Allow @_ and %_ to be used in signatures."^^Change;
 	].
+
+`Kavorka 0.004 cpan:TOBYINK`
+	issued  2013-10-13;
+	changeset [
+		item "Correct minor typo."^^Documentation;
+		item "Implement multi subs and multi methods."^^Addition;
+	].
