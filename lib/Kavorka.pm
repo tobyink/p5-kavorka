@@ -31,6 +31,7 @@ our %IMPLEMENTATION = (
 	func         => 'Kavorka::Sub::Fun',
 	function     => 'Kavorka::Sub::Fun',
 	method       => 'Kavorka::Sub::Method',
+	multi        => 'Kavorka::Multi',
 	objectmethod => 'Kavorka::Sub::ObjectMethod',
 );
 
@@ -55,6 +56,8 @@ sub _exporter_expand_sub
 	
 	Module::Runtime::use_package_optimistically($implementation)->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
+	
+	$^H{$me} .= "$name=$implementation ";
 	
 	no warnings 'void';
 	my $code = Sub::Name::subname(

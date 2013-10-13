@@ -29,6 +29,8 @@ has qualified_name  => (is => 'rwp');
 
 sub allow_anonymous { 1 }
 
+sub invocation_style { +undef }
+
 sub parse
 {
 	my $class = shift;
@@ -364,6 +366,12 @@ Method called at run time to install the sub into the symbol table.
 This makes sense to override if the sub shouldn't be installed in the
 normal Perlish way. For example L<Kavorka::MethodModifier> overrides
 it.
+
+=item C<invocation_style>
+
+Returns a string "fun" or "method" depending on whether subs are
+expected to be invoked as functions or methods. May return undef if
+neither is really the case (e.g. as with method modifiers).
 
 =back
 

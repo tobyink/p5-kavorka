@@ -28,6 +28,7 @@ has parameter_class => (is => 'ro',  default => sub { 'Kavorka::Signature::Param
 has last_position   => (is => 'lazy');
 has args_min        => (is => 'lazy');
 has args_max        => (is => 'lazy');
+has checker         => (is => 'lazy');
 
 sub parse
 {
@@ -306,6 +307,21 @@ sub invocants
 	grep $_->invocant, @{$self->params};
 }
 
+sub check
+{
+	my $checker = shift->checker;
+	goto $checker;
+}
+
+sub _build_checker
+{
+	my $self = shift;
+	eval sprintf(
+		'sub { eval { %s; 1 } }',
+		$self->injection,
+	);
+}
+
 1;
 
 __END__
@@ -377,6 +393,15 @@ The minimum/maximum number of arguments expected by the function.
 Invocants are not counted. If there are any named or slurpy arguments,
 of the yada yada operator was used in the signature, then C<args_max>
 will be undef.
+
+=item C<< check(@args) >>
+
+Check whether C<< @args >> (which should include any invocants) would
+satisfy the signature.
+
+=item C<< checker >>
+
+Returns a coderef which acts like C<< check(@args) >>.
 
 =back
 

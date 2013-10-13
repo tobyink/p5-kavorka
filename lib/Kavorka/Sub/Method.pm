@@ -12,6 +12,8 @@ our $VERSION   = '0.003';
 use Moo;
 with 'Kavorka::Sub';
 
+sub invocation_style { 'method' }
+
 sub default_attributes
 {
 	return (

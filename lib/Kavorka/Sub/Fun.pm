@@ -10,6 +10,8 @@ our $VERSION   = '0.003';
 use Moo;
 with 'Kavorka::Sub';
 
+sub invocation_style { 'fun' }
+
 sub forward_declare
 {
 	my $self = shift;
