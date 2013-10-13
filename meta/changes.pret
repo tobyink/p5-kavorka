@@ -129,3 +129,12 @@
 		item "Correct minor typo."^^Documentation;
 		item "Implement multi subs and multi methods."^^Addition;
 	].
+
+`Kavorka 0.005 cpan:TOBYINK`
+	issued  2013-10-13;
+	changeset [
+		item "Fix error parsing `where` clauses."^^Bugfix;
+		item "$parameter->constraints is now an arrayref of coderefs rather than an arrayref of strings of Perl code."^^Change;
+		item "Changed error message resulting from failed value constraint."^^Change;
+		item "Included fibonnacci.pl example of using multi subs."^^Documentation;
+	].
