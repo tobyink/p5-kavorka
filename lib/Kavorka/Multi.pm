@@ -7,6 +7,7 @@ package Kavorka::Multi;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.003';
 
+use Devel::Pragma qw( fqname );
 use Parse::Keyword {};
 use Parse::KeywordX;
 
@@ -14,7 +15,9 @@ use Moo;
 with 'Kavorka::Sub';
 use namespace::sweep;
 
-has multi_type => (is => 'ro', required => 1);
+has multi_type          => (is => 'ro', required => 1);
+has declared_long_name  => (is => 'rwp');
+has qualified_long_name => (is => 'rwp');
 
 around parse => sub
 {
@@ -37,21 +40,42 @@ around parse => sub
 	return $class->$next(@_, multi_type => $type);
 };
 
+around parse_attributes => sub
+{
+	my $next = shift;
+	my $self = shift;
+	my @attr = $self->$next(@_);
+	my @return;
+	$_->[0] eq 'long'
+		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar fqname $_->[1]))
+		: push(@return, $_)
+		for @attr;
+	return @return;
+};
+
 sub allow_anonymous { 0 }
 
 sub default_attributes
 {
-	shift->multi_type->default_attributes;
+	my $code = $_[0]->multi_type->can('default_attributes');
+	goto $code;
 }
 
 sub default_invocant
 {
-	shift->multi_type->default_invocant;
+	my $code = $_[0]->multi_type->can('default_invocant');
+	goto $code;
+}
+
+sub forward_declare
+{
+	my $code = $_[0]->multi_type->can('forward_declare');
+	goto $code;
 }
 
 sub invocation_style
 {
-	shift->multi_type->invocation_style
+	$_[0]->multi_type->invocation_style
 		or Carp::croak("No invocation style defined");
 }
 
@@ -105,6 +129,13 @@ sub install_sub
 	
 	$DISPATCH_STYLE{$pkg}{$subname} eq $self->invocation_style
 		or Carp::croak("Two different invocation styles used for $subname");
+	
+	my $long = $self->qualified_long_name;
+	if (defined $long)
+	{
+		no strict 'refs';
+		*$long = $self->body;
+	}
 	
 	push @{ $DISPATCH_TABLE{$pkg}{$subname} }, $self;
 }

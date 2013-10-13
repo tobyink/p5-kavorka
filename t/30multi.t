@@ -55,7 +55,7 @@ use Test::Fatal;
 		return 'ScalarRef';
 	}
 	
-	multi fun bar (ScalarRef $z)
+	multi fun bar (ScalarRef $z) :long(bar_sr)
 	{
 		return 'bar:ScalarRef';
 	}
@@ -71,5 +71,7 @@ is( Example2->foo(\1), 'ScalarRef' );
 
 is( Example2::bar(\1), 'bar:ScalarRef' );
 ok( exception{ Example2::bar({}) }, 'bar is a function; should not inherit multis' );
+
+is( Example2::bar_sr(\1), 'bar:ScalarRef', 'can call function via long name' );
 
 done_testing;
