@@ -158,9 +158,10 @@ sub parse
 	
 	while (lex_peek(5) eq 'where')
 	{
-		lex_read(1);
+		lex_read(5);
 		lex_read_space;
-		push @constraints, 'do' . $deparse->coderef2text(parse_block);
+		push @constraints, parse_block;
+		lex_read_space;
 	}
 	
 	$peek = lex_peek(1000);
@@ -537,14 +538,16 @@ sub _injection_type_check
 		);
 	}
 	
-	for my $constraint (@{ $self->constraints })
+	for my $i (0 .. $#{$self->constraints})
 	{
 		$check .= sprintf(
-			'do { local $_ = %s; %s } or Carp::croak(sprintf("%%s failed constraint {%%s}", %s, %s));',
+			'do { local $_ = %s; $%s::PARAMS[%d]->{constraints}[%d]->() } or Carp::croak(sprintf("%%s failed value constraint", %s, %d));',
 			$var,
-			$constraint,
+			__PACKAGE__,
+			$self->ID,
+			$i,
 			B::perlstring($var),
-			B::perlstring($constraint),
+			$i,
 		);
 	}
 	
@@ -603,8 +606,8 @@ its sigil.
 
 =item C<constraints>
 
-An arrayref of additional constraints upon the value. Currently these
-are given as strings of Perl code, but this is subject to change.
+An arrayref of additional constraints upon the value. These are given
+as coderefs.
 
 =item C<named>
 
