@@ -626,12 +626,6 @@ Kavorka supports multi methods and multi subs:
    __PACKAGE__->process( [] );    # here
    __PACKAGE__->process( {} );    # there
 
-When dispatching to a C<multi method>, candidates are checked in
-standard L<mro> order; within each package candidates are checked
-in the order in which they were defined. When dispatching to a
-C<multi fun> inheritance is ignored, and only candidates from the
-current package are considered.
-
 This feature is shared with Perl 6 signatures, though Kavorka does
 not support some of Perl 6's more advanced features such as multi
 method prototypes. (Though method modifiers should more or less work
@@ -644,6 +638,31 @@ type constraints are checked when deciding which multi method candidate
 to dispatch to, and then re-checked once the dispatch has been done.
 However, there are opportunities for future versions of Kavorka to
 optimize some aspects of the multi method implementation.
+
+=head3 Multi methods versus multi subs
+
+The word after C<multi> (i.e. C<method> in the above example) can be
+any Kavorka keyword that has been set up in the current lexical scope,
+provided the implementation class provides a non-undef
+C<invocation_style> method (see L<Kavorka::Sub>).
+
+If the C<invocation_style> is "fun" (like L<Kavorka::Sub::Fun>), then
+the signature of each candidate function in package is checked in the
+order in which they were defined, and the first matching candidate is
+dispatched to.
+
+If the C<invocation_style> is "method" (like L<Kavorka::Sub::Method>),
+then if no successful candidate is found in the current class,
+candidates in superclasses are also considered.
+
+(The situation with multiple inheritance is complicated, and may change
+in a future version. If class A multi-inherits from class B and class
+C, and class A does not define a multimethod called "foo", but classes
+B and C each do, then C<< A->foo >> will only dispatch to candidates in
+B. But if A defined one or more candidate methods, candidates in both
+B and C can be dispatched to.)
+
+=head3 Long names
 
 It is possible to define alternative "long names" for the candidates
 of a multi method or multi sub using the C<:long> attribute:
@@ -660,8 +679,15 @@ of a multi method or multi sub using the C<:long> attribute:
    process_array($b);    # single dispatch
    process_hash($c);     # single dispatch
 
+(Actually, C<< :long >> isn't a real attribute; we just borrow the
+syntax. If you try to use L<attributes>' introspection stuff, you won't
+find it.)
+
 Future versions of Kavorka I<might> skip some type constraint checks
 when a candidate is called directly by its long name.
+
+Prototypes, subroutine attributes, etc declared on the multi subs will
+appear on the "long name" subs, but not the multi sub.
 
 =head2 Introspection API
 
