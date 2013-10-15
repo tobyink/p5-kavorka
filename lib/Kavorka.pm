@@ -300,6 +300,12 @@ The function would be called like this:
 
 This feature is shared with Perl 6 signatures.
 
+A function can have multiple long names:
+
+   fun xxx ( :foo(:bar(:baz($x))) ) { ... }
+
+This unwieldly syntax is borrowed from Perl 6 signatures.
+
 Long named parameters will be available in C<< %_ >> under their
 "outside" name, not their "inside" name.
 
@@ -316,6 +322,12 @@ will be optional.
 
 You can not use named parameters and optional positional parameters in
 the same signature.
+
+For long named parameters, the trailing indicator should appear
+after the close parentheses:
+
+   fun xxx ( :foo($x)! ) { ... }
+   fun xxx ( :foo($x!) ) { ... }   # NO!
 
 =head3 Slurpy parameters
 

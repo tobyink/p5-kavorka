@@ -107,24 +107,34 @@ sub parse
 		$type->isa('Type::Tiny') or croak("Type constraint expression did not return a blessed type constraint object");
 	}
 	
-	my ($named, $varname, $paramname) = 0;
+	my ($named, $parens, $varname, @paramname) = (0, 0);
+	
+	# :foo( ... )
+	if (lex_peek(2) =~ /\A\:\w/)
+	{
+		$named = 2;
+		$traits{_optional} = 1;
+		while (lex_peek(2) =~ /\A\:\w/)
+		{
+			lex_read(1);
+			push @paramname, parse_name('named parameter name', 0);
+			lex_peek eq '('
+				? lex_read(1)
+				: croak("Expected parentheses after named parameter name");
+			$parens++;
+			lex_read_space;
+		}
+	}
+	
 	$peek = lex_peek(1000);
 	
-	# :foo( $foo )
-	if ($peek =~ /\A(\:(\w+)\(\s*($variable_re)\s*\))/)
-	{
-		$named     = 1;
-		$paramname = $2;
-		$varname   = $3;
-		lex_read(length($1));
-		lex_read_space;
-	}
 	# :$foo
-	elsif ($peek =~ /\A(\:($variable_re))/)
+	if ($peek =~ /\A(\:($variable_re))/)
 	{
-		$named     = 1;
-		$paramname = substr($2, 1);
-		$varname   = $2;
+		$named   = 1;
+		$varname = $2;
+		$traits{_optional} = 1;
+		push @paramname, substr($2, 1);
 		lex_read(length($1));
 		lex_read_space;
 	}
@@ -132,12 +142,20 @@ sub parse
 	elsif ($peek =~ /\A($variable_re)/)
 	{
 		$varname   = $1;
-		$traits{_optional} = 0;
+		$traits{_optional} = 0 unless @paramname;
 		lex_read(length($1));
 		lex_read_space;
 	}
 	
 	undef($peek);
+	
+	for (1 .. $parens)
+	{
+		lex_peek(1) eq ')'
+			? lex_read(1)
+			: croak("Expected close parentheses after named parameter name");
+		lex_read_space;
+	}
 	
 	$traits{slurpy} = 1 if defined($varname) && $varname =~ /\A[\@\%]/;
 	
@@ -191,8 +209,8 @@ sub parse
 		type           => $type,
 		name           => $varname,
 		constraints    => \@constraints,
-		named          => $named,
-		named_names    => [ defined($paramname) ? $paramname : () ],
+		named          => !!$named,
+		named_names    => \@paramname,
 		default        => $default,
 		default_when   => $default_when,
 		traits         => \%traits,

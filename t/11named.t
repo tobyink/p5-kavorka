@@ -109,5 +109,32 @@ like(
 	'long named parameter cannot be invoked with its short name',
 );
 
+{
+	package Example2;
+	use Kavorka;
+	
+	fun xxx ( :foo( :bar(:baz($x) )) , ... )
+	{
+		return $x;
+	}
+	
+	fun yyy ( :foo( :bar(:baz(:$x) )) , ... )
+	{
+		return $x;
+	}
+}
+
+is_deeply(
+	[ Example2::xxx(foo => 40), Example2::xxx(bar => 41), Example2::xxx(baz => 42), Example2::xxx(x => 43) ],
+	[ 40 .. 42, undef ],
+	'multi-named parameters'
+);
+
+is_deeply(
+	[ Example2::yyy(foo => 40), Example2::yyy(bar => 41), Example2::yyy(baz => 42), Example2::yyy(x => 43) ],
+	[ 40 .. 42, 43 ],
+	'multi-named parameters'
+);
+
 done_testing;
 
