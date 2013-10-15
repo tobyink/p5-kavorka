@@ -138,3 +138,11 @@
 		item "Changed error message resulting from failed value constraint."^^Change;
 		item "Included fibonnacci.pl example of using multi subs."^^Documentation;
 	].
+
+`Kavorka 0.006 cpan:TOBYINK`
+	issued  2013-10-15;
+	changeset [
+		item "Document interplay between multi subs and multiple inheritance."^^Documentation;
+		item "Use invocant as starting point for searching for multi method candidates."^^Change;
+		item "Test cases for multi subs versus multiple inheritance."^^Tests;
+	].
