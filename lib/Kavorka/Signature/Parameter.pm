@@ -118,10 +118,11 @@ sub parse
 		{
 			lex_read(1);
 			push @paramname, parse_name('named parameter name', 0);
-			lex_peek eq '('
-				? lex_read(1)
-				: croak("Expected parentheses after named parameter name");
-			$parens++;
+			if (lex_peek eq '(')
+			{
+				lex_read(1);
+				$parens++;
+			}
 			lex_read_space;
 		}
 	}

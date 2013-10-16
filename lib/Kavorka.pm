@@ -300,14 +300,19 @@ The function would be called like this:
 
 This feature is shared with Perl 6 signatures.
 
+Long named parameters will be available in C<< %_ >> under their
+"outside" name, not their "inside" name.
+
 A function can have multiple long names:
 
    fun xxx ( :foo(:bar(:baz($x))) ) { ... }
 
 This unwieldly syntax is borrowed from Perl 6 signatures.
 
-Long named parameters will be available in C<< %_ >> under their
-"outside" name, not their "inside" name.
+Kavorka provides an experimental shortcut - you may omit the
+parentheses:
+
+   fun xxx ( :foo :bar :baz $x ) { ... }
 
 =head3 Optional and required parameters
 
