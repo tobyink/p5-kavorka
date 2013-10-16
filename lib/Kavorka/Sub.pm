@@ -38,12 +38,7 @@ sub parse
 	
 	lex_read_space;
 	
-	my $has_name = (lex_peek(2) =~ /\A(?:\w|::)/);
-	$has_name
-		or $self->allow_anonymous
-		or die "Keyword '${\ $self->keyword }' does not support defining anonymous subs";
-	
-	my $subname = $self->_set_declared_name( $has_name ? parse_name('subroutine', 1) : undef );
+	my $subname = $self->_set_declared_name( $self->parse_subname );
 	my $sig     = $self->_set_signature( $self->parse_signature );
 	my $proto   = $self->_set_prototype( $self->parse_prototype );
 	my $attrs   ; push @{$attrs = $self->attributes}, $self->parse_attributes;
@@ -159,6 +154,18 @@ sub inject_attributes
 #	my $proto = $self->prototype;
 #	defined($proto) ? "($proto)" : "";
 #}
+
+sub parse_subname
+{
+	my $self = shift;
+	
+	my $has_name = (lex_peek(2) =~ /\A(?:\w|::)/);
+	$has_name
+		or $self->allow_anonymous
+		or die "Keyword '${\ $self->keyword }' does not support defining anonymous subs";
+	
+	$has_name ? parse_name('subroutine', 1) : undef;
+}
 
 sub parse_signature
 {
@@ -318,10 +325,12 @@ the signature code injected into it.
 
 =over
 
-=item C<parse>, C<parse_attributes>, C<parse_prototype>, C<parse_signature>
+=item C<parse>, C<parse_name>, C<parse_attributes>, C<parse_prototype>,
+C<parse_signature>
 
-Internal methods used to parse a signature. It only makes sense to use
-these within a L<Parse::Keyword> parser.
+Internal methods used to parse a signature. It only makes sense to call
+these from a L<Parse::Keyword> parser, but may make sense to override
+them in classes consuming the Kavorka::Sub role.
 
 =item C<allow_anonymous>
 
