@@ -44,13 +44,18 @@ around parse_attributes => sub
 {
 	my $next = shift;
 	my $self = shift;
-	my @attr = $self->$next(@_);
-	my @return;
+	$self->$next(@_);
+	
+	my @attr = @{$self->attributes};
+	
+	my @filtered;
 	$_->[0] eq 'long'
 		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar fqname $_->[1]))
-		: push(@return, $_)
+		: push(@filtered, $_)
 		for @attr;
-	return @return;
+	@{$self->attributes} = @filtered;
+	
+	();
 };
 
 sub allow_anonymous { 0 }

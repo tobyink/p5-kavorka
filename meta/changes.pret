@@ -152,4 +152,5 @@
 	changeset [
 		item 'Allow named parameters to have multiple "outside" names.'^^Change;
 		item "Make the parentheses surrounding long named parameters optional."^^Change;
+		item "Refactor Kavorka::Sub."^^Change;
 	].

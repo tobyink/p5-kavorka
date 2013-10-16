@@ -23,123 +23,30 @@ has package         => (is => 'ro');
 has declared_name   => (is => 'rwp');
 has signature       => (is => 'rwp');
 has prototype       => (is => 'rwp');
-has attributes      => (is => 'ro', default => sub { +[] });
+has attributes      => (is => 'ro', default => sub { [] });
 has body            => (is => 'rwp');
 has qualified_name  => (is => 'rwp');
 
-sub allow_anonymous { 1 }
-
-sub invocation_style { +undef }
-
-sub parse
-{
-	my $class = shift;
-	my $self  = $class->new(@_, package => compiling_package);
-	
-	lex_read_space;
-	
-	my $subname = $self->_set_declared_name( $self->parse_subname );
-	my $sig     = $self->_set_signature( $self->parse_signature );
-	my $proto   = $self->_set_prototype( $self->parse_prototype );
-	my $attrs   ; push @{$attrs = $self->attributes}, $self->parse_attributes;
-	
-	push @$attrs, $self->default_attributes;
-	unless ($sig->has_invocants)
-	{
-		unshift @{$sig->params}, $self->default_invocant;
-		$sig->_set_has_invocants(1);
-	}
-	if (!!$subname)
-	{
-		$self->_set_qualified_name(scalar fqname($subname));
-	}
-	
-	lex_read_space;
-	lex_peek(1) eq '{' or die "expected block!";
-	lex_read(1);
-	
-	if ($subname)
-	{
-		state $i = 0;
-		lex_stuff(
-			sprintf(
-				"sub Kavorka::Temp::f%d %s { %s",
-				++$i,
-				$self->inject_attributes,
-				$self->signature->injection,
-			)
-		);
-		$self->{argh} = "Kavorka::Temp::f$i";
-	}
-	else
-	{
-		lex_stuff(sprintf("{ %s", $self->signature->injection));
-		
-		my $code = parse_block(!!$subname) or die "cannot parse block!";
-		&Scalar::Util::set_prototype($code, $self->prototype);
-		$code = Sub::Name::subname(
-			$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
-			$code,
-		);
-		if (@$attrs)
-		{
-			require attributes;
-			no warnings;
-			attributes->import(
-				$self->package,
-				$code,
-				map($_->[0], @$attrs),
-			);
-		}
-		$self->_set_body($code);
-	}
-
-	$self->forward_declare_sub if !!$subname;
-	$self->_set_signature(undef) if $sig->_is_dummy;
-	return $self;
-}
-
-sub _post_parse
-{
-	my $self = shift;
-	
-	if ($self->{argh})
-	{
-		no strict 'refs';
-		my $code = \&{ delete $self->{argh} };
-		Sub::Name::subname(
-			$self->declared_name ? $self->qualified_name : join('::', $self->package, '__ANON__'),
-			$code,
-		);
-		&Scalar::Util::set_prototype($code, $self->prototype);
-		$self->_set_body($code);
-	}
-}
-
-sub default_attributes
-{
-	return;
-}
-
-sub default_invocant
-{
-	return;
-}
-
-sub forward_declare_sub
-{
-	return;
-}
+sub allow_anonymous      { 1 }
+sub is_anonymous         { !defined( shift->declared_name ) }
+sub invocation_style     { +undef }
+sub default_attributes   { return; }
+sub default_invocant     { return; }
+sub forward_declare_sub  { return; }
 
 sub install_sub
 {
 	my $self = shift;
-	my $name = $self->qualified_name;
 	my $code = $self->body;
 	
-	no strict 'refs';
-	*{$name} = $code if defined $name;
-	return $code;
+	unless ($self->is_anonymous)
+	{
+		my $name = $self->qualified_name;
+		no strict 'refs';
+		*{$name} = $code;
+	}
+	
+	$code;
 }
 
 sub inject_attributes
@@ -148,12 +55,52 @@ sub inject_attributes
 	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
 }
 
-#sub inject_prototype
-#{
-#	my $self  = shift;
-#	my $proto = $self->prototype;
-#	defined($proto) ? "($proto)" : "";
-#}
+sub inject_prelude
+{
+	my $self = shift;
+	$self->signature->injection;
+}
+
+sub parse
+{
+	my $class = shift;
+	my $self  = $class->new(@_, package => compiling_package);
+	
+	lex_read_space;
+	
+	# sub name
+	$self->parse_subname;
+	unless ($self->is_anonymous)
+	{
+		my $qualified = fqname($self->declared_name);
+		$self->_set_qualified_name($qualified);
+		$self->forward_declare_sub;
+	}
+	
+	# signature
+	$self->parse_signature;
+	my $sig = $self->signature;
+	unless ($sig->has_invocants)
+	{
+		my @defaults = $self->default_invocant;
+		unshift @{$sig->params}, @defaults;
+		$sig->_set_has_invocants(scalar @defaults);
+	}
+	
+	# prototype and attributes
+	$self->parse_prototype;
+	$self->parse_attributes;
+	push @{$self->attributes}, $self->default_attributes;
+	
+	# body
+	$self->parse_body;
+	
+	# clean up
+	$self->_set_signature(undef)
+		if $sig->_is_dummy;
+	
+	$self;
+}
 
 sub parse_subname
 {
@@ -164,7 +111,11 @@ sub parse_subname
 		or $self->allow_anonymous
 		or die "Keyword '${\ $self->keyword }' does not support defining anonymous subs";
 	
-	$has_name ? parse_name('subroutine', 1) : undef;
+	$self->_set_declared_name(
+		$has_name ? parse_name('subroutine', 1) : undef
+	);
+	
+	();
 }
 
 sub parse_signature
@@ -181,7 +132,10 @@ sub parse_signature
 	lex_peek eq ')' or die;
 	lex_read(1);
 	lex_read_space;
-	return $sig;
+	
+	$self->_set_signature($sig);
+	
+	();
 }
 
 sub parse_prototype
@@ -199,10 +153,11 @@ sub parse_prototype
 		my $extracted = extract_bracketed($peek, '()');
 		lex_read(length $extracted);
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
-		return $extracted;
+		
+		$self->_set_prototype($extracted);
 	}
 	
-	undef;
+	();
 }
 
 sub parse_attributes
@@ -219,8 +174,6 @@ sub parse_attributes
 	{
 		return;
 	}
-	
-	my @attrs;
 	
 	my $peek;
 	while ($peek = lex_peek(1000) and $peek =~ /\A([^\W0-9]\w+)/)
@@ -245,10 +198,86 @@ sub parse_attributes
 			lex_read_space;
 		}
 		
-		push @attrs, [ $name => $extracted ];
+		push @{$self->attributes}, [ $name => $extracted ];
 	}
 	
-	@attrs;
+	();
+}
+
+sub parse_body
+{
+	my $self = shift;
+	
+	lex_read_space;
+	lex_peek(1) eq '{' or Carp::croak("expected block!");
+	lex_read(1);
+	
+	if ($self->is_anonymous)
+	{
+		lex_stuff(sprintf("{ %s", $self->inject_prelude));
+		
+		# Parse the actual code
+		my $code = parse_block(0) or Carp::croak("cannot parse block!");
+		
+		# Set up prototype
+		&Scalar::Util::set_prototype($code, $self->prototype);
+		
+		# Fix sub name
+		$code = Sub::Name::subname(join('::', $self->package, '__ANON__'), $code);
+		
+		# Set up attributes - this doesn't much work
+		my $attrs = $self->attributes;
+		if (@$attrs)
+		{
+			require attributes;
+			no warnings;
+			attributes->import(
+				$self->package,
+				$code,
+				map($_->[0], @$attrs),
+			);
+		}
+		
+		# And keep the coderef
+		$self->_set_body($code);
+	}
+	else
+	{
+		# Here instead of parsing the body we'll leave it to plain old
+		# Perl. We'll pick it up later from this name in _post_parse
+		
+		state $i = 0;
+		lex_stuff(
+			sprintf(
+				"sub Kavorka::Temp::f%d %s { %s",
+				++$i,
+				$self->inject_attributes,
+				$self->inject_prelude,
+			)
+		);
+		$self->{argh} = "Kavorka::Temp::f$i";
+	}
+	
+	();
+}
+
+sub _post_parse
+{
+	my $self = shift;
+	
+	if ($self->{argh})
+	{
+		no strict 'refs';
+		my $code = \&{ delete $self->{argh} };
+		Sub::Name::subname(
+			$self->is_anonymous ? join('::', $self->package, '__ANON__') : $self->qualified_name,
+			$code,
+		);
+		&Scalar::Util::set_prototype($code, $self->prototype);
+		$self->_set_body($code);
+	}
+	
+	();
 }
 
 1;
@@ -291,6 +320,10 @@ the package it will be installed into...
 
    package Foo;
    fun UNIVERSAL::quux { ... }  # will be installed into UNIVERSAL
+
+=item C<is_anonymous>
+
+Returns a boolean indicating whether this is an anonymous coderef.
 
 =item C<declared_name>
 
@@ -381,6 +414,16 @@ it.
 Returns a string "fun" or "method" depending on whether subs are
 expected to be invoked as functions or methods. May return undef if
 neither is really the case (e.g. as with method modifiers).
+
+=item C<inject_attributes>
+
+Returns a string of Perl code along the lines of ":foo :bar(1)" which
+is injected into the Perl token stream to be parsed as the sub's
+attributes. (Only used for named subs.)
+
+=item C<inject_prelude>
+
+Returns a string of Perl code to inject into the body of the sub.
 
 =back
 
