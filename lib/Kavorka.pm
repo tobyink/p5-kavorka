@@ -307,7 +307,7 @@ A function can have multiple long names:
 
    fun xxx ( :foo(:bar(:baz($x))) ) { ... }
 
-This unwieldly syntax is borrowed from Perl 6 signatures.
+This unwieldy syntax is borrowed from Perl 6 signatures.
 
 Kavorka provides an experimental shortcut - you may omit the
 parentheses:
