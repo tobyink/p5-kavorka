@@ -30,6 +30,22 @@ use Benchmark 'cmpthese';
 	}
 }
 
+{
+	package Using_Plain;
+	use Moose;
+	use Scalar::Util;
+	
+	sub fib {
+		my $self = shift;
+		my ($i) = @_;
+		
+		defined($i) && !ref($i) && $i =~ /\A-?[0-9]+\z/ or die;
+		
+		return $i if $i <= 1;
+		return $self->fib($i-1) + $self->fib($i-2);
+	}
+}
+
 cmpthese(-5, {
 	Kavorka => q{
 		my $obj = Using_Kavorka->new;
@@ -37,6 +53,10 @@ cmpthese(-5, {
 	},
 	MXMM => q{
 		my $obj = Using_MXMM->new;
+		$obj->fib($_) for 0..10;
+	},
+	Plain => q{
+		my $obj = Using_Plain->new;
 		$obj->fib($_) for 0..10;
 	},
 });
@@ -74,17 +94,23 @@ L<Kavorka> (of course)
 
 L<MooseX::MultiMethods>
 
+=item
+
+Plain old Perl 5 subs, for comparison.
+
 =back
 
 =head1 RESULTS
 
 Running C<< perl -Ilib examples/benchmarks-multisub.pl >>:
 
-         s/iter    MXMM Kavorka
- MXMM      1.28      --    -86%
- Kavorka  0.181    610%      --
+            Rate    MXMM Kavorka   Plain
+ MXMM    0.809/s      --    -85%   -100%
+ Kavorka  5.38/s    565%      --    -98%
+ Plain     283/s  34873%   5161%      --
 
-Kavorka is the winner.
+Kavorka is the faster multi-method implementation, though is
+significantly slower than avoiding multi-methods.
 
 =head1 AUTHOR
 
