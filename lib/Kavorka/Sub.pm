@@ -365,7 +365,7 @@ C<parse_prototype>,
 C<parse_attributes>,
 C<parse_body> 
 
-Internal methods used to parse a signature. It only makes sense to call
+Internal methods used to parse a subroutine. It only makes sense to call
 these from a L<Parse::Keyword> parser, but may make sense to override
 them in classes consuming the Kavorka::Sub role.
 
