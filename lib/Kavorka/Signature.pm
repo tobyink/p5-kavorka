@@ -7,7 +7,7 @@ use Kavorka::Signature::Parameter ();
 package Kavorka::Signature;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 our @CARP_NOT  = qw( Kavorka::Sub Kavorka );
 
 use Carp qw( croak );

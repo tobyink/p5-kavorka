@@ -146,3 +146,10 @@
 		item "Use invocant as starting point for searching for multi method candidates."^^Change;
 		item "Test cases for multi subs versus multiple inheritance."^^Tests;
 	].
+
+`Kavorka 0.007 cpan:TOBYINK`
+	issued  2013-10-16;
+	changeset [
+		item 'Allow named parameters to have multiple "outside" names.'^^Change;
+		item "Make the parentheses surrounding long named parameters optional."^^Change;
+	].
