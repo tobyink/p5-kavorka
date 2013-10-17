@@ -44,6 +44,12 @@ sub info
 	$INFO{$code};
 }
 
+sub guess_implementation
+{
+	my $me = shift;
+	$IMPLEMENTATION{$_[0]};
+}
+
 sub _exporter_expand_sub
 {
 	my $me = shift;
@@ -51,7 +57,7 @@ sub _exporter_expand_sub
 	
 	my $implementation =
 		$args->{'implementation'}
-		// $IMPLEMENTATION{$name}
+		// $me->guess_implementation($name)
 		// $me;
 	
 	Module::Runtime::use_package_optimistically($implementation)->can('parse')
