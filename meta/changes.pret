@@ -154,3 +154,11 @@
 		item "Make the parentheses surrounding long named parameters optional."^^Change;
 		item "Refactor Kavorka::Sub."^^Change;
 	].
+
+`Kavorka 0.008 cpan:TOBYINK`
+	issued  2013-10-17;
+	changeset [
+		item "Make subclassing Kavorka.pm itself a little easier."^^Change;
+		item "Include an example of extending Kavorka to cover some Dancer2 concepts."^^Documentation;
+		item "Minor documentation fixes."^^Documentation;
+	].
