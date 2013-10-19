@@ -133,7 +133,7 @@ package KavorkaX::Dancer2::Sub::HTTP
 		# This allows GET,HEAD /foo { ... }
 		my @more_methods;
 		lex_read_space;
-		if (lex_peek eq ',')
+		while (lex_peek eq ',')
 		{
 			lex_read(1);
 			lex_read_space;
