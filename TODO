@@ -1,0 +1,32 @@
+1. It might be nice to allow something like this:
+
+	method $foo ($self: Int $x) {
+		...;
+	}
+	
+	$self->$foo(1234);
+
+2. Would be good to allow:
+
+	# This would localize the package variable
+	# 
+	method dump ($self: Int $Data::Dumper::MadDepth = 1) {
+		return Data::Dumper::Dumper($self);
+	}
+
+3. Also:
+
+	# Again, this would localize the package variable
+	# 
+	method bar ($self: Int our $quux = 42) {
+		...;
+	}
+	
+4. And:
+
+	# "my" is the default anyway...
+	# 
+	method baz ($self: Int my $quux = 42) {
+		...;
+	}
+	
