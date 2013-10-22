@@ -13,7 +13,7 @@ use Sub::Name ();
 package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );

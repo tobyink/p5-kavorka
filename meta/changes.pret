@@ -162,3 +162,10 @@
 		item "Include an example of extending Kavorka to cover some Dancer2 concepts."^^Documentation;
 		item "Minor documentation fixes."^^Documentation;
 	].
+
+`Kavorka 0.009 cpan:TOBYINK`
+	issued  2013-10-22;
+	changeset [
+		item "Minor fix to KavorkaX::Dancer2 example extension module."^^Documentation;
+		item "Package my TODO list."^^Packaging;
+	].
