@@ -37,7 +37,7 @@ use Test::Fatal;
 		return { '@_' => \@_ };
 	}
 
-	fun Example2::baz ($x, $y) {
+	fun Example2::baz (my $x, $y) {
 		return { '@_' => \@_, '$x' => \$x, '$y' => \$y };
 	}
 

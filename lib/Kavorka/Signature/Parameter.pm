@@ -30,7 +30,7 @@ has ID              => (is => 'rwp');
 has traits          => (is => 'ro', default => sub { +{} });
 
 has sigil           => (is => 'lazy', builder => sub { substr(shift->name, 0, 1) });
-has global          => (is => 'lazy', builder => sub { scalar(shift->name =~ /\A[\$\@\%](?:\W|_\z)/) });
+has kind            => (is => 'lazy', builder => 1);
 
 sub readonly  { !!shift->traits->{ro} }
 sub ro        { !!shift->traits->{ro} }
@@ -50,6 +50,13 @@ sub BUILD
 	my $id = scalar(@PARAMS);
 	$self->_set_ID($id);
 	$PARAMS[$id] = $self;
+}
+
+sub _build_kind
+{
+	my $self = shift;
+	local $_ = $self->name;
+	/::/ ? 'global' : /\A[\$\@\%](?:\W|_\z)/ ? 'magic' : 'my';
 }
 
 my $variable_re = qr{ [\$\%\@] (?: \{\^[A-Z]+\} | \w* ) }x;
@@ -77,7 +84,7 @@ sub parse
 	
 	my $type;
 	my $peek = lex_peek(1000);
-	if ($peek =~ /\A[^\W0-9]/)
+	if ($peek =~ /\A[^\W0-9]/ and not $peek =~ /\A(my|our)\b/)
 	{
 		my $reg = do {
 			require Type::Registry;
@@ -107,7 +114,7 @@ sub parse
 		$type->isa('Type::Tiny') or croak("Type constraint expression did not return a blessed type constraint object");
 	}
 	
-	my ($named, $parens, $varname, @paramname) = (0, 0);
+	my ($named, $parens, $varname, $varkind, @paramname) = (0, 0);
 	
 	# :foo( ... )
 	if (lex_peek(2) =~ /\A\:\w/)
@@ -127,24 +134,41 @@ sub parse
 		}
 	}
 	
-	$peek = lex_peek(1000);
+	# Allow colon before "my"/"our" - just shift it to the correct position
+	my $saw_colon;
+	if (lex_peek eq ':')
+	{
+		$saw_colon++;
+		lex_read(1);
+		lex_read_space;
+	}
+	
+	if (lex_peek(3) =~ /\A(my|our)/)
+	{
+		$varkind = $1;
+		lex_read(length $varkind);
+		lex_read_space;
+	}
+	
+	lex_stuff(':') if $saw_colon; # re-insert colon
+	$peek = lex_peek;
 	
 	# :$foo
-	if ($peek =~ /\A(\:($variable_re))/)
+	if ($peek eq ':')
 	{
+		lex_read(1);
+		lex_read_space;
+		$varname = parse_variable;
 		$named   = 1;
-		$varname = $2;
 		$traits{_optional} = 1;
-		push @paramname, substr($2, 1);
-		lex_read(length($1));
+		push @paramname, substr($varname, 1);
 		lex_read_space;
 	}
 	# $foo
-	elsif ($peek =~ /\A($variable_re)/)
+	elsif ($peek eq '$' or $peek eq '@' or $peek eq '%')
 	{
-		$varname   = $1;
+		$varname = parse_variable(1);
 		$traits{_optional} = 0 unless @paramname;
-		lex_read(length($1));
 		lex_read_space;
 	}
 	
@@ -215,6 +239,7 @@ sub parse
 		default        => $default,
 		default_when   => $default_when,
 		traits         => \%traits,
+		((kind         => $varkind) x!!(defined $varkind)),
 	);
 }
 
@@ -266,23 +291,27 @@ sub _injection_assignment
 {
 	my $self = shift;
 	my ($sig, $var, $val) = @_;
+	my $kind = $self->kind;
+	
+	my $assignment = '';
+	$assignment = "our $var;" if $kind eq 'our';
 	
 	if ($self->alias)
 	{
-		if ($self->global)
-		{
-			(my $glob = $var) =~ s/\A./*/;
-			return sprintf('local %s = \\do { %s };', $glob, $val);
-		}
-		else
+		if ($kind eq 'my')
 		{
 			require Data::Alias;
 			return sprintf('Data::Alias::alias(my %s = do { %s });', $var, $val);
 		}
+		else
+		{
+			(my $glob = $var) =~ s/\A./*/;
+			return $assignment . sprintf('local %s = \\do { %s };', $glob, $val);
+		}
 	}
 	
-	my $decl = $self->global ? 'local' : 'my';
-	my $assignment = sprintf('%s %s = %s;', $decl, $var, $val);
+	my $decl = $kind eq 'my' ? 'my' : 'local';
+	$assignment .= sprintf('%s %s = %s;', $decl, $var, $val);
 	
 	if ($self->locked)
 	{
@@ -657,11 +686,11 @@ the values are booleans.
 
 The sigil of the variable for this parameter.
 
-=item C<global>
+=item C<kind>
 
-Indicates whether the variable for this parameter is a global. The
-only globals supported within function signatures are C<< $_ >> and
-variables named like C<< ${^XXXX} >> for any name "XXXX".
+Returns "our" for package variables; "global" for namespace-qualified
+package variables (i.e. containing "::"); "magic" for C<< $_ >> and
+escape char variables like C<< ${^HELLO} >>; "my" otherwise.
 
 =item C<readonly>, C<ro>
 

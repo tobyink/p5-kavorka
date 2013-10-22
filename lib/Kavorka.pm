@@ -320,6 +320,21 @@ parentheses:
 
    fun xxx ( :foo :bar :baz $x ) { ... }
 
+=head3 Global variables
+
+The variables established by Kavorka are normally plain old lexicals
+(C<my> variables). However, you can instead make them into localised
+package variables (C<our> variables):
+
+   fun xxx ( Int our $x ) { ... }
+
+Variables containing "::", the special globals C<< $_ >>, C<< @_ >>,
+and C<< %_ >>, and variables named like C<< ${^HELLO} >> are
+automatically localized.
+
+(The other special punctuation variables listed in L<perlvar> are not
+supported.)
+
 =head3 Optional and required parameters
 
 A trailing exclamation mark makes an attribute required. A trailing

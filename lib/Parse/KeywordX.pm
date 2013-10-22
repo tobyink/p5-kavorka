@@ -12,7 +12,7 @@ our $VERSION   = '0.009';
 use Parse::Keyword {};
 
 our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( parse_name );
+our @EXPORT = qw( parse_name parse_variable );
 
 #### From p5-mop-redux
 sub read_tokenish ()
@@ -35,7 +35,7 @@ sub read_tokenish ()
 #### From p5-mop-redux
 sub parse_name
 {
-	my ($what, $allow_package) = @_;
+	my ($what, $allow_package, $stop_at_single_colon) = @_;
 	my $name = '';
 
 	# XXX this isn't quite right, i think, but probably close enough for now?
@@ -56,8 +56,11 @@ sub parse_name
 		}
 		elsif ($allow_package && $char eq ':')
 		{
-			die("Invalid identifier: $name" . read_tokenish)
-				unless lex_peek(3) =~ /^::(?:[^:]|$)/;
+			if (lex_peek(3) !~ /^::(?:[^:]|$)/)
+			{
+				return $name if $stop_at_single_colon;
+				die("Not a valid $what name: $name" . read_tokenish);
+			}
 			$name .= '::';
 			lex_read(2);
 		}
@@ -70,6 +73,43 @@ sub parse_name
 	die("Not a valid $what name: " . read_tokenish) unless length $name;
 	
 	($name =~ /\A::/) ? "main$name" : $name;
+}
+
+sub parse_variable
+{
+	my $allow_bare_sigil = $_[0];
+	
+	my $sigil = lex_peek(1);
+	($sigil eq '$' or $sigil eq '@' or $sigil eq '%')
+		? lex_read(1)
+		: die("Not a valid variable name: " . read_tokenish);
+	
+	my $name = $sigil;
+	
+	my $escape_char = 0;
+	if (lex_peek(2) eq '{^')
+	{
+		lex_read(2);
+		$name .= '{^';
+		$name .= parse_name('escape-char variable', 0);
+		lex_peek(1) eq '}'
+			? ( lex_read(1), ($name .= '}') )
+			: die("Expected closing brace after escape-char variable");
+		return $name;
+	}
+	
+	if (lex_peek =~ /[\w:]/)
+	{
+		$name .= parse_name('variable', 1, 1);
+		return $name;
+	}
+	
+	if ($allow_bare_sigil)
+	{
+		return $name;
+	}
+	
+	die "Expected variable name";
 }
 
 1;
