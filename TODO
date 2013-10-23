@@ -22,3 +22,5 @@ modifier parsing to allow multiple methods to be modified:
 
 	before foo, bar, baz (...) { ... }
 
+
+4. Support the :prototype attribute, like Perl 5.20 will.
