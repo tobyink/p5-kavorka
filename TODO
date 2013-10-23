@@ -26,3 +26,10 @@ modifier parsing to allow multiple methods to be modified:
 4. Support the :prototype attribute, like Perl 5.20 will.
 
 5. Optimizations for multi subs and multi methods.
+
+6. Documentation:
+
+	- document ||= defaults
+	- correct documentation about *when* function definition
+	  occurs (runtime vs compile time)
+	- split up Kavorka.pm docs into a Kavorka::Manual namespace
