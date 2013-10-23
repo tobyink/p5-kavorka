@@ -24,3 +24,5 @@ modifier parsing to allow multiple methods to be modified:
 
 
 4. Support the :prototype attribute, like Perl 5.20 will.
+
+5. Optimizations for multi subs and multi methods.
