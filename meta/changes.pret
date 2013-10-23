@@ -169,3 +169,11 @@
 		item "Minor fix to KavorkaX::Dancer2 example extension module."^^Documentation;
 		item "Package my TODO list."^^Packaging;
 	].
+
+`Kavorka 0.010 cpan:TOBYINK`
+	issued  2013-10-23;
+	changeset [
+		item "Support 'my' and 'our' prefixes to variable names in signatures."^^Change;
+		item "Allow package variables such as $Foo::Bar in signatures."^^Change;
+		item "General refactoring of variable name parsing."^^Change;
+	].
