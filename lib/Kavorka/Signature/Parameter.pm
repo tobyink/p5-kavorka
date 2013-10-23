@@ -259,6 +259,15 @@ sub sanity_check
 		croak("Bad parameter $name") if $self->slurpy;
 	}
 	
+	if ($self->kind eq 'my')
+	{
+		croak("Bad name for lexical variable: $name") if $name =~ /(::|\^)/;
+	}
+	else
+	{
+		croak("Bad name for package variable: $name") if length($name) < 2;
+	}
+	
 	croak("Bad parameter $name") if $self->invocant && $self->optional;
 	croak("Bad parameter $name") if $self->invocant && $self->slurpy;
 	croak("Parameter $name cannot be an alias and coerce") if $traits->{alias} && $traits->{coerce};
