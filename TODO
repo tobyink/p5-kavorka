@@ -16,3 +16,9 @@
 This may be of limited utility.
 
 See http://perlcabal.org/syn/S06.html#Attributive_parameters
+
+3. Along the lines of the KavorkaX::Dancer2 example, change the method
+modifier parsing to allow multiple methods to be modified:
+
+	before foo, bar, baz (...) { ... }
+
