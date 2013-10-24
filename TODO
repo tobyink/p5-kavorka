@@ -17,11 +17,9 @@ This may be of limited utility.
 
 See http://perlcabal.org/syn/S06.html#Attributive_parameters
 
-3. Support the :prototype attribute, like Perl 5.20 will.
+3. Optimizations for multi subs and multi methods.
 
-4. Optimizations for multi subs and multi methods.
-
-5. Documentation:
+4. Documentation:
 
 	- document ||= defaults
 	- correct documentation about *when* function definition

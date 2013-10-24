@@ -639,6 +639,10 @@ Like L<Function::Parameters>, Kavorka uses C<< :(...) >> to indicate
 a prototype. This avoids ambiguity between signatures, prototypes and
 attributes.
 
+For compatibility with Perl 5.20, the special attribute
+C<< :prototype(...) >> is supported as an alternative mechanism for
+expressing prototypes.
+
 =head2 The Attributes
 
 Attributes are parsed as per L<perlsub/Subroutine Attributes>.

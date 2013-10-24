@@ -9,7 +9,7 @@ package Kavorka::Sub;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.010';
 
-use Text::Balanced qw( extract_codeblock extract_bracketed );
+use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};
 use Parse::KeywordX;
 use Devel::Pragma qw( fqname );
@@ -186,7 +186,7 @@ sub parse_attributes
 		if (lex_peek eq '(')
 		{
 			$peek = lex_peek(1000);
-			$extracted = extract_codeblock($peek, '(){}[]<>', undef, '()');
+			$extracted = extract_bracketed($peek, '()');
 			lex_read(length $extracted);
 			lex_read_space;
 			$extracted =~ s/(?: \A\( | \)\z )//xgsm;
@@ -196,6 +196,12 @@ sub parse_attributes
 		{
 			lex_read(1);
 			lex_read_space;
+		}
+		
+		if ($name eq 'prototype')
+		{
+			$self->_set_prototype($extracted);
+			next;
 		}
 		
 		push @{$self->attributes}, [ $name => $extracted ];
