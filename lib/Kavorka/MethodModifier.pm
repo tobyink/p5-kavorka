@@ -41,10 +41,30 @@ package Kavorka::MethodModifier;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.010';
 
+use Devel::Pragma 'fqname';
+use Parse::Keyword {};
+use Parse::KeywordX;
+
 use Moo::Role;
 with 'Kavorka::Sub';
+use namespace::sweep;
 
 requires 'method_modifier';
+
+has more_names => (is => 'ro', default => sub { [] });
+
+after parse_subname => sub
+{
+	my $self = shift;
+	lex_read_space;
+	while (lex_peek eq ',')
+	{
+		lex_read(1);
+		lex_read_space;
+		push @{$self->more_names}, scalar fqname(parse_name('method', 1));
+		lex_read_space;
+	}
+};
 
 sub allow_anonymous { 0 }
 
@@ -62,51 +82,58 @@ sub default_invocant
 sub install_sub
 {
 	my $self = shift;
-	my $name = $self->qualified_name or die;
 	my $code = $self->body;
 	
-	my ($package, $method) = ($name =~ /\A(.+)::(\w+)\z/);
 	my $modification = $self->method_modifier;
 	
-	my $OO = $package->$DETECT_OO;
+	my @names = $self->qualified_name or die;
+	push @names, @{$self->more_names};
 	
-	if ($OO eq 'Moose')
+	for my $name (@names)
 	{
-		require Moose::Util;
-		my $installer = sprintf('add_%s_method_modifier', $modification);
-		return Moose::Util::find_meta($package)->$installer($method, $code);
+		my ($package, $method) = ($name =~ /\A(.+)::(\w+)\z/);
+		my $OO = $package->$DETECT_OO;
+		
+		if ($OO eq 'Moose')
+		{
+			require Moose::Util;
+			my $installer = sprintf('add_%s_method_modifier', $modification);
+			Moose::Util::find_meta($package)->$installer($method, $code);
+		}
+		
+		elsif ($OO eq 'Mouse')
+		{
+			require Mouse::Util;
+			my $installer = sprintf('add_%s_method_modifier', $modification);
+			Mouse::Util::find_meta($package)->$installer($method, $code);
+		}
+		
+		elsif ($OO eq 'Role::Tiny')
+		{
+			require Class::Method::Modifiers;
+			push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
+		}
+		
+		elsif ($OO eq 'Moo::Role')
+		{
+			require Class::Method::Modifiers;
+			push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
+			$OO->_maybe_reset_handlemoose($package);
+		}
+		
+		elsif ($OO eq 'Moo')
+		{
+			require Class::Method::Modifiers;
+			require Moo::_Utils;
+			Moo::_Utils::_install_modifier($package, $modification, $method, $code);
+		}
+		
+		else
+		{
+			require Class::Method::Modifiers;
+			Class::Method::Modifiers::install_modifier($package, $modification, $method, $code);
+		}
 	}
-	
-	if ($OO eq 'Mouse')
-	{
-		require Mouse::Util;
-		my $installer = sprintf('add_%s_method_modifier', $modification);
-		return Mouse::Util::find_meta($package)->$installer($method, $code);
-	}
-	
-	if ($OO eq 'Role::Tiny')
-	{
-		require Class::Method::Modifiers;
-		push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
-		return;
-	}
-	
-	if ($OO eq 'Moo::Role')
-	{
-		require Class::Method::Modifiers;
-		push @{$Role::Tiny::INFO{$package}{modifiers}||=[]}, [ $modification, $method, $code ];
-		return $OO->_maybe_reset_handlemoose($package);
-	}
-	
-	if ($OO eq 'Moo')
-	{
-		require Class::Method::Modifiers;
-		require Moo::_Utils;
-		return Moo::_Utils::_install_modifier($package, $modification, $method, $code);
-	}
-	
-	require Class::Method::Modifiers;
-	return Class::Method::Modifiers::install_modifier($package, $modification, $method, $code);
 }
 
 1;
