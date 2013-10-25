@@ -1,0 +1,129 @@
+=pod
+
+=encoding utf-8
+
+=for stopwords invocant invocants lexicals unintuitive yada globals
+
+=head1 NAME
+
+Kavorka::Manual::Functions - fun keyword
+
+=head1 DESCRIPTION
+
+=head2 Basic Syntax
+
+The syntax provided by Kavorka is largely inspired by Perl 6, though
+it has also been greatly influenced by L<Method::Signatures> and
+L<Function::Parameters>.
+
+The anatomy of a function:
+
+=over
+
+=item 1.
+
+The keyword introducing the function.
+
+=item 2.
+
+The function name (optional).
+
+=item 3.
+
+The signature (optional).
+
+=item 4.
+
+The prototype (optional).
+
+=item 5.
+
+The attribute list (optional).
+
+=item 6.
+
+The function body.
+
+=back
+
+Example:
+
+   #  (1) (2)    (3)          (4)   (5)     (6)
+      fun foobar ($foo, $bar) :($$) :cached { return $foo + $bar }
+   
+   #          (1) (6)
+      my $f = fun { return $_[0] + $_[1] };
+
+=head2 The Keyword
+
+By default this module exports the keywords C<fun> and C<method>. These
+keywords are respectively implemented by L<Kavorka::Sub::Fun> and
+L<Kavorka::Sub::Method>. Other keywords may be imported upon request:
+C<after>, C<around>, C<before>, C<classmethod> and C<objectmethod>.
+
+The module implementing the keyword may alter various aspects of the
+keyword's behaviour. For example, C<fun> ensures that the function's
+name and prototype is declared at compile time; C<method> shifts the
+invocant off C<< @_ >>; and C<before>, C<after> and C<around> pass the
+body coderef to your OO framework's method modifier installation
+function.
+
+See the implementing modules' documentation for further details.
+
+=head2 The Function Name
+
+If present, it specifies the name of the function being defined. As
+with C<sub>, if a name is present, by default the whole declaration is
+syntactically a statement and its effects are performed at compile time
+(i.e. at runtime you can call functions whose definitions only occur
+later in the file). If no name is present, the declaration is an
+expression that evaluates to a reference to the function in question.
+
+=head2 The Signature
+
+See L<Kavorka::Manual::Signature>.
+
+=head2 The Prototype
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+=head2 The Attributes
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+=head2 The Function Body
+
+This is more or less what you'd expect from the function body you'd
+write with L<sub|perlsub>, however the lexical variables for parameters
+are pre-declared and pre-populated, and invocants have been shifted
+off C<< @_ >>.
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
+
+=head1 SEE ALSO
+
+L<Kavorka>,
+L<Kavorka::Sub>,
+L<Kavorka::Signature>,
+L<Kavorka::Signature::Parameter>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
