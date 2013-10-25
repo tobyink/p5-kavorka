@@ -177,3 +177,12 @@
 		item "Allow package variables such as $Foo::Bar in signatures."^^Change;
 		item "General refactoring of variable name parsing."^^Change;
 	].
+
+`Kavorka 0.011 cpan:TOBYINK`
+	issued  2013-10-25;
+	changeset [
+		item "Rename ${^NEXT} variable to $next for `around` method modifiers."^^Change;
+		item "Support Perl 5.20 style :prototype(...) attribute."^^Change;
+		item "Allow multiple method names to be modified with a single method modifier."^^Change;
+		item "Split up documentation into a manual with bite-sized chunks."^^Documentation;
+	].
