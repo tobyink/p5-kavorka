@@ -148,6 +148,10 @@ Kavorka provides C<fun> and C<method> keywords for declaring functions
 and methods. It uses Perl 5.14's keyword API, so should work more
 reliably than source filters or L<Devel::Declare>-based modules.
 
+The syntax provided by Kavorka is largely inspired by Perl 6, though
+it has also been greatly influenced by L<Method::Signatures> and
+L<Function::Parameters>.
+
 For further information see:
 
 =over
@@ -191,7 +195,7 @@ C<classmethod>, C<objectmethod>, and C<multi>.
 
 For example:
 
-   # Everything except objectmethod...
+   # Everything except objectmethod and multi...
    use Kavorka qw( -default -modifiers classmethod );
 
 You can rename imported functions (see L<Exporter::Tiny>):
@@ -202,6 +206,8 @@ You can provide alternative implementations:
 
    # use My::Sub::Method instead of Kavorka::Sub::Method
    use Kavorka method => { implementation => 'My::Sub::Method' };
+
+See L<Exporter::Tiny> for more tips.
 
 =head2 Function Introspection API
 
@@ -226,8 +232,8 @@ Kavorka method signatures via the meta object protocol.
 
 =head1 CAVEATS
 
-As noted above, subroutine attributes don't work for anonymous
-functions.
+As noted in L<Kavorka::Manual::PrototypeAndAttributes>, subroutine
+attributes don't work properly for anonymous functions.
 
 If importing Kavorka's method modifiers into Moo/Mouse/Moose classes,
 pay attention to load order:
@@ -240,6 +246,8 @@ keywords will stomp on top of Kavorka's...
 
    use Kavorka -all;
    use Moose;          # STOMP, STOMP, STOMP!  :-(
+
+This can lead to delightfully hard to debug errors.
 
 =head1 BUGS
 

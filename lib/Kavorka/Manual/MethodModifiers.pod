@@ -10,7 +10,99 @@ Kavorka::Manual::MethodModifiers - before/after/around keywords
 
 =head1 DESCRIPTION
 
+Kavorka provides the C<before>, C<after> and C<around> keywords for
+method modifiers.
 
+Method modifiers should work in L<Moose>, L<Moo>, L<Mouse> and
+L<Role::Tiny> classes and roles. In other classes they will fall back
+to using L<Class::Method::Modifiers>.
+
+The anatomy of a method modifier:
+
+=over
+
+=item 1.
+
+The keyword introducing the method.
+
+=item 2.
+
+The method name(s).
+
+=item 3.
+
+The signature (optional).
+
+=item 4.
+
+The prototype (optional).
+
+=item 5.
+
+The attribute list (optional).
+
+=item 6.
+
+The modifier body.
+
+=back
+
+Example:
+
+   #  (1)   (2)    (3)    (4)  (5)     (6)
+      after foobar ($foo) :($) :cached { $self->log("foobar $foo") }
+
+=head2 The Keyword
+
+By default, these keywords are exported. They must be exported by
+request:
+
+   use Kavorka qw( before after around );
+   use Kavorka qw( -modifiers );
+
+=head2 The Method Names
+
+These are the names of the methods being wrapped. 
+
+Multiple names may be separated by colons:
+
+   after foo, bar, baz { ... }
+
+=head2 The Signature
+
+See L<Kavorka::Manual::Signature>.
+
+The C<before> and C<after> keywords have a default invocant called
+C<< $self >>, but it does not have a type constraint, so can equally
+be used for class or object methods.
+
+The C<around> modifier defines two invocants called C<< $next >> and
+C<< $self >>. (C<< ${^NEXT} >> is also available as an alias for
+C<< $next >> for backwards compatibility with Moops::MethodModifiers.)
+
+Beware using type constraints for method modifiers (which are
+essentially wrappers); constraints will be checked at each level of
+wrapping which will slow down method calls.
+
+=head2 The Prototype
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+Note however that prototypes are fairly useless for methods.
+
+=head2 The Attributes
+
+See L<Kavorka::Manual::PrototypeAndAttributes>.
+
+Note that this applies the attribute to the modifier code, and not to
+the method being modified.
+
+=head2 The Modifier Body
+
+This is more or less what you'd expect from the modifier body you'd
+write with L<Moose>, however the lexical variables for parameters
+are pre-declared and pre-populated, and invocants have been shifted
+off C<< @_ >>.
 
 =head1 BUGS
 
