@@ -22,7 +22,3 @@ See http://perlcabal.org/syn/S06.html#Attributive_parameters
 4. Documentation:
 
 	- document ||= defaults
-	- correct documentation about *when* function definition
-	  occurs (runtime vs compile time)
-	- split up Kavorka.pm docs into a Kavorka::Manual namespace
-	- method modifiers
