@@ -6,7 +6,7 @@
 
 =head1 NAME
 
-Kavorka::Manual::PrototypeAndAttributes - method/classmethod/objectmethod keywords
+Kavorka::Manual::PrototypeAndAttributes - the more rarely used features of Perl subroutines
 
 =head1 DESCRIPTION
 
