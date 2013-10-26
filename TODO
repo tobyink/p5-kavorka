@@ -18,7 +18,3 @@ This may be of limited utility.
 See http://perlcabal.org/syn/S06.html#Attributive_parameters
 
 3. Optimizations for multi subs and multi methods.
-
-4. Documentation:
-
-	- document ||= defaults

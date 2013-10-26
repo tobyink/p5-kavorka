@@ -2,7 +2,7 @@
 
 =encoding utf-8
 
-=for stopwords invocant invocants lexicals unintuitive yada globals ro rw
+=for stopwords invocant invocants lexicals unintuitive yada globals ro rw boolification
 
 =head1 NAME
 
@@ -278,6 +278,11 @@ is passed to the function, use C<< //= >>:
 
 This feature is shared with L<Method::Signatures>. Kavorka doesn't
 support Method::Signatures' C<when> keyword.
+
+C<< ||= >> is also supported for setting defaults. It kicks in when any
+false value (undef, zero, the empty string, or objects overloading
+boolification to return false) is passed to the function, though this
+is rarely of much use.
 
 Slurpy parameters may take defaults:
 
