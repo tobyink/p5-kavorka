@@ -81,10 +81,11 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SEE ALSO
 
-L<Kavorka>,
-L<Kavorka::Sub>,
-L<Kavorka::Signature>,
-L<Kavorka::Signature::Parameter>.
+L<Kavorka::Manual>,
+L<Kavorka::Manual::Signature>,
+L<Kavorka::Manual::PrototypeAndAttributes>,
+L<Kavorka::Manual::Functions>,
+L<Kavorka::Manual::Methods>.
 
 =head1 AUTHOR
 
