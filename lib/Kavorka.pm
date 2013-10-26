@@ -198,7 +198,7 @@ For example:
    # Everything except objectmethod and multi...
    use Kavorka qw( -default -modifiers classmethod );
 
-You can rename imported functions (see L<Exporter::Tiny>):
+You can rename imported functions:
 
    use Kavorka method => { -as => 'meth' };
 
