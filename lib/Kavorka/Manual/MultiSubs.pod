@@ -25,12 +25,6 @@ with multi methods!) Kavorka includes both type constraints and value
 constraints in the dispatch decision, while Perl 6 only uses type
 constraints.
 
-The current implementation is not especially efficient. For example,
-type constraints are checked when deciding which multi method candidate
-to dispatch to, and then re-checked once the dispatch has been done.
-However, there are opportunities for future versions of Kavorka to
-optimize some aspects of the multi method implementation.
-
 =head2 Multi methods versus multi subs
 
 The word after C<multi> (i.e. C<method> in the above example) can be
@@ -67,9 +61,6 @@ of a multi method or multi sub using the C<:long> attribute:
 (Actually, C<< :long >> isn't a real attribute; we just borrow the
 syntax. If you try to use L<attributes>' introspection stuff, you won't
 find it.)
-
-Future versions of Kavorka I<might> skip some type constraint checks
-when a candidate is called directly by its long name.
 
 Prototypes, subroutine attributes, etc declared on the multi subs will
 appear on the "long name" subs, but not the multi sub.

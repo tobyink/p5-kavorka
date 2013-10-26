@@ -105,9 +105,9 @@ Plain old Perl 5 subs, for comparison.
 Running C<< perl -Ilib examples/benchmarks-multisub.pl >>:
 
             Rate    MXMM Kavorka   Plain
- MXMM    0.828/s      --    -89%   -100%
- Kavorka  7.68/s    827%      --    -97%
- Plain     276/s  33280%   3499%      --
+ MXMM    0.861/s      --    -89%   -100%
+ Kavorka  7.81/s    807%      --    -97%
+ Plain     276/s  32026%   3441%      --
 
 Kavorka is the faster multi-method implementation, though is
 significantly slower than avoiding multi-methods.

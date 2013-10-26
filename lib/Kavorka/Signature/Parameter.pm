@@ -372,6 +372,12 @@ sub _injection_conditional_type_check
 		sprintf('if (%s) { %s }', $condition, $self->_injection_type_check($var));
 	
 	return '' if $type =~ /\{  \}\z/;
+	
+	return sprintf(
+		'unless ($____nobble_checks) { %s };',
+		$type,
+	) if $sig->nobble_checks;
+	
 	return $type;
 }
 

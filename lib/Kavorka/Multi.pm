@@ -40,11 +40,9 @@ around parse => sub
 	return $class->$next(@_, multi_type => $type);
 };
 
-around parse_attributes => sub
+after parse_attributes => sub
 {
-	my $next = shift;
 	my $self = shift;
-	$self->$next(@_);
 	
 	my @attr = @{$self->attributes};
 	
@@ -53,9 +51,14 @@ around parse_attributes => sub
 		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar fqname $_->[1]))
 		: push(@filtered, $_)
 		for @attr;
-	@{$self->attributes} = @filtered;
 	
-	();
+	@{$self->attributes} = @filtered;
+};
+
+after parse_signature => sub
+{
+	my $self = shift;
+	$self->signature->_set_nobble_checks(1);
 };
 
 sub allow_anonymous { 0 }
@@ -136,11 +139,17 @@ sub __compile
 	
 	my $compiled = join q[] => (
 		map {
-			sprintf(
-				"do { my \@tmp = \@_; goto \$coderefs[%d] if %s };\n",
+			my $sig = $candidates[$_]->signature;
+			$sig && $sig->nobble_checks ? sprintf(
+				"\@tmp = \@_; if (%s) { unshift \@_, \$Kavorka::Signature::NOBBLE; goto \$coderefs[%d] }\n",
+				$candidates[$_]->signature->inline_check('@tmp'),
 				$_,
-				$candidates[$_]->signature ? $candidates[$_]->signature->inline_check('@tmp') : 1,
-			),
+			) :
+			$sig ? sprintf(
+				"\@tmp = \@_; if (%s) { goto \$coderefs[%d] }\n",
+				$candidates[$_]->signature->inline_check('@tmp'),
+				$_,
+			) : sprintf('goto \$coderefs[%d];', $_);
 		} 0 .. $#candidates,
 	);
 	
@@ -148,7 +157,7 @@ sub __compile
 	
 	Sub::Name::subname(
 		"$pkg\::$subname",
-		eval("package $pkg; sub { $slowpath; $compiled; $error }"),
+		eval("package $pkg; sub { $slowpath; my \@tmp; $compiled; $error }"),
 	);
 }
 
@@ -165,7 +174,7 @@ sub install_sub
 	
 	$DISPATCH_STYLE{$pkg}{$subname} eq $self->invocation_style
 		or Carp::croak("Two different invocation styles used for $subname");
-
+	
 	{
 		no strict "refs";
 		no warnings "redefine";
@@ -176,7 +185,7 @@ sub install_sub
 			},
 		);
 	}
-
+	
 	my $long = $self->qualified_long_name;
 	if (defined $long)
 	{
