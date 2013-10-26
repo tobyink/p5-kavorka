@@ -152,7 +152,7 @@ The syntax provided by Kavorka is largely inspired by Perl 6, though
 it has also been greatly influenced by L<Method::Signatures> and
 L<Function::Parameters>.
 
-For further information see:
+For information using the keywords exported by Kavorka:
 
 =over
 
@@ -230,6 +230,9 @@ L<Kavorka::Signature::Parameter> for further details.
 If you're using Moose, consider using L<MooseX::KavorkaInfo> to expose
 Kavorka method signatures via the meta object protocol.
 
+L<Kavorka::Manual::API> provides more details and examples using the
+introspection API.
+
 =head1 CAVEATS
 
 As noted in L<Kavorka::Manual::PrototypeAndAttributes>, subroutine
@@ -256,13 +259,12 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SEE ALSO
 
+L<Kavorka::Manual>.
+
+B<< Inspirations: >>
 L<http://perlcabal.org/syn/S06.html>,
 L<Function::Parameters>,
 L<Method::Signatures>.
-
-L<Kavorka::Sub>,
-L<Kavorka::Signature>,
-L<Kavorka::Signature::Parameter>.
 
 L<http://en.wikipedia.org/wiki/The_Conversion_(Seinfeld)>.
 

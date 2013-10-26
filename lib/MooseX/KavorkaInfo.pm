@@ -145,7 +145,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SEE ALSO
 
-L<Kavorka>,
+L<Kavorka::Manual::API>,
 L<Moose::Meta::Method>.
 
 =head1 AUTHOR

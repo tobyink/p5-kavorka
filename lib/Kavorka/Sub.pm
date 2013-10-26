@@ -444,9 +444,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SEE ALSO
 
-L<http://perlcabal.org/syn/S06.html>,
-L<Kavorka>,
-L<Kavorka::Signature::Parameter>.
+L<Kavorka::Manual::API>,
+L<Kavorka::Signature>.
 
 =head1 AUTHOR
 
