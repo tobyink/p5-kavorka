@@ -322,6 +322,18 @@ sub _build_checker
 	);
 }
 
+sub inline_check
+{
+	my $self = shift;
+	my ($arr) = @_;
+	
+	sprintf(
+		'do { local @_ = %s; eval { %s; 1 } }',
+		$arr,
+		$self->injection,
+	);
+}
+
 1;
 
 __END__
@@ -402,6 +414,11 @@ satisfy the signature.
 =item C<< checker >>
 
 Returns a coderef which acts like C<< check(@args) >>.
+
+=item C<< inline_check($varname) >>
+
+Returns a string of Perl code that acts like an inline check, given the
+name of an array variable, such as C<< '@foo' >>.
 
 =back
 

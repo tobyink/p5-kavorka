@@ -87,23 +87,25 @@ sub invocation_style
 our %DISPATCH_TABLE;
 our %DISPATCH_STYLE;
 
-my $DISPATCH = sub
+sub __gather_candidates
+{
+	my ($pkg, $subname, $args) = @_;
+	
+	if ($DISPATCH_STYLE{$pkg}{$subname} eq 'fun')
+	{
+		return @{$DISPATCH_TABLE{$pkg}{$subname}};
+	}
+	
+	require mro;
+	my $invocant = ref($args->[0]) || $args->[0];
+	return map @{$DISPATCH_TABLE{$_}{$subname} || [] }, @{ $invocant->mro::get_linear_isa };
+}
+
+sub __dispatch
 {
 	my ($pkg, $subname) = @{ +shift };
 	
-	my @candidates;
-	if ($DISPATCH_STYLE{$pkg}{$subname} eq 'fun')
-	{
-		@candidates = @{$DISPATCH_TABLE{$pkg}{$subname}};
-	}
-	else
-	{
-		require mro;
-		my $invocant = ref($_[0]) || $_[0];
-		@candidates  = map @{$DISPATCH_TABLE{$_}{$subname} || [] }, @{ $invocant->mro::get_linear_isa };
-	}
-	
-	for my $c (@candidates)
+	for my $c ( __gather_candidates($pkg, $subname, \@_) )
 	{
 		my @copy = @_;
 		next unless $c->signature->check(@copy);
@@ -112,7 +114,43 @@ my $DISPATCH = sub
 	}
 	
 	Carp::croak("Arguments to $pkg\::$subname did not match any known signature for multi sub");
-};
+}
+
+sub __compile
+{
+	my ($pkg, $subname) = @_;
+	
+	my @candidates = __gather_candidates($pkg, $subname, [$pkg]);
+	my @coderefs   = map $_->body, @candidates;
+	
+	my $slowpath = '';
+	if ($DISPATCH_STYLE{$pkg}{$subname} ne 'fun')
+	{
+		$slowpath = sprintf(
+			'if ((ref($_[0]) || $_[0]) ne %s) { unshift @_, [%s, %s]; goto \\&Kavorka::Multi::__dispatch }',
+			B::perlstring($pkg),
+			B::perlstring($pkg),
+			B::perlstring($subname),
+		);
+	}
+	
+	my $compiled = join q[] => (
+		map {
+			sprintf(
+				"do { my \@tmp = \@_; goto \$coderefs[%d] if %s };\n",
+				$_,
+				$candidates[$_]->signature ? $candidates[$_]->signature->inline_check('@tmp') : 1,
+			),
+		} 0 .. $#candidates,
+	);
+	
+	my $error = "Carp::croak(qq/Arguments to $pkg\::$subname did not match any known signature for multi sub/);";
+	
+	Sub::Name::subname(
+		"$pkg\::$subname",
+		eval("package $pkg; sub { $slowpath; $compiled; $error }"),
+	);
+}
 
 sub install_sub
 {
@@ -123,19 +161,22 @@ sub install_sub
 	{
 		$DISPATCH_TABLE{$pkg}{$subname} = [];
 		$DISPATCH_STYLE{$pkg}{$subname} = $self->invocation_style;
-		
-		no strict 'refs';
-		*{"$pkg\::$subname"} = Sub::Name::subname(
-			"$pkg\::$subname" => sub {
-				unshift @_, [$pkg, $subname];
-				goto $DISPATCH;
-			},
-		);
 	}
 	
 	$DISPATCH_STYLE{$pkg}{$subname} eq $self->invocation_style
 		or Carp::croak("Two different invocation styles used for $subname");
-	
+
+	{
+		no strict "refs";
+		no warnings "redefine";
+		*{"$pkg\::$subname"} = Sub::Name::subname(
+			"$pkg\::$subname" => sub {
+				*{"$pkg\::$subname"} = (my $compiled = __compile($pkg, $subname));
+				goto $compiled;
+			},
+		);
+	}
+
 	my $long = $self->qualified_long_name;
 	if (defined $long)
 	{

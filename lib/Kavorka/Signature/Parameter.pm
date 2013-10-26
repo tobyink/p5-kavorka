@@ -611,7 +611,6 @@ sub _injection_type_check
 	return $check;
 }
 
-
 1;
 
 
