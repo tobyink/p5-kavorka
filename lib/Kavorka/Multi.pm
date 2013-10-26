@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::Multi;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011';
+our $VERSION   = '0.012';
 
 use Devel::Pragma qw( fqname );
 use Parse::Keyword {};
