@@ -18,6 +18,9 @@ Kavorka supports multi methods and multi subs:
    __PACKAGE__->process( [] );    # here
    __PACKAGE__->process( {} );    # there
 
+Multi subs and multi methods must be named (cannot be anonymous
+coderefs).
+
 This feature is shared with Perl 6 signatures, though Kavorka does
 not support some of Perl 6's more advanced features such as multi
 method prototypes. (Though method modifiers should more or less work
@@ -64,6 +67,29 @@ find it.)
 
 Prototypes, subroutine attributes, etc declared on the multi subs will
 appear on the "long name" subs, but not the multi sub.
+
+=head2 Definition at run time
+
+Multi subs and multi methods are added to the symbol at run time
+(like methods, see L<Kavorka::Manual::Methods/The Method Name>).
+
+This means that it's possible to partly define a multi sub, call it,
+then further define it, before calling it again.
+
+   use Kavorka qw( multi fun );
+   use Try::Tiny;
+   
+   multi fun plus_one (Int $x) { $x + 1 }
+   
+   try {
+      plus_one(41;       # 42
+      plus_one(1.1);     # throws
+   };
+   
+   multi fun plus_one (Num $x) { $x + 1 }
+   
+   plus_one(41);      # 42
+   plus_one(1.1);     # 2.1
 
 =head1 BUGS
 
