@@ -194,3 +194,11 @@
 		item "Optimization: compile dispatchers for multi subs on demand."^^Change;
 		item "Optimization: avoid double type checks in multi subs."^^Change;
 	].
+
+`Kavorka 0.013 cpan:TOBYINK`
+	issued  2013-10-27;
+	changeset [
+		item "Compiled dispatchers introduced in Kavorka 0.012 are essentially a form of cache. No cache invalidation was in place, leading to issues when adding extra same-named multi method candidates to parent classes after a multi method had already been invoked in a child class. Cache invalidation now works."^^Bugfix;
+		item "Test that definition of multi subs happens at runtime, and definition can continue even after the multi sub has been invoked."^^Tests;
+		item "Test for cache invalidation of compiled multi sub dispatchers."^^Tests;
+	].
