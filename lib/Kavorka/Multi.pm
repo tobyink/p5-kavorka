@@ -176,6 +176,8 @@ sub install_sub
 		or Carp::croak("Two different invocation styles used for $subname");
 	
 	{
+		# A placeholder dispatcher that will replace itself with a more
+		# efficient optimized (compiled) dispatcher.
 		no strict "refs";
 		no warnings "redefine";
 		*{"$pkg\::$subname"} = Sub::Name::subname(
@@ -184,6 +186,11 @@ sub install_sub
 				goto $compiled;
 			},
 		);
+		
+		# XXX - TODO
+		# If dispatch style is 'method', ought to find subclasses of $pkg
+		# and, if they contain any optimized (compiled) dispatchers, wipe
+		# them out and replace them with the placeholder one.
 	}
 	
 	my $long = $self->qualified_long_name;
