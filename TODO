@@ -5,14 +5,3 @@
 	}
 	
 	$self->$foo(1234);
-
-2. Maybe attempt to get Perl 6 style attributive parameters working:
-
-	method foo ($self: $.name) {
-		# $.name is an alias (tied) for $self->name attribute
-		# only works if you have a meta object (i.e. Moose/Mouse)
-	}
-
-This may be of limited utility.
-
-See http://perlcabal.org/syn/S06.html#Attributive_parameters
