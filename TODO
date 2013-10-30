@@ -5,3 +5,5 @@
 	}
 	
 	$self->$foo(1234);
+
+2. Return values
