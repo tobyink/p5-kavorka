@@ -11,6 +11,7 @@
 	:runtime-requirement    [ :on "Moo 1.003001"^^:CpanId ];
 	:runtime-requirement    [ :on "PadWalker 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Parse::Keyword 0.06"^^:CpanId ];
+	:runtime-requirement    [ :on "Return::Type 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Sub::Name 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Type::Parser 0.028"^^:CpanId ];
 	:runtime-requirement    [ :on "Type::Registry 0.028"^^:CpanId ];
