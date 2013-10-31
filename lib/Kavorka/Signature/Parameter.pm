@@ -213,7 +213,7 @@ sub parse
 		$traits{"$2"} = 1;
 		lex_read(length($1));
 		lex_read_space;
-		$peek = lex_peek(4);
+		$peek = lex_peek(1000);
 	}
 	
 	if ($peek =~ m{ \A ( (?: [/]{2} | [|]{2} )?= ) }x)

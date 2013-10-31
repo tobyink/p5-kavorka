@@ -1,8 +1,10 @@
 use 5.014;
 use strict;
+use utf8;
 use warnings;
 
 use Kavorka::Signature::Parameter ();
+use Kavorka::Signature::ReturnType ();
 
 package Kavorka::Signature;
 
@@ -17,19 +19,21 @@ use Parse::KeywordX;
 use Moo;
 use namespace::sweep;
 
-has package         => (is => 'ro');
-has _is_dummy       => (is => 'ro');
-has params          => (is => 'ro',  default => sub { +[] });
-has has_invocants   => (is => 'rwp', default => sub { +undef });
-has has_named       => (is => 'rwp', default => sub { +undef });
-has has_slurpy      => (is => 'rwp', default => sub { +undef });
-has yadayada        => (is => 'rwp', default => sub { 0 });
-has parameter_class => (is => 'ro',  default => sub { 'Kavorka::Signature::Parameter' });
-has last_position   => (is => 'lazy');
-has args_min        => (is => 'lazy');
-has args_max        => (is => 'lazy');
-has checker         => (is => 'lazy');
-has nobble_checks   => (is => 'rwp', default => sub { 0 });
+has package           => (is => 'ro');
+has _is_dummy         => (is => 'ro');
+has params            => (is => 'ro',  default => sub { +[] });
+has return_types      => (is => 'ro',  default => sub { +[] });
+has has_invocants     => (is => 'rwp', default => sub { +undef });
+has has_named         => (is => 'rwp', default => sub { +undef });
+has has_slurpy        => (is => 'rwp', default => sub { +undef });
+has yadayada          => (is => 'rwp', default => sub { 0 });
+has parameter_class   => (is => 'ro',  default => sub { 'Kavorka::Signature::Parameter' });
+has return_type_class => (is => 'ro',  default => sub { 'Kavorka::Signature::ReturnType' });
+has last_position     => (is => 'lazy');
+has args_min          => (is => 'lazy');
+has args_max          => (is => 'lazy');
+has checker           => (is => 'lazy');
+has nobble_checks     => (is => 'rwp', default => sub { 0 });
 
 sub parse
 {
@@ -39,6 +43,8 @@ sub parse
 	lex_read_space;
 	
 	my $found_colon = 0;
+	my $arr    = $self->params;
+	my $_class = 'parameter_class';
 	while (lex_peek ne ')')
 	{
 		if (lex_peek(3) eq '...')
@@ -50,7 +56,7 @@ sub parse
 			next;
 		}
 		
-		push @{$self->params}, $self->parameter_class->parse(package => $self->package);
+		push @$arr, $self->$_class->parse(package => $self->package);
 		lex_read_space;
 		
 		my $peek = lex_peek;
@@ -68,9 +74,16 @@ sub parse
 		{
 			lex_read(1);
 		}
-		elsif (lex_peek eq ')')
+		elsif ($peek eq ')')
 		{
 			last;
+		}
+		elsif (lex_peek(6) =~ /\A(\xE2\x86\x92|-->)/)
+		{
+			lex_read(length $1);
+			lex_read_space;
+			$arr    = $self->return_types;
+			$_class = 'return_type_class';
 		}
 		else
 		{

@@ -81,11 +81,6 @@ sub _exporter_expand_sub
 			Scalar::Util::weaken($subroutine->{body})
 				unless Scalar::Util::isweak($subroutine->{body});
 			
-			my $closed_over = PadWalker::closed_over($subroutine->{body});
-			my $caller_vars = PadWalker::peek_my(1);
-			$closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
-			PadWalker::set_closed_over($subroutine->{body}, $closed_over);
-			
 			wantarray ? @r : $r[0];
 		},
 	);

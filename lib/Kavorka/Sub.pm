@@ -283,7 +283,41 @@ sub _post_parse
 		$self->_set_body($code);
 	}
 	
+	$self->_apply_return_types;
+	
 	();
+}
+
+sub _apply_return_types
+{
+	my $self = shift;
+	
+	my @rt = @{ $self->signature->return_types };
+	if (@rt)
+	{
+		my @scalar = map $_->type, grep !$_->list, @rt;
+		my @list   = map $_->type, grep  $_->list, @rt;
+		my $coerce = grep $_->coerce, @rt;
+		
+		my $scalar =
+			(@scalar == 0) ? undef :
+			(@scalar == 1) ? $scalar[0] :
+			do { require Type::Tiny::Union; Type::Tiny::Union->new(type_constraint => \@scalar) };
+		
+		my $list =
+			(@list == 0) ? undef :
+			(@list == 1) ? $list[0] :
+			do { require Type::Tiny::Union; Type::Tiny::Union->new(type_constraint => \@list) };
+		
+		require Return::Type;
+		my $wrapped = Return::Type->wrap_sub(
+			$self->body,
+			scalar  => $scalar,
+			list    => $list,
+			coerce  => $coerce,
+		);
+		$self->_set_body($wrapped);
+	}
 }
 
 1;
