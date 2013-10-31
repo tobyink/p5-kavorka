@@ -302,12 +302,12 @@ sub _apply_return_types
 		my $scalar =
 			(@scalar == 0) ? undef :
 			(@scalar == 1) ? $scalar[0] :
-			do { require Type::Tiny::Union; Type::Tiny::Union->new(type_constraint => \@scalar) };
+			croak("Multiple scalar context return types specified for function");
 		
 		my $list =
 			(@list == 0) ? undef :
 			(@list == 1) ? $list[0] :
-			do { require Type::Tiny::Union; Type::Tiny::Union->new(type_constraint => \@list) };
+			croak("Multiple list context return types specified for function");
 		
 		require Return::Type;
 		my $wrapped = Return::Type->wrap_sub(

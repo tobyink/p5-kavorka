@@ -78,15 +78,16 @@ sub parse
 		{
 			last;
 		}
-		elsif (lex_peek(6) =~ /\A(\xE2\x86\x92|-->)/)
+		elsif (lex_peek(4) =~ /\A(\xE2\x86\x92|-->)/)
 		{
 			lex_read(length $1);
-			lex_read_space;
 			$arr    = $self->return_types;
 			$_class = 'return_type_class';
 		}
 		else
 		{
+			use Data::Dumper;
+			print Dumper($self);
 			croak("Unexpected characters in signature (${\ lex_peek(8) })");
 		}
 		
@@ -404,6 +405,10 @@ Returns the package name the parameter was declared in.
 
 Returns an arrayref of parameters.
 
+=item C<return_types>
+
+Returns an arrayref of declared return types.
+
 =item C<has_invocants>, C<invocants>
 
 Returns a boolean/list of invocant parameters.
@@ -465,6 +470,10 @@ within a L<Parse::Keyword> parser.
 =item C<parameter_class>
 
 A class to use for parameters when parsing the signature.
+
+=item C<return_type_class>
+
+A class to use for return types when parsing the signature.
 
 =item C<injection>
 

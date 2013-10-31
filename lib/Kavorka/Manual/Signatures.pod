@@ -432,6 +432,37 @@ This feature is shared with L<Method::Signatures>.
 
 See also L<http://en.wikipedia.org/wiki/The_Yada_Yada>.
 
+=head2 Return types
+
+After a Unicode rightwards arrow character (C<< → >>) or the ASCII
+equivalent (C<< --> >>), you may list return type constraints.
+
+For a function which only returns one value:
+
+   fun foo ($a → Int) { ... }
+
+For a function which returns a list in list context:
+
+   fun foo ($a → Int is scalar, ArrayRef[Int] is list) { ... }
+
+Note that the list of returned values is validated as if it were an
+arrayref (or a hashref if that seems more appropriate).
+
+Return types can be coerced:
+
+   fun foo ($a → Int does coerce) { ... }
+
+B<TODO:>
+There are some minor bugs parsing multiple return type constraints if
+they don't have traits (C<scalar>, C<list> and C<coerce> are traits of
+course!).
+
+B<TODO:>
+Setting the C<coerce> trait on one return type constraint automatically
+applies it to all return type constraints in that signature. (So you
+can't, say, coerce in scalar context without coercing in list context
+too.)
+
 =head1 BUGS
 
 Please report any bugs to
