@@ -1,6 +1,7 @@
 use 5.014;
 use strict;
 use warnings;
+no warnings 'void';	
 
 use Carp ();
 use Exporter::Tiny ();
@@ -63,21 +64,30 @@ sub _exporter_expand_sub
 	Module::Runtime::use_package_optimistically($implementation)->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
 	
-	$^H{$me} .= "$name=$implementation ";
+	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
+	# currently in scope.
+	$^H{'Kavorka'} .= "$name=$implementation ";
 	
-	no warnings 'void';
+	# This is the code that gets called at run-time.
+	#
 	my $code = Sub::Name::subname(
 		"$me\::$name",
 		sub {
-			$name; # close over name to prevent optimization
 			my $subroutine = shift;
+			$name; # close over name to prevent optimization
+			
+			# Post-parse clean-up
 			$subroutine->_post_parse();
+			
+			# Store $subroutine for introspection
 			$INFO{ $subroutine->body } = $subroutine;
 			
+			# Install sub
 			my @r = wantarray
 				? $subroutine->install_sub
 				: scalar($subroutine->install_sub);
 			
+			# Prevents a cycle between %INFO and $subroutine.
 			Scalar::Util::weaken($subroutine->{body})
 				unless Scalar::Util::isweak($subroutine->{body});
 			
@@ -85,6 +95,9 @@ sub _exporter_expand_sub
 		},
 	);
 	
+	# This joins up the code above with our custom parsing via
+	# Parse::Keyword
+	#
 	Parse::Keyword::install_keyword_handler(
 		$code => Sub::Name::subname(
 			"$me\::parse_$name",
@@ -99,6 +112,7 @@ sub _exporter_expand_sub
 		),
 	);
 	
+	# Symbol for Exporter::Tiny to export
 	return ($name => $code);
 }
 
