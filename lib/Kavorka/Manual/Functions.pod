@@ -77,6 +77,13 @@ but are installed into the symbol table at run-time. So this works:
       fun foobar { ... }
    }
 
+It is possible to define lexical functions using a dollar-prefixed
+function name:
+
+   fun $add ($x, $y) {
+	   $x + $y;
+   }
+
 =head2 The Signature
 
 See L<Kavorka::Manual::Signature>.

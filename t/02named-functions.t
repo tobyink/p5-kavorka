@@ -44,6 +44,14 @@ use Test::Fatal;
 	fun ::quux ($x, $y, ...) {
 		return { '@_' => \@_, '$x' => \$x, '$y' => \$y };
 	}
+	
+	fun $xyzzy ($x) {
+		return { '$x' => \$x };
+	}
+	
+	fun XYZZY ($x) {
+		return $xyzzy->($x);
+	}
 }
 
 is_deeply(
@@ -123,6 +131,12 @@ is(
 	exception { quux(undef, undef) },
 	undef,
 	'an explicit undef satisfies positional parameters with yadayada',
+);
+
+is_deeply(
+	Example::XYZZY(42),
+	{ '$x' => \42 },
+	'lexical subs',
 );
 
 { package Example3; use Kavorka; fun xxx { } };

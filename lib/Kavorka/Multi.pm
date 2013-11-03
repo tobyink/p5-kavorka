@@ -62,6 +62,7 @@ after parse_signature => sub
 };
 
 sub allow_anonymous { 0 }
+sub allow_lexical   { 0 }
 
 sub default_attributes
 {

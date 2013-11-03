@@ -44,6 +44,14 @@ use Test::Fatal;
 	method ::quux ($x, $y, ...) {
 		return { '$self' => $self, '@_' => \@_, '$x' => \$x, '$y' => \$y };
 	}
+	
+	method $xyzzy ($x) {
+		return { '$self' => $self, '$x' => \$x };
+	}
+	
+	method XYZZY ($x) {
+		return $self->$xyzzy($x);
+	}
 }
 
 is_deeply(
@@ -123,6 +131,12 @@ is(
 	exception { main->quux(undef, undef) },
 	undef,
 	'an explicit undef satisfies positional parameters with yadayada',
+);
+
+is_deeply(
+	Example->XYZZY(42),
+	{ '$self' => 'Example', '$x' => \42 },
+	'lexical methods',
 );
 
 { package Example3; use Kavorka; method xxx { } };

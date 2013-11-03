@@ -1,9 +1,0 @@
-1. It might be nice to allow something like this:
-
-	method $foo ($self: Int $x) {
-		...;
-	}
-	
-	$self->$foo(1234);
-
-2. Return values
