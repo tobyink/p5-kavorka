@@ -453,11 +453,6 @@ Return types can be coerced:
    fun foo ($a → Int does coerce) { ... }
 
 B<TODO:>
-There are some minor bugs parsing multiple return type constraints if
-they don't have traits (C<scalar>, C<list> and C<coerce> are traits of
-course!).
-
-B<TODO:>
 Setting the C<coerce> trait on one return type constraint automatically
 applies it to all return type constraints in that signature. (So you
 can't, say, coerce in scalar context without coercing in list context

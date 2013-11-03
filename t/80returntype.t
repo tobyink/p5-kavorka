@@ -27,14 +27,20 @@ use Test::Fatal;
 
 use Kavorka;
 
+note "simple type constraint";
+
 fun add1 ($a, $b → Int) {
 	return $a + $b;
 }
 
 is( add1(4,5), 9 );
 is( add1(4.1,4.9), 9 );
+like(exception { my $r = add1(4.1, 5) }, qr{did not pass type constraint "Int" at \S+ line 38});
 
-ok exception { my $r = add1(4.1, 5) };
+is_deeply( [add1(4,5)], [9] );
+like(exception { my @r = add1(4.1, 5) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 41});
+
+note "type constraint expression";
 
 use Types::Standard ();
 use constant Rounded => Types::Standard::Int()->plus_coercions(Types::Standard::Num(), q[int($_)]);
@@ -46,5 +52,19 @@ fun add2 ($a, $b --> (Rounded) does coerce) {
 is( add2(4,5), 9 );
 is( add2(4.1,4.9), 9 );
 is( add2(4.1,5), 9 );
+
+note "type constraints for list and scalar contexts";
+
+fun add3 ($a, $b → Int, ArrayRef[Int] is list) {
+	wantarray ? ($a,$b) : ($a+$b);
+}
+
+is( add3(4,5), 9 );
+is( add3(4.1,4.9), 9 );
+like(exception { my $r = add3(4.1, 5) }, qr{did not pass type constraint "Int" at \S+ line 64});
+
+is_deeply( [add3(4,5)], [4,5] );
+like(exception { my @r = add3(4.1,4.9) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 67});
+like(exception { my @r = add3(4.1,5) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 68});
 
 done_testing;
