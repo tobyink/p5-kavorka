@@ -329,9 +329,8 @@ sub _apply_return_types
 	my @rt = @{ $self->signature->return_types };
 	if (@rt)
 	{
-		my @scalar = map $_->type, grep !$_->list, @rt;
-		my @list   = map $_->type, grep  $_->list, @rt;
-		my $coerce = grep $_->coerce, @rt;
+		my @scalar = grep !$_->list, @rt;
+		my @list   = grep  $_->list, @rt;
 		
 		my $scalar =
 			(@scalar == 0) ? undef :
@@ -346,9 +345,10 @@ sub _apply_return_types
 		require Return::Type;
 		my $wrapped = Return::Type->wrap_sub(
 			$self->body,
-			scalar  => $scalar,
-			list    => $list,
-			coerce  => $coerce,
+			scalar        => ($scalar ? $scalar->type   : undef),
+			list          => ($list   ? $list->type     : undef),
+			coerce_scalar => ($scalar ? $scalar->coerce : 0),
+			coerce_list   => ($list   ? $list->coerce   : $scalar ? $scalar->coerce : 0),
 		);
 		$self->_set_body($wrapped);
 	}

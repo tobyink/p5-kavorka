@@ -448,15 +448,13 @@ For a function which returns a list in list context:
 Note that the list of returned values is validated as if it were an
 arrayref (or a hashref if that seems more appropriate).
 
+If no type constraint is provided for list context, then the type
+constraint is assumed to be an arrayref of whatever type constraint
+was given for scalar context.
+
 Return types can be coerced:
 
    fun foo ($a → Int does coerce) { ... }
-
-B<TODO:>
-Setting the C<coerce> trait on one return type constraint automatically
-applies it to all return type constraints in that signature. (So you
-can't, say, coerce in scalar context without coercing in list context
-too.)
 
 =head1 BUGS
 
