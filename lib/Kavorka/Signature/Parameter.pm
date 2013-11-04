@@ -335,6 +335,7 @@ sub _injection_assignment
 				and $_->parent->strictly_equals(Types::Standard::Dict())
 			} $_[0], $_[0]->parents;
 			return unless $dict;
+			return if ref($dict->parameters->[-1]) eq q(HASH);
 			my @keys = sort keys %{ +{ @{ $dict->parameters } } };
 			return unless @keys;
 			\@keys;

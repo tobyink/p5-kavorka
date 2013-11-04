@@ -351,7 +351,7 @@ locked I<outside> the function too!
 
 This trait has special support for the C<Dict> type constraint from
 L<Types::Standard>, including optional keys in the list of allowed
-keys.
+keys, unless the type constraint includes a C<slurpy> component.
 
    fun foo (HashRef $x is locked) {
       $x->{foo} = 1;
