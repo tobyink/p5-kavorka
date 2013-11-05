@@ -437,9 +437,14 @@ See also L<http://en.wikipedia.org/wiki/The_Yada_Yada>.
 After a Unicode rightwards arrow character (C<< → >>) or the ASCII
 equivalent (C<< --> >>), you may list return type constraints.
 
-For a function which only returns one value:
+For a function which takes three values and returns an integer:
 
-   fun foo ($a → Int) { ... }
+   fun foo ($a, $b, $c → Int) { ... }
+
+It is possible to include a return type for functions which take
+no parameters:
+
+   fun foo (→ Int) { ... }
 
 For a function which returns a list in list context, you can use the
 C<list> and C<scalar> traits to specify return types for each context.

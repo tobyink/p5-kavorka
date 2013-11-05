@@ -45,6 +45,16 @@ sub parse
 	my $found_colon = 0;
 	my $arr    = $self->params;
 	my $_class = 'parameter_class';
+	
+	if (lex_peek(4) =~ /\A(\xE2\x86\x92|-->)/)
+	{
+		lex_read(length $1);
+		$arr    = $self->return_types;
+		$_class = 'return_type_class';
+		lex_read_space;
+	}
+	
+	my $skip = 0;
 	while (lex_peek ne ')')
 	{
 		if (lex_peek(3) eq '...')
@@ -52,11 +62,12 @@ sub parse
 			$self->_set_yadayada(1);
 			lex_read(3);
 			lex_read_space;
+			++$skip && next if lex_peek(4) =~ /\A(\xE2\x86\x92|-->)/;
 			croak("After yada-yada, expected right parenthesis") unless lex_peek eq ")";
 			next;
 		}
 		
-		push @$arr, $self->$_class->parse(package => $self->package);
+		push @$arr, $self->$_class->parse(package => $self->package) unless $skip--;
 		lex_read_space;
 		
 		my $peek = lex_peek;
