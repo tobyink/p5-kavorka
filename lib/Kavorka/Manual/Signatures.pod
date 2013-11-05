@@ -2,7 +2,7 @@
 
 =encoding utf-8
 
-=for stopwords invocant invocants lexicals unintuitive yada globals ro rw boolification
+=for stopwords invocant invocants lexicals unintuitive yada globals ro rw boolification rightwards
 
 =head1 NAME
 

@@ -1,7 +1,7 @@
 use 5.014;
 use strict;
 use warnings;
-no warnings 'void';	
+no warnings 'void';
 
 use Carp ();
 use Exporter::Tiny ();
