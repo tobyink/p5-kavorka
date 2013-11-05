@@ -456,6 +456,12 @@ Return types can be coerced:
 
    fun foo ($a → Int does coerce) { ... }
 
+Return types are implemented using L<Return::Type> which adds a wrapper
+around your function. Although this wrapper should be invisible to
+C<caller> (thanks to L<Scope::Upper>), it does add some overhead to
+your function calls, so return types are a feature to use
+conservatively.
+
 =head1 BUGS
 
 Please report any bugs to
