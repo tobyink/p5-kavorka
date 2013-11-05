@@ -9,7 +9,7 @@ use Kavorka::Signature::ReturnType ();
 package Kavorka::Signature;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 our @CARP_NOT  = qw( Kavorka::Sub Kavorka );
 
 use Carp qw( croak );

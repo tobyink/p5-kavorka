@@ -202,3 +202,12 @@
 		item "Test that definition of multi subs happens at runtime, and definition can continue even after the multi sub has been invoked."^^Tests;
 		item "Test for cache invalidation of compiled multi sub dispatchers."^^Tests;
 	].
+
+`Kavorka 0.014 cpan:TOBYINK`
+	issued  2013-11-05;
+	label   "Gunpowder, treason and plot";
+	changeset [
+		item "Work with (and indeed require Type::Tiny 0.032)."^^Update;
+		item "Return types, optionally with coercion."^^Addition;
+		item "Lexical functions and methods."^^Addition;
+	].

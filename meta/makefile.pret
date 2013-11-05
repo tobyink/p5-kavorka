@@ -14,9 +14,9 @@
 	:runtime-requirement    [ :on "Return::Type 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Sub::Name 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Type::Parser 0.032"^^:CpanId; comment "Fix for comma-delimited type lists." ];
-	:runtime-requirement    [ :on "Type::Registry 0.028"^^:CpanId ];
-	:runtime-requirement    [ :on "Type::Utils 0.028"^^:CpanId ];
-	:runtime-requirement    [ :on "Types::Standard 0.028"^^:CpanId ];
+	:runtime-requirement    [ :on "Type::Registry 0.032"^^:CpanId ];
+	:runtime-requirement    [ :on "Type::Utils 0.032"^^:CpanId ];
+	:runtime-requirement    [ :on "Types::Standard 0.032"^^:CpanId ];
 	:runtime-requirement    [ :on "namespace::sweep 0.006"^^:CpanId ];
 	:test-requirement       [ :on "Test::More 0.96"^^:CpanId ];
 	:test-requirement       [ :on "Test::Fatal"^^:CpanId ];
