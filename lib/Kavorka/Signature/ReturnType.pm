@@ -10,6 +10,7 @@ our @CARP_NOT  = qw( Kavorka::Signature Kavorka::Sub Kavorka );
 
 use Carp qw( croak );
 use Parse::Keyword {};
+use Types::Standard qw(Any);
 
 use Moo;
 use namespace::sweep;
@@ -18,8 +19,9 @@ has package         => (is => 'ro');
 has type            => (is => 'ro');
 has traits          => (is => 'ro', default => sub { +{} });
 
-sub coerce { !!shift->traits->{coerce} }
-sub list   { !!shift->traits->{list} }
+sub coerce  { !!shift->traits->{coerce} }
+sub list    { !!shift->traits->{list} }
+sub assumed { !!shift->traits->{assumed} }
 
 sub parse
 {
@@ -80,6 +82,22 @@ sub parse
 		type           => $type,
 		traits         => \%traits,
 	);
+}
+
+sub sanity_check
+{
+	my $self = shift;
+	
+	croak("Return type cannot coerce and be assumed")
+		if $self->assumed && $self->coerce;
+	
+	();
+}
+
+sub _effective_type
+{
+	my $self = shift;
+	$self->assumed ? Any : $self->type;
 }
 
 1;

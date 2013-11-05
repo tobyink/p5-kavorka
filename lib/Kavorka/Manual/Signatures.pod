@@ -441,7 +441,8 @@ For a function which only returns one value:
 
    fun foo ($a → Int) { ... }
 
-For a function which returns a list in list context:
+For a function which returns a list in list context, you can use the
+C<list> and C<scalar> traits to specify return types for each context.
 
    fun foo ($a → Int is scalar, ArrayRef[Int] is list) { ... }
 
@@ -461,6 +462,19 @@ around your function. Although this wrapper should be invisible to
 C<caller> (thanks to L<Scope::Upper>), it does add some overhead to
 your function calls, so return types are a feature to use
 conservatively.
+
+If a return type has the C<assumed> trait, it will I<not> be checked
+at run time; we just assume the function is doing its job properly and
+returning an appropriate value. This avoids the overhead of checking
+return types at run time, but still includes the return type constraint
+in the introspection API.
+
+   fun plus_one (Int $x → Int is assumed)
+   {
+      # No need to check return type.
+      # If $x is an Int, then $x+1 must be too!
+      return $x + 1;
+   }
 
 =head1 BUGS
 

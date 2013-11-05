@@ -327,6 +327,7 @@ sub _apply_return_types
 	my $self = shift;
 	
 	my @rt = @{ $self->signature->return_types };
+	
 	if (@rt)
 	{
 		my @scalar = grep !$_->list, @rt;
@@ -342,13 +343,15 @@ sub _apply_return_types
 			(@list == 1) ? $list[0] :
 			croak("Multiple list context return types specified for function");
 		
+		return if (!$scalar || $scalar->assumed) && (!$list || $list->assumed);
+		
 		require Return::Type;
 		my $wrapped = Return::Type->wrap_sub(
 			$self->body,
-			scalar        => ($scalar ? $scalar->type   : undef),
-			list          => ($list   ? $list->type     : undef),
-			coerce_scalar => ($scalar ? $scalar->coerce : 0),
-			coerce_list   => ($list   ? $list->coerce   : $scalar ? $scalar->coerce : 0),
+			scalar        => ($scalar ? $scalar->_effective_type   : undef),
+			list          => ($list   ? $list->_effective_type     : undef),
+			coerce_scalar => ($scalar ? $scalar->coerce            : 0),
+			coerce_list   => ($list   ? $list->coerce              : $scalar ? $scalar->coerce : 0),
 		);
 		$self->_set_body($wrapped);
 	}

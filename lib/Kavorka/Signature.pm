@@ -170,6 +170,8 @@ sub sanity_check
 		croak("Found $p_type parameter ($name) after $zone; forbidden");
 	}
 	
+	$_->sanity_check for @{ $self->return_types };
+	
 	();
 }
 
