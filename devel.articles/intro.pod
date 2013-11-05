@@ -1,0 +1,78 @@
+=pod
+
+=encoding utf-8
+
+=head1 Introducing Kavorka
+
+Kavorka is a function signatures module, along the lines of
+L<Function::Parameters>, L<Method::Signatures>, and
+L<MooseX::Method::Signatures>.
+
+Its features include:
+
+=over
+
+=item *
+
+Named, positional and slurpy parameters
+
+=item *
+
+Required and optional parameters
+
+=item *
+
+Defaults for optional parameters
+
+=item *
+
+Type constraints and value constraints
+
+=item *
+
+Type coercions
+
+=item *
+
+Return types
+
+=item *
+
+Method modifiers
+
+=item *
+
+Multi subs and multi methods
+
+=item *
+
+Lexical (private) methods
+
+=item *
+
+An introspection API that can integrate with Moose's MOP
+
+=item *
+
+L<Speed|https://metacpan.org/pod/release/TOBYINK/Kavorka-0.014/examples/benchmarks.pl#RESULTS>
+
+=back
+
+It probably has every feature you want from in a function signatures
+module, unless you want minimalism.
+
+Here's how you might write a function with type checks on the incoming
+parameters and also the returned value:
+
+   fun maxnum (Num @numbers → Num) {
+      my $max = shift @numbers;
+      for (@numbers) {
+         $max = $_ if $max < $_;
+      }
+      return $max;
+   }
+
+Kavorka is still not especially stable, but seems to work pretty well
+(except in some cases defining closures over variables outside the sub).
+
+Feedback welcome.
