@@ -67,7 +67,9 @@ sub parse
 			next;
 		}
 		
-		push @$arr, $self->$_class->parse(package => $self->package) unless $skip--;
+		$skip
+			? ($skip = 0)
+			: push(@$arr, $self->$_class->parse(package => $self->package));
 		lex_read_space;
 		
 		my $peek = lex_peek;
