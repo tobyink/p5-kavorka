@@ -1,0 +1,252 @@
+<!doctype html>
+
+<style type="text/css">
+	@import url(http://fonts.googleapis.com/css?family=Raleway:400,700);
+	body { margin: 0; padding: 2em 4em; font-family: 'Raleway', sans-serif; }
+	table { border-collapse: collapse; border: 2px solid #666 }
+	th, td { border: 1px solid #ccc }
+	th[scope=row] { text-align: right; font-weight: normal }
+	td.Y { background: #dfd; color: #060 }
+	td.N { background: #fdd; color: #600 }
+	td.X { background: #ddf; color: #006 }
+	td.X span { border: 1px solid black; background: #ff9; color: black; font-size: 80% }
+</style>
+
+<title>Feature comparison between Perl function signature implementations</title>
+<h1>Feature comparison between Perl function signature implementations</h1>
+
+<p>As the author of one of these, I am arguably biased, so a diligent reader may wish to check the documentation of the relevent modules, and perform their own benchmarking.</p>
+
+<table>
+	<caption>Feature comparison between Perl function signature implementations</caption>
+	<thead>
+		<tr>
+			<th scope="col">Feature
+			<th scope="col"><a href="https://metacpan.org/release/Function-Parameters">Function-Parameters</a>
+			<th scope="col"><a href="https://metacpan.org/release/Kavorka">Kavorka</a>
+			<th scope="col"><a href="https://metacpan.org/release/Method-Signatures">Method-Signatures</a>
+			<th scope="col"><a href="https://metacpan.org/release/MooseX-Method-Signatures">MooseX-Method-Signatures</a>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th scope="row">Positional parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Named parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Long named parameters
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Slurpy parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Required parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Optional parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Aliased parameters
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Defaults for optional parameters
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Fine-grained control over when defaults are used
+			<td class="N">No
+			<td class="X">Partial <span>(provides <code>//=</code> and <code>||=</code>)</span>
+			<td class="Y">Yes
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Type constraints
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Type coercion
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Value constraints
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Return type constraints
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Return type coercion
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Allows <code>$_</code> to be used as a parameter
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Allows <code>\@foo</code> to be used as a parameter
+			<td class="N">No
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Can define non-method functions
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Method modifiers
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Multi methods / multi subs
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="X">Requires extension <span>(requires <a href="https://metacpan.org/release/MooseX-MultiMethods">MooseX-MultiMethods</a>)</span>
+		</tr>
+		<tr>
+			<th scope="row">Anonymous functions / methods
+			<td class="Y">Yes
+			<td class="X">Potentially buggy <span>(problems with closures)</span>
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Lexical (private) functions / methods
+			<td class="X">Sort of <span>(you can assign an anonymous function/method to a lexical variable)</span>
+			<td class="Y">Yes
+			<td class="X">Sort of <span>(you can assign an anonymous function/method to a lexical variable)</span>
+			<td class="X">Sort of <span>(you can assign an anonymous function/method to a lexical variable)</span>
+		</tr>
+		<tr>
+			<th scope="row">Prototypes (like <code>(&@)</code>)
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Attributes (like <code>:lvalue</code>)
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="N">No
+		</tr>
+		<tr>
+			<th scope="row">Introspection API
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="N">No
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row">Extensible in Pure Perl
+			<td class="N">No
+			<td class="Y">Yes
+			<td class="Y">Yes
+			<td class="Y">Yes
+		</tr>
+		<tr>
+			<th scope="row"><a href="https://metacpan.org/pod/release/TOBYINK/Kavorka-0.014/examples/benchmarks.pl#RESULTS">Benchmarking results</a>, with Moose
+			<td>9732/s
+			<td>17598/s
+			<td>8980/s
+			<td>777/s
+		</tr>
+		<tr>
+			<th scope="row"><a href="https://metacpan.org/pod/release/TOBYINK/Kavorka-0.014/examples/benchmarks.pl#RESULTS">Benchmarking results</a>, with Mouse
+			<td>10353/s
+			<td>43689/s
+			<td>41684/s
+			<td>817/s
+		</tr>
+		<tr>
+			<th scope="row">Non-core dependencies</th>
+			<td><a href="http://deps.cpantesters.org/?module=Function::Parameters">3</a>
+			<td><a href="http://deps.cpantesters.org/?module=Kavorka">38</a>
+			<td><a href="http://deps.cpantesters.org/?module=Method::Signatures">40</a>
+			<td><a href="http://deps.cpantesters.org/?module=MooseX::Method::Signatures">78</a>
+		</tr>
+	</tbody>
+</table>
+
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script type="text/javascript">
+$(function () {
+	$('td.X').each(function (i, e) {
+		var td   = $(e);
+		var span = td.find('span');
+		td.hover(
+			function () {
+				td.css({ position: "relative" });
+				span.css({ display: "block", position: "absolute", top: "1em", left: "1em"  });
+			},
+			function () {
+				td.css({ position: "static" });
+				span.css({ display: "none" });
+			}
+		);
+		span.css({ display: "none" });
+	});
+});
+</script>
+
