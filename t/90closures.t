@@ -88,4 +88,26 @@ subtest "Closing over a variable in a where {} block" => sub
 	ok exception { $lim7->(8) };
 };
 
+package Joo {
+	use Kavorka;
+	method get_set ($x) {
+		return (
+			fun ()   { $x },
+			fun ($y) { $x = $y },
+		);
+	}
+}
+
+subtest "Two anonymous functions closing over the same variable" => sub
+{
+	my ($g, $s) = Joo->get_set(20);
+	my ($g2, $s2) = Joo->get_set(666);
+	is($g->(), 20);
+	is($s->(21), 21);
+	is($g->(), 21);
+	is($s->($g->() * 2), 42);
+	is($g->(), 42);
+	is($g2->(), 666);
+};
+
 done_testing;
