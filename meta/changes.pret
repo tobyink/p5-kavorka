@@ -211,3 +211,14 @@
 		item "Return types, optionally with coercion."^^Addition;
 		item "Lexical functions and methods."^^Addition;
 	].
+
+`Kavorka 0.015 cpan:TOBYINK`
+	issued  2013-11-07;
+	changeset [
+		item "Most of the closure issues associated with Parse::Keyword are now worked around."^^Bugfix;
+		item "$sub->signature now returns undef if no signature was given in the declaration."^^Bugfix;
+		item "Checking if @_ < 0 is silly; stop doing that."^^Change;
+		item "Document that fun ($x, $y=$x) {...} doesn't work how you might expect it to, and some work-arounds."^^Documentation;
+		item "Tidy up some of the closure tests."^^Tests;
+		item "Change the syntax of lexical functions and methods to include the `my` keyword in their declaration."^^BackCompat;
+	].
