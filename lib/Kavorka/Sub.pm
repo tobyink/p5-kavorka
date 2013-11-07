@@ -25,6 +25,7 @@ has signature       => (is => 'rwp');
 has prototype       => (is => 'rwp');
 has attributes      => (is => 'ro', default => sub { [] });
 has body            => (is => 'rwp');
+has _unwrapped_body => (is => 'rwp');
 has qualified_name  => (is => 'rwp');
 
 sub allow_anonymous      { 1 }
@@ -353,6 +354,7 @@ sub _apply_return_types
 			coerce_scalar => ($scalar ? $scalar->coerce            : 0),
 			coerce_list   => ($list   ? $list->coerce              : $scalar ? $scalar->coerce : 0),
 		);
+		$self->_set__unwrapped_body($self->body);
 		$self->_set_body($wrapped);
 	}
 }
