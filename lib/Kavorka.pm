@@ -92,11 +92,13 @@ sub _exporter_expand_sub
 			{
 				my $orig = $r[0];
 				my $caller_vars = PadWalker::peek_my(1);
-				@r = sub {
+				@r = Sub::Name::subname($subroutine->package."::__ANON__", sub {
 					$subroutine->_poke_pads($caller_vars);
 					goto $orig;
-				};
+				});
 				&Scalar::Util::set_prototype($r[0], $_) for grep defined, prototype($orig);
+				$INFO{ $r[0] } = $subroutine;
+				Scalar::Util::weaken($INFO{ $r[0] });
 			}
 			else
 			{

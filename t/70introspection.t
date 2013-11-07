@@ -45,10 +45,8 @@ is($foo->keyword, 'fun', '$foo->keyword');
 is($foo->declared_name, 'Example::foo', '$foo->declared_name');
 is($foo->qualified_name, 'Example::foo', '$foo->qualified_name');
 
-{
-	local $TODO = 'not sure why this is failing!';
-	is($foo->signature, undef, '$foo->signature');
-}
+is($foo->signature, undef, '$foo->signature')
+	or diag explain($foo);
 
 is($foo->prototype, '@', '$foo->prototype');
 
@@ -83,6 +81,15 @@ ok(
 	q/traits/,
 );
 is($bar->prototype, undef, '$bar->prototype');
+
+{
+	package ZZZZ;
+	use Kavorka;
+	my $info = Kavorka->info(fun ($x) { 42 });
+	
+	::is($info->package, 'ZZZZ', 'introspection of anon function - A');
+	::is($info->signature->params->[0]->name, '$x', 'introspection of anon function - B');
+}
 
 done_testing;
 

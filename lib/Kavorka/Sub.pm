@@ -109,10 +109,6 @@ sub parse
 	# body
 	$self->parse_body;
 	
-	# clean up
-	$self->_set_signature(undef)
-		if $sig->_is_dummy;
-	
 	$self;
 }
 
@@ -149,7 +145,11 @@ sub parse_signature
 	
 	# default signature
 	my $dummy = 0;
-	$dummy = 1 && lex_stuff('(...)') if lex_peek ne '(';
+	if (lex_peek ne '(')
+	{
+		$dummy = 1;
+		lex_stuff('(...)');
+	}
 	
 	lex_read(1);
 	my $sig = $self->signature_class->parse(package => $self->package, _is_dummy => $dummy);
@@ -322,6 +322,9 @@ sub _post_parse
 	
 	$self->_apply_return_types;
 	
+	$self->_set_signature(undef)
+		if $self->signature && $self->signature->_is_dummy;
+	
 	();
 }
 
@@ -329,7 +332,7 @@ sub _apply_return_types
 {
 	my $self = shift;
 	
-	my @rt = @{ $self->signature->return_types };
+	my @rt = @{ $self->signature ? $self->signature->return_types : [] };
 	
 	if (@rt)
 	{
@@ -367,7 +370,7 @@ sub _build__pads_to_poke
 	
 	my @pads = $self->_unwrapped_body // $self->body;
 	
-	for my $param (@{ $self->signature->params })
+	for my $param (@{ $self->signature ? $self->signature->params : [] })
 	{
 		push @pads, $param->default if $param->default;
 		push @pads, @{ $param->constraints };
