@@ -138,15 +138,11 @@ for my $i (0..2) {
 	push @subs,      sub      { $i };
 }
 
-{
-	local $TODO = 'broken closures';
-	
-	is_deeply(
-		[ $functions[0]->(7), $functions[1]->(7), $functions[2]->(7) ],
-		[ $subs[0]->(7),      $subs[1]->(7),      $subs[2]->(7) ],
-		'closures work for anonymous functions',
-	);
-}
+is_deeply(
+	[ $functions[0]->(7), $functions[1]->(7), $functions[2]->(7) ],
+	[ $subs[0]->(7),      $subs[1]->(7),      $subs[2]->(7) ],
+	'closures work for anonymous functions',
+);
 
 done_testing;
 

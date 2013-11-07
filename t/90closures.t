@@ -24,4 +24,19 @@ is($foo->dec, 2);
 is($foo->dec, 1);
 is($x, 1);
 
+package Goo {
+	use Kavorka;
+	
+	method xyz {
+		my @links;
+		fun $xxx { push @links, 42 };
+		$xxx->();
+		return \@links;
+	}
+}
+
+is_deeply(Goo->xyz, [42]);
+is_deeply(Goo->xyz, [42]);
+is_deeply(Goo->xyz, [42]);
+
 done_testing;

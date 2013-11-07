@@ -286,7 +286,7 @@ sub parse_body
 		# Perl. We'll pick it up later from this name in _post_parse
 		lex_stuff(
 			sprintf(
-				"%s sub Kavorka::Temp::f%d %s { %s",
+				"%s sub Kavorka::Temp::f%d %s { no warnings 'closure'; %s",
 				$lex,
 				++$i,
 				$self->inject_attributes,

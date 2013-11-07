@@ -87,6 +87,27 @@ sub _exporter_expand_sub
 				? $subroutine->install_sub
 				: scalar($subroutine->install_sub);
 			
+			# Workarounds for closure issues in Parse::Keyword
+			if ($subroutine->is_lexical)
+			{
+				my $closed_over = PadWalker::closed_over($subroutine->{body});
+            my $caller_vars = PadWalker::peek_my(1);
+            $closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
+            PadWalker::set_closed_over($subroutine->{body}, $closed_over);
+			}
+			elsif ($subroutine->is_anonymous)
+			{
+				my $orig = $r[0];
+            my $caller_vars = PadWalker::peek_my(1);
+				@r = sub {
+					my $closed_over = PadWalker::closed_over($orig);
+					$closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
+					PadWalker::set_closed_over($orig, $closed_over);
+					goto $orig;
+				};
+				&Scalar::Util::set_prototype($r[0], $_) for grep defined, prototype($orig);
+			}
+			
 			# Prevents a cycle between %INFO and $subroutine.
 			Scalar::Util::weaken($subroutine->{body})
 				unless Scalar::Util::isweak($subroutine->{body});
