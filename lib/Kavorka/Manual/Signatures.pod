@@ -292,6 +292,26 @@ For slurpy references, the syntax is a little unintuitive:
 
    fun foo ( slurpy ArrayRef $bar = (1, 2, 3) ) { ... }
 
+B<< Caveat: >> the following does not work:
+
+   fun foo ($x, $y = $x) { ... }
+
+The lexical variable C<< $x >> has scope in the body of the sub, but
+not within the signature itself, so it cannot be used as the default
+value for C<< $y >>. This can be worked around by making C<< $x >> a
+package variable:
+
+   fun foo (our $x, $y = our $x) { ... }
+
+Or simply set the default manually in the body of the function.
+
+   fun foo ($x, $y?) {
+      $y = $x if @_ == 1;
+      ...;
+   }
+
+You hadn't forgotten how to do that already, had you?
+
 =head2 Traits
 
 Traits may be added to each parameter using the C<is> keyword:
