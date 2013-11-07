@@ -271,6 +271,14 @@ attributes don't work properly for anonymous functions.
 
 =item *
 
+This module is based on L<Parse::Keyword>, which has a chronically
+broken implementation of closures. Kavorka uses L<PadWalker> to attempt
+to work around the problem. This mostly seems to work, but you may
+experience some problems in edge cases, especially for anonymous
+functions and methods.
+
+=item *
+
 If importing Kavorka's method modifiers into Moo/Mouse/Moose classes,
 pay attention to load order:
 
