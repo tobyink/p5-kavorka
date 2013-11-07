@@ -74,12 +74,12 @@ Methods are added to the class at run-time. So this works:
    }
 
 It is possible to define lexical (i.e. truly private) methods using a
-dollar-prefixed method name:
+lexical variable for a method name:
 
    objectmethod get_name () {
       return $self->{name};
    }
-   objectmethod $set_name (Str $new) {
+   objectmethod my $set_name (Str $new) {
       $self->{name} = $new;
    }
    

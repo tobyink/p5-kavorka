@@ -45,7 +45,7 @@ use Test::Fatal;
 		return { '@_' => \@_, '$x' => \$x, '$y' => \$y };
 	}
 	
-	fun $xyzzy ($x) {
+	fun my $xyzzy ($x) {
 		return { '$x' => \$x };
 	}
 	
@@ -59,7 +59,7 @@ use Test::Fatal;
 	);
 	
 	{
-		fun $xyzzy () { 42 };
+		fun my $xyzzy () { 42 };
 		::is($xyzzy->(), 42, 'can redefine lexical function in another scope');
 	}
 }

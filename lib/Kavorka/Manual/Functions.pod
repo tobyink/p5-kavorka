@@ -77,12 +77,14 @@ but are installed into the symbol table at run-time. So this works:
       fun foobar { ... }
    }
 
-It is possible to define lexical functions using a dollar-prefixed
-function name:
+It is possible to define lexical functions using a lexical variable
+for a function name:
 
-   fun $add ($x, $y) {
-	   $x + $y;
+   fun my $add ($x, $y) {
+      $x + $y;
    }
+   
+   my $sum = $add->(20, 22);
 
 =head2 The Signature
 

@@ -33,7 +33,7 @@ package Goo {
 	
 	method xyz {
 		my @links;
-		fun $xxx { push @links, 42 };
+		fun my $xxx { push @links, 42 };
 		$xxx->();
 		return \@links;
 	}

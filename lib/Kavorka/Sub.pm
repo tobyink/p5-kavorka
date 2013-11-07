@@ -13,6 +13,9 @@ use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};
 use Parse::KeywordX;
 use Devel::Pragma qw( fqname );
+use Carp;
+
+our @CARP_NOT = qw(Kavorka);
 
 use Moo::Role;
 use namespace::sweep;
@@ -115,25 +118,47 @@ sub parse
 sub parse_subname
 {
 	my $self = shift;
-	
 	my $peek = lex_peek(2);
+	
+	my $saw_my = 0;
+	
 	if ($peek =~ /\A(?:\w|::)/)     # normal sub
 	{
-		$self->_set_declared_name(parse_name('subroutine', 1));
+		my $name = parse_name('subroutine', 1);
+		
+		if ($name eq 'my')
+		{
+			lex_read_space;
+			$saw_my = 1 if lex_peek eq '$';
+		}
+		
+		if ($saw_my)
+		{
+			$peek = lex_peek(2);
+		}
+		else
+		{
+			$self->_set_declared_name($name);
+			return;
+		}
 	}
-	elsif ($peek =~ /\A\$[^\W0-9]/) # lexical sub
+	
+	if ($peek =~ /\A\$[^\W0-9]/) # lexical sub
 	{
+		carp("'${\ $self->keyword }' should be '${\ $self->keyword } my'")
+			unless $saw_my;
+		
 		lex_read(1);
 		$self->_set_declared_name('$' . parse_name('lexical subroutine', 0));
 		
-		die("Keyword '${\ $self->keyword }' does not support defining lexical subs")
+		croak("Keyword '${\ $self->keyword }' does not support defining lexical subs")
 			unless $self->allow_lexical;
+		
+		return;
 	}
-	else
-	{
-		die("Keyword '${\ $self->keyword }' does not support defining anonymous subs")
-			unless $self->allow_anonymous;
-	}
+	
+	croak("Keyword '${\ $self->keyword }' does not support defining anonymous subs")
+		unless $self->allow_anonymous;
 	
 	();
 }
@@ -153,7 +178,7 @@ sub parse_signature
 	
 	lex_read(1);
 	my $sig = $self->signature_class->parse(package => $self->package, _is_dummy => $dummy);
-	lex_peek eq ')' or die;
+	lex_peek eq ')' or croak('Expected ")" after signature');
 	lex_read(1);
 	lex_read_space;
 	
@@ -239,7 +264,7 @@ sub parse_body
 	my $self = shift;
 	
 	lex_read_space;
-	lex_peek(1) eq '{' or Carp::croak("expected block!");
+	lex_peek(1) eq '{' or croak("expected block!");
 	lex_read(1);
 	
 	if ($self->is_anonymous)

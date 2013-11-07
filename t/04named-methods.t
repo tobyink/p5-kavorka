@@ -45,7 +45,7 @@ use Test::Fatal;
 		return { '$self' => $self, '@_' => \@_, '$x' => \$x, '$y' => \$y };
 	}
 	
-	method $xyzzy ($x) {
+	method my $xyzzy ($x) {
 		return { '$self' => $self, '$x' => \$x };
 	}
 	
