@@ -262,8 +262,14 @@ introspection API.
 
 =head1 CAVEATS
 
+=over
+
+=item *
+
 As noted in L<Kavorka::Manual::PrototypeAndAttributes>, subroutine
 attributes don't work properly for anonymous functions.
+
+=item *
 
 If importing Kavorka's method modifiers into Moo/Mouse/Moose classes,
 pay attention to load order:
@@ -278,6 +284,8 @@ keywords will stomp on top of Kavorka's...
    use Moose;          # STOMP, STOMP, STOMP!  :-(
 
 This can lead to delightfully hard to debug errors.
+
+=back
 
 =head1 BUGS
 
