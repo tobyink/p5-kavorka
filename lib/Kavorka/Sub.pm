@@ -304,7 +304,7 @@ sub parse_body
 		if ($self->is_lexical)
 		{
 			$lex = sprintf(
-				'Internals::SvREADONLY(my %s = \&Kavorka::Temp::f%d, 1);',
+				'&Internals::SvREADONLY(\\(my %s = \&Kavorka::Temp::f%d), 1);',
 				$self->declared_name,
 				$i + 1
 			);
