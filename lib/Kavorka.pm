@@ -91,22 +91,16 @@ sub _exporter_expand_sub
 			if ($subroutine->is_anonymous)
 			{
 				my $orig = $r[0];
-            my $caller_vars = PadWalker::peek_my(1);
+				my $caller_vars = PadWalker::peek_my(1);
 				@r = sub {
-					my $closed_over = PadWalker::closed_over($orig);
-					$closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
-					PadWalker::set_closed_over($orig, $closed_over);
+					$subroutine->_poke_pads($caller_vars);
 					goto $orig;
 				};
 				&Scalar::Util::set_prototype($r[0], $_) for grep defined, prototype($orig);
 			}
 			else
 			{
-				my $code = $subroutine->_unwrapped_body // $subroutine->body;
-				my $closed_over = PadWalker::closed_over($code);
-            my $caller_vars = PadWalker::peek_my(1);
-            $closed_over->{$_} = $caller_vars->{$_} for keys %$closed_over;
-            PadWalker::set_closed_over($code, $closed_over);
+				$subroutine->_poke_pads( PadWalker::peek_my(1) );
 			}
 			
 			# Prevents a cycle between %INFO and $subroutine.

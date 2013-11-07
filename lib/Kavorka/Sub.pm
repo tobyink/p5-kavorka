@@ -25,8 +25,10 @@ has signature       => (is => 'rwp');
 has prototype       => (is => 'rwp');
 has attributes      => (is => 'ro', default => sub { [] });
 has body            => (is => 'rwp');
-has _unwrapped_body => (is => 'rwp');
 has qualified_name  => (is => 'rwp');
+
+has _unwrapped_body => (is => 'rwp');
+has _pads_to_poke   => (is => 'lazy');
 
 sub allow_anonymous      { 1 }
 sub allow_lexical        { 1 }
@@ -356,6 +358,34 @@ sub _apply_return_types
 		);
 		$self->_set__unwrapped_body($self->body);
 		$self->_set_body($wrapped);
+	}
+}
+
+sub _build__pads_to_poke
+{
+	my $self = shift;
+	
+	my @pads = $self->_unwrapped_body // $self->body;
+	
+	for my $param (@{ $self->signature->params })
+	{
+		push @pads, $param->default if $param->default;
+		push @pads, @{ $param->constraints };
+	}
+	
+	\@pads;
+}
+
+sub _poke_pads
+{
+	my $self = shift;
+	my ($vars) = @_;
+	
+	for my $code (@{$self->_pads_to_poke})
+	{
+		my $closed_over = PadWalker::closed_over($code);
+		$closed_over->{$_} = $vars->{$_} for keys %$closed_over;
+		PadWalker::set_closed_over($code, $closed_over);
 	}
 }
 
