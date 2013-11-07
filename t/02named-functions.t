@@ -52,6 +52,16 @@ use Test::Fatal;
 	fun XYZZY ($x) {
 		return $xyzzy->($x);
 	}
+	
+	::ok(
+		::exception { $xyzzy = 42 },
+		'cannot rebind the lexical function'
+	);
+	
+	{
+		fun $xyzzy () { 42 };
+		::is($xyzzy->(), 42, 'can redefine lexical function in another scope');
+	}
 }
 
 is_deeply(
