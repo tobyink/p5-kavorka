@@ -39,4 +39,28 @@ is_deeply(Goo->xyz, [42]);
 is_deeply(Goo->xyz, [42]);
 is_deeply(Goo->xyz, [42]);
 
+
+package Hoo {
+	use Kavorka;
+	
+	method xyz ($x) {
+		return (
+			\$x,
+			fun ($y = $x) { $y }
+		);
+	}
+}
+
+local $TODO = 'closures in defaults';
+
+my ($X1, $fourtytwo) = Hoo->xyz(42);
+is($fourtytwo->(666), 666);
+is($fourtytwo->(), 42);
+
+my ($X2, $sixsixsix) = Hoo->xyz(666);
+is($sixsixsix->(999), 999);
+is($sixsixsix->(), 666);
+$$X2 = 777;
+is($sixsixsix->(), 777);
+
 done_testing;
