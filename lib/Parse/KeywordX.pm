@@ -132,8 +132,7 @@ sub parse_trait
 	if (defined $extracted)
 	{
 		my $ccstash = compiling_package;
-		$evaled = eval("package $ccstash; no warnings; no strict; local \$SIG{__WARN__}=sub{die}; [$extracted]")
-			or warn "Could not parse trait parameters: $@";
+		$evaled = eval("package $ccstash; no warnings; no strict; local \$SIG{__WARN__}=sub{die}; [$extracted]");
 	}
 	
 	($name, $extracted, $evaled);

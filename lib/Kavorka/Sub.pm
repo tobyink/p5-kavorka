@@ -224,21 +224,19 @@ sub parse_attributes
 		return;
 	}
 	
-	my $peek;
-	while ($peek = lex_peek(1000) and $peek =~ /\A([^\W0-9]\w+)/)
+	my $peek = lex_peek(1000);
+	while ($peek =~ /\A([^\W0-9]\w+)/)
 	{
-		my $name = $1;
-		lex_read(length $name);
+		my $parsed = [parse_trait];
 		lex_read_space;
 		
-		my $extracted;
-		if (lex_peek eq '(')
+		if ($parsed->[0] eq 'prototype')
 		{
-			$peek = lex_peek(1000);
-			$extracted = extract_bracketed($peek, '()');
-			lex_read(length $extracted);
-			lex_read_space;
-			$extracted =~ s/(?: \A\( | \)\z )//xgsm;
+			$self->_set_prototype($parsed->[1]);
+		}
+		else
+		{
+			push @{$self->attributes}, $parsed;
 		}
 		
 		if (lex_peek eq ':')
@@ -247,13 +245,7 @@ sub parse_attributes
 			lex_read_space;
 		}
 		
-		if ($name eq 'prototype')
-		{
-			$self->_set_prototype($extracted);
-			next;
-		}
-		
-		push @{$self->attributes}, [ $name => $extracted ];
+		$peek = lex_peek(1000);
 	}
 	
 	();
