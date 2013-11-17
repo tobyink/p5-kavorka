@@ -9,10 +9,11 @@ package Parse::KeywordX;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.016';
 
+use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};
 
 our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( parse_name parse_variable );
+our @EXPORT = qw( parse_name parse_variable parse_trait );
 
 #### From p5-mop-redux
 sub read_tokenish ()
@@ -110,6 +111,32 @@ sub parse_variable
 	}
 	
 	die "Expected variable name";
+}
+
+sub parse_trait
+{
+	my $name = parse_name('trait', 0);
+	lex_read_space;
+	
+	my $extracted;
+	if (lex_peek eq '(')
+	{
+		my $peek = lex_peek(1000);
+		$extracted = extract_bracketed($peek, '()');
+		lex_read(length $extracted);
+		lex_read_space;
+		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
+	}
+	
+	my $evaled = 1;
+	if (defined $extracted)
+	{
+		my $ccstash = compiling_package;
+		$evaled = eval("package $ccstash; no warnings; no strict; local \$SIG{__WARN__}=sub{die}; [$extracted]")
+			or warn "Could not parse trait parameters: $@";
+	}
+	
+	($name, $extracted, $evaled);
 }
 
 1;

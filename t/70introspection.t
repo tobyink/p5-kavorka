@@ -32,7 +32,7 @@ use Test::Fatal;
 	use Kavorka;
 	
 	fun Example::foo :(@)                      { return $_[1] }
-	fun bar ($Debbie does Dallas: $x, :$y, %z) { return $_[1] }
+	fun bar ($Debbie: $x, :$y, %z) { return $_[1] }
 }
 
 is(Example::foo(1, 2, y => 3, z => 4), 2,   'foo works');
@@ -75,10 +75,6 @@ is(
 	$sig->slurpy_param->name,
 	'%z',
 	q/$bar->signature->slurpy_param/,
-);
-ok(
-	$sig->params->[0]->traits->{Dallas},
-	q/traits/,
 );
 is($bar->prototype, undef, '$bar->prototype');
 

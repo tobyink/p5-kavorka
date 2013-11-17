@@ -324,10 +324,45 @@ The keyword C<does> is also available which acts as an alias for C<is>.
 
 This feature is shared with Perl 6 signatures and L<Method::Signatures>.
 
-You can use pretty much any word you like as a trait; Kavorka doesn't
-check that they're "valid" or anything. Choosing random words of course
-won't do anything, but the traits are available through the
-introspection API.
+Many traits are recognized by Kavorka natively. If you use an
+unrecognized trait, such as C<foo>, Kavorka will attempt to apply a
+role called C<Kavorka::TraitFor::Parameter::foo> or
+C<Kavorka::TraitFor::ReturnType::foo> (as appropriate) to the
+underlying L<Kavorka::Signature::Parameter> or
+L<Kavorka::Signature::ReturnType> object for this parameter. This
+role can then potentially influence the behaviour of the parameter in
+your sub.
+
+Although none of Kavorka's native traits make use of this syntax,
+traits can be followed by trait parameters in parentheses:
+
+   BEGIN {
+      package Kavorka::TraitFor::Parameter::debug;
+      use Moo::Role;
+      around injection => sub
+      {
+         my $next = shift;
+         my $self = shift;
+         my $code = $self->$next(@_);
+         $code .= sprintf(
+            "printf STDERR %s, %s, %s;",
+            B::perlstring($self->traits->{debug}[0]),
+            B::perlstring($self->name),
+            $self->name,
+         );
+         return $code;
+      };
+   }
+   
+   use Kavorka;
+   
+   fun foo ($x does debug("%s is %s\n")) {
+      ## Injected:
+      ## printf STDERR "%s is %s\n", "\$x", $x;
+      return $x;
+   }
+   
+   foo(42);  # says to STDERR: '$x is 42'
 
 The traits Kavorka understands natively are:
 

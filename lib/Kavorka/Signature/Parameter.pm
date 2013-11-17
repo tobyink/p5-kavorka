@@ -50,6 +50,26 @@ sub BUILD
 	my $id = scalar(@PARAMS);
 	$self->_set_ID($id);
 	$PARAMS[$id] = $self;
+	
+	# traits handled natively
+	state $native_traits = {
+		alias     => 1,
+		coerce    => 1,
+		copy      => 1,
+		invocant  => 1,
+		locked    => 1,
+		optional  => 1,
+		ro        => 1,
+		rw        => 1,
+		slurpy    => 1,
+	};
+	
+	my @custom_traits =
+		map  "Kavorka::TraitFor::Parameter::$_",
+		grep !exists($native_traits->{$_}),
+		keys %{$self->traits};
+	
+	'Moo::Role'->apply_roles_to_object($self, @custom_traits) if @custom_traits;
 }
 
 sub _build_kind
@@ -207,16 +227,16 @@ sub parse
 		lex_read_space;
 	}
 	
-	$peek = lex_peek(1000);
-	while ($peek =~ /\A((?:is|does)\s+(\w+))/sm)
+	while (lex_peek(5) =~ m{ \A (is|does) \s }xsm)
 	{
-		$traits{"$2"} = 1;
 		lex_read(length($1));
 		lex_read_space;
-		$peek = lex_peek(1000);
+		my ($name, undef, $args) = parse_trait;
+		$traits{$name} = $args;
+		lex_read_space;
 	}
 	
-	if ($peek =~ m{ \A ( (?: [/]{2} | [|]{2} )?= ) }x)
+	if (lex_peek(5) =~ m{ \A ( (?: [/]{2} | [|]{2} )?= ) }x)
 	{
 		$default_when = $1;
 		lex_read(length($1));
