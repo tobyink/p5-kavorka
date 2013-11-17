@@ -211,13 +211,13 @@ sub injection
 	);
 }
 
-our $NOBBLE = bless(do { my $x = 1; \$x }, 'Kavorka::NOBBLE');
+our $NOBBLE = bless(do { my $x = 1; \$x }, 'Kavorka::Signature::NOBBLE');
 sub _injection_nobble
 {
 	my $self = shift;
 	return unless $self->nobble_checks;
 	
-	sprintf('my $____nobble_checks = (ref($_[0]) eq "Kavorka::NOBBLE") ? ${+shift} : 0;');
+	sprintf('my $____nobble_checks = (ref($_[0]) eq "Kavorka::Signature::NOBBLE") ? ${+shift} : 0;');
 }
 
 sub _injection_parameter_count
