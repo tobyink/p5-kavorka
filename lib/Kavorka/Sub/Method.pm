@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-use Kavorka::Signature::Parameter ();
+use Kavorka::Parameter ();
 
 package Kavorka::Sub::Method;
 
@@ -25,7 +25,7 @@ sub default_invocant
 {
 	my $self = shift;
 	return (
-		'Kavorka::Signature::Parameter'->new(
+		'Kavorka::Parameter'->new(
 			as_string => '$self:',
 			name      => '$self',
 			traits    => { invocant => 1 },

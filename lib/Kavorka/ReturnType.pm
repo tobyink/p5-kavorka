@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-package Kavorka::Signature::ReturnType;
+package Kavorka::ReturnType;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.016';

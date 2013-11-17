@@ -3,8 +3,8 @@ use strict;
 use utf8;
 use warnings;
 
-use Kavorka::Signature::Parameter ();
-use Kavorka::Signature::ReturnType ();
+use Kavorka::Parameter ();
+use Kavorka::ReturnType ();
 
 package Kavorka::Signature;
 
@@ -27,8 +27,8 @@ has has_invocants     => (is => 'rwp', default => sub { +undef });
 has has_named         => (is => 'rwp', default => sub { +undef });
 has has_slurpy        => (is => 'rwp', default => sub { +undef });
 has yadayada          => (is => 'rwp', default => sub { 0 });
-has parameter_class   => (is => 'ro',  default => sub { 'Kavorka::Signature::Parameter' });
-has return_type_class => (is => 'ro',  default => sub { 'Kavorka::Signature::ReturnType' });
+has parameter_class   => (is => 'ro',  default => sub { 'Kavorka::Parameter' });
+has return_type_class => (is => 'ro',  default => sub { 'Kavorka::ReturnType' });
 has last_position     => (is => 'lazy');
 has args_min          => (is => 'lazy');
 has args_max          => (is => 'lazy');
@@ -211,13 +211,13 @@ sub injection
 	);
 }
 
-our $NOBBLE = bless(do { my $x = 1; \$x }, 'Kavorka::Signature::NOBBLE');
+our $NOBBLE = bless(do { my $x = 1; \$x }, 'Kavorka::NOBBLE');
 sub _injection_nobble
 {
 	my $self = shift;
 	return unless $self->nobble_checks;
 	
-	sprintf('my $____nobble_checks = (ref($_[0]) eq "Kavorka::Signature::NOBBLE") ? ${+shift} : 0;');
+	sprintf('my $____nobble_checks = (ref($_[0]) eq "Kavorka::NOBBLE") ? ${+shift} : 0;');
 }
 
 sub _injection_parameter_count
@@ -408,7 +408,7 @@ introspection API.
 
 A signature instance has the following methods. Each method
 which returns parameters, returns an instance of
-L<Kavorka::Signature::Parameter>.
+L<Kavorka::Parameter>.
 
 =over
 
@@ -510,7 +510,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 L<Kavorka::Manual::API>,
 L<Kavorka::Sub>,
-L<Kavorka::Signature::Parameter>.
+L<Kavorka::Parameter>.
 
 =head1 AUTHOR
 

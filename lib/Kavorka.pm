@@ -252,7 +252,7 @@ does the L<Kavorka::Sub> role.
    say $named_params[0]->named_names->[0];   # says 'x'
 
 See L<Kavorka::Sub>, L<Kavorka::Signature> and
-L<Kavorka::Signature::Parameter> for further details.
+L<Kavorka::Parameter> for further details.
 
 If you're using Moose, consider using L<MooseX::KavorkaInfo> to expose
 Kavorka method signatures via the meta object protocol.

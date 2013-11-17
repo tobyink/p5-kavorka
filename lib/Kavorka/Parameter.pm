@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-package Kavorka::Signature::Parameter;
+package Kavorka::Parameter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.016';
@@ -651,11 +651,11 @@ __END__
 
 =head1 NAME
 
-Kavorka::Signature::Parameter - a single parameter in a function signature
+Kavorka::Parameter - a single parameter in a function signature
 
 =head1 DESCRIPTION
 
-Kavorka::Signature::Parameter is a class where each instance represents
+Kavorka::Parameter is a class where each instance represents
 a parameter in a function signature. This class is used to help parse
 the function signature, and also to inject Perl code into the final
 function.

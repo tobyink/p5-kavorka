@@ -146,7 +146,7 @@ sub __compile
 		map {
 			my $sig = $candidates[$_]->signature;
 			$sig && $sig->nobble_checks ? sprintf(
-				"\@tmp = \@_; if (%s) { unshift \@_, \$Kavorka::Signature::NOBBLE; goto \$coderefs[%d] }\n",
+				"\@tmp = \@_; if (%s) { unshift \@_, \$Kavorka::NOBBLE; goto \$coderefs[%d] }\n",
 				$candidates[$_]->signature->inline_check('@tmp'),
 				$_,
 			) :

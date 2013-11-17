@@ -2,7 +2,7 @@ use 5.014;
 use strict;
 use warnings;
 
-use Kavorka::Signature::Parameter ();
+use Kavorka::Parameter ();
 use Role::Tiny ();
 
 my $DETECT_OO = do {
@@ -73,7 +73,7 @@ sub default_invocant
 {
 	my $self = shift;
 	return (
-		'Kavorka::Signature::Parameter'->new(
+		'Kavorka::Parameter'->new(
 			name      => '$self',
 			traits    => { invocant => 1 },
 		),

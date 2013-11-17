@@ -328,8 +328,8 @@ Many traits are recognized by Kavorka natively. If you use an
 unrecognized trait, such as C<foo>, Kavorka will attempt to apply a
 role called C<Kavorka::TraitFor::Parameter::foo> or
 C<Kavorka::TraitFor::ReturnType::foo> (as appropriate) to the
-underlying L<Kavorka::Signature::Parameter> or
-L<Kavorka::Signature::ReturnType> object for this parameter. This
+underlying L<Kavorka::Parameter> or
+L<Kavorka::ReturnType> object for this parameter. This
 role can then potentially influence the behaviour of the parameter in
 your sub.
 
