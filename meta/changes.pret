@@ -236,3 +236,9 @@
 		item "Rename Kavorka::Signature::Parameter -> Kavorka::Parameter."^^Change;
 		item "Rename Kavorka::Signature::ReturnType -> Kavorka::ReturnType."^^Change;
 	].
+
+`Kavorka 0.018 cpan:TOBYINK`
+	issued  2013-11-18;
+	changeset [
+		item "Allow non-Type::Tiny type constraints to be returned by type constraint expressions, provided they can be converted to Type::Tiny objects via Types::TypeTiny::to_TypeTiny."^^Change;
+	].

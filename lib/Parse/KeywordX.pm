@@ -7,7 +7,7 @@ use Exporter::Tiny ();
 package Parse::KeywordX;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.017';
+our $VERSION   = '0.018';
 
 use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};
