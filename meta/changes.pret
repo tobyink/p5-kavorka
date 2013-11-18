@@ -228,3 +228,11 @@
 	changeset [
 		item "Bypass the Internals::SvREADONLY prototype because handling of the ($;$) prototype changed in 5.16.0 and we were relying on the new behaviour."^^Bugfix;
 	].
+
+`Kavorka 0.017 cpan:TOBYINK`
+	issued  2013-11-18;
+	changeset [
+		item "Extensibility via parameter traits."^^Change;
+		item "Rename Kavorka::Signature::Parameter -> Kavorka::Parameter."^^Change;
+		item "Rename Kavorka::Signature::ReturnType -> Kavorka::ReturnType."^^Change;
+	].

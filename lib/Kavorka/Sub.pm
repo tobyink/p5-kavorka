@@ -7,7 +7,7 @@ use Kavorka::Signature ();
 package Kavorka::Sub;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.016';
+our $VERSION   = '0.017';
 
 use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};
