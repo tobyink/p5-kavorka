@@ -214,7 +214,8 @@ the following are roughly equivalent:
 Type constraints may be surrounded with parentheses, in which case,
 instead of parsing them with C<dwim_type>, they'll be evaluated (at
 compile time) as an expression which is expected to return a blessed
-L<Type::Tiny> object:
+L<Type::Tiny> object, or any other value that L<Types::TypeTiny> can
+coerce to a Type::Tiny object.
 
    use Types::Standard qw( LaxNum StrictNum );
    
