@@ -17,6 +17,10 @@ Method modifiers should work in L<Moose>, L<Moo>, L<Mouse> and
 L<Role::Tiny> classes and roles. In other classes they will fall back
 to using L<Class::Method::Modifiers>.
 
+The keywords C<augment> and C<override> are also available, but will
+only work in classes backed by a framework that supports these
+modifiers (i.e. L<Moose> or L<Mouse>, but I<not> L<Moo>).
+
 The anatomy of a method modifier:
 
 =over

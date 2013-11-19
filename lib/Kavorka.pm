@@ -18,14 +18,16 @@ our $VERSION   = '0.018';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );
-our @EXPORT_OK   = qw( fun method after around before classmethod objectmethod );
+our @EXPORT_OK   = qw( fun method after around before override augment classmethod objectmethod );
 our %EXPORT_TAGS = (
-	modifiers => [qw( after around before )],
+	modifiers    => [qw( after around before )],
+	allmodifiers => [qw( after around before override augment )],
 );
 
 our %IMPLEMENTATION = (
 	after        => 'Kavorka::Sub::After',
 	around       => 'Kavorka::Sub::Around',
+	augment      => 'Kavorka::Sub::Augment',
 	before       => 'Kavorka::Sub::Before',
 	classmethod  => 'Kavorka::Sub::ClassMethod',
 	fun          => 'Kavorka::Sub::Fun',
@@ -34,6 +36,7 @@ our %IMPLEMENTATION = (
 	method       => 'Kavorka::Sub::Method',
 	multi        => 'Kavorka::Multi',
 	objectmethod => 'Kavorka::Sub::ObjectMethod',
+	override     => 'Kavorka::Sub::Override',
 );
 
 our %INFO;
@@ -213,17 +216,22 @@ Exports C<fun> and C<method>.
 
 Exports C<before>, C<after>, and C<around>.
 
+=item C<< -allmodifiers >>
+
+Exports C<before>, C<after>, C<around>, C<augment>, and C<override>.
+
 =item C<< -all >>
 
 Exports C<fun>, C<method>, C<before>, C<after>, C<around>,
-C<classmethod>, C<objectmethod>, and C<multi>.
+C<augment>, C<override>, C<classmethod>, C<objectmethod>,
+and C<multi>.
 
 =back
 
 For example:
 
    # Everything except objectmethod and multi...
-   use Kavorka qw( -default -modifiers classmethod );
+   use Kavorka qw( -default -allmodifiers classmethod );
 
 You can rename imported functions:
 
