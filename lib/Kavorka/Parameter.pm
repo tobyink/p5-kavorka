@@ -51,15 +51,32 @@ sub BUILD
 	$self->_set_ID($id);
 	$PARAMS[$id] = $self;
 	
+	my $traits = $self->traits;
+	
+	exists($traits->{rw})
+		and !exists($traits->{ro})
+		and ($traits->{ro} = !$traits->{rw});
+	
+	exists($traits->{ro})
+		and !exists($traits->{rw})
+		and ($traits->{rw} = !$traits->{ro});
+	
+	exists($traits->{copy})
+		and !exists($traits->{alias})
+		and ($traits->{alias} = !$traits->{copy});
+	
+	exists($traits->{alias})
+		and !exists($traits->{copy})
+		and ($traits->{copy} = !$traits->{alias});
+	
+	$traits->{$_} || delete($traits->{$_}) for keys %$traits;
+	
 	# traits handled natively
 	state $native_traits = {
-		alias     => 1,
 		coerce    => 1,
 		copy      => 1,
 		invocant  => 1,
-		locked    => 1,
 		optional  => 1,
-		ro        => 1,
 		rw        => 1,
 		slurpy    => 1,
 	};
@@ -67,7 +84,7 @@ sub BUILD
 	my @custom_traits =
 		map  "Kavorka::TraitFor::Parameter::$_",
 		grep !exists($native_traits->{$_}),
-		keys %{$self->traits};
+		keys %$traits;
 	
 	'Moo::Role'->apply_roles_to_object($self, @custom_traits) if @custom_traits;
 }
@@ -297,6 +314,7 @@ sub sanity_check
 	croak("Bad parameter $name") if $self->invocant && $self->slurpy;
 	croak("Parameter $name cannot be an alias and coerce") if $traits->{alias} && $traits->{coerce};
 	croak("Parameter $name cannot be an alias and a copy") if $traits->{alias} && $traits->{copy};
+	croak("Parameter $name cannot be an alias and locked") if $traits->{alias} && $traits->{locked};
 	croak("Parameter $name cannot be rw and ro") if $traits->{ro} && $traits->{rw};
 }
 
@@ -327,62 +345,16 @@ sub _injection_assignment
 	my ($sig, $var, $val) = @_;
 	my $kind = $self->kind;
 	
-	my $assignment = '';
-	$assignment = "our $var;" if $kind eq 'our';
-	
-	if ($self->alias)
-	{
-		if ($kind eq 'my')
-		{
-			require Data::Alias;
-			return sprintf('Data::Alias::alias(my %s = do { %s });', $var, $val);
-		}
-		else
-		{
-			(my $glob = $var) =~ s/\A./*/;
-			return $assignment . sprintf('local %s = \\do { %s };', $glob, $val);
-		}
-	}
-	
-	my $decl = $kind eq 'my' ? 'my' : 'local';
-	$assignment .= sprintf('%s %s = %s;', $decl, $var, $val);
-	
-	if ($self->locked)
-	{
-		require Hash::Util;
-		require Types::Standard;
-		
-		state $_FIND_KEYS = sub {
-			return unless $_[0];
-			my ($dict) = grep {
-				$_->is_parameterized
-				and $_->has_parent
-				and $_->parent->strictly_equals(Types::Standard::Dict())
-			} $_[0], $_[0]->parents;
-			return unless $dict;
-			return if ref($dict->parameters->[-1]) eq q(HASH);
-			my @keys = sort keys %{ +{ @{ $dict->parameters } } };
-			return unless @keys;
-			\@keys;
-		};
-		
-		my $legal_keys  = $_FIND_KEYS->($self->type);
-		my $quoted_keys = $legal_keys ? join(q[,], q[], map B::perlstring($_), @$legal_keys) : '';
-		my $ref_var     = $self->sigil eq '$' ? $var : "\\$var";
-		
-		$assignment .= "&Hash::Util::unlock_hash($ref_var);";
-		$assignment .= "&Hash::Util::lock_keys($ref_var $quoted_keys);";
-	}
-	
-	if ($self->ro)
-	{
-		$assignment .= sprintf(
-			'&Internals::SvREADONLY(\\%s, 1);',
-			$var,
-		);
-	}
-	
-	return $assignment;
+	sprintf(
+		'%s %s = %s;',
+		(
+			$kind eq 'our' ? "our $var; local" :
+			$kind eq 'my'  ? 'my' :
+			'local'
+		),
+		$var,
+		$val,
+	);
 }
 
 sub _injection_conditional_type_check
@@ -660,8 +632,8 @@ Kavorka::Parameter - a single parameter in a function signature
 
 =head1 DESCRIPTION
 
-Kavorka::Parameter is a class where each instance represents
-a parameter in a function signature. This class is used to help parse
+Kavorka::Parameter is a class where each instance represents a
+parameter in a function signature. This class is used to help parse
 the function signature, and also to inject Perl code into the final
 function.
 
