@@ -86,6 +86,12 @@ is_deeply(
 );
 
 is_deeply(
+	Example::baz({ x => 666, y => 42 }),
+	{ '@_' => [{ x => 666, y => 42 }], '%_' => { x => 666, y => 42 }, '$x' => 666, '$y' => 42  },
+	'two named parameters (passed as hashref)',
+);
+
+is_deeply(
 	Example::baz(y => 42),
 	{ '@_' => [y => 42], '%_' => { y => 42 }, '$x' => undef, '$y' => 42  },
 	'two named parameters - omit the optional one',
