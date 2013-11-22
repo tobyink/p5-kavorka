@@ -74,13 +74,19 @@ The method would be called like this:
 
    $object->foo( x => 1, y => 2 );
 
+Or this:
+
+   $object->foo({ x => 1, y => 2 });
+
 This feature is shared with Perl 6 signatures, L<Function::Parameters>,
 and L<Method::Signatures>.
 
 Positional parameters (if any) must precede named parameters.
 
 If you have any named parameters, they will also be made available in
-the magic global hash C<< %_ >>.
+the magic global hash C<< %_ >>. If you pass a I<hashref> (rather than
+a I<hash>) of named parameters, then C<< %_ >> will be an alias for the
+referenced hash.
 
 =head2 Long name parameters
 

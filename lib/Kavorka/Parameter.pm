@@ -475,9 +475,10 @@ sub _injection_extract_value
 					'delete $tmp{$_} for (%s);',
 					join(q[,], map B::perlstring($_), @names),
 				);
+				my $ix  = 1 + $sig->last_position;
 				$val = sprintf(
-					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; %s %%tmp ? %%tmp : (%s) }',
-					$sig->last_position + 1,
+					'do { use warnings FATAL => qw(all); my %%tmp = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]; %s %%tmp ? %%tmp : (%s) }',
+					($ix) x 4,
 					$delete,
 					($default // ''),
 				);

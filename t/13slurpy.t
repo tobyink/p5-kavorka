@@ -88,6 +88,12 @@ is_deeply(
 );
 
 is_deeply(
+	Example::baz({x => 42, a => 1, b => 2, c => 3 }),
+	{ '@_' => [{qw/ x 42 a 1 b 2 c 3 /}], '%_' => +{qw/ x 42 a 1 b 2 c 3 /}, '$x' => 42, '$y' => undef, '%z' => +{qw/ a 1 b 2 c 3 /} },
+	'function with named parameters and slurpy hash (invoked with hashref)'
+);
+
+is_deeply(
 	Example::quux(42, a => 1, b => 2, c => 3),
 	{ '@_' => [qw/ 42 a 1 b 2 c 3 /], '%_' => +{qw/ a 1 b 2 c 3 /}, '$x' => 42, },
 	'anon slurpy hash'
