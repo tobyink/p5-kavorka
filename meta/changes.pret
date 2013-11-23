@@ -242,3 +242,12 @@
 	changeset [
 		item "Allow non-Type::Tiny type constraints to be returned by type constraint expressions, provided they can be converted to Type::Tiny objects via Types::TypeTiny::to_TypeTiny."^^Change;
 	].
+
+`Kavorka 0.019 cpan:TOBYINK`
+	issued  2013-11-23;
+	changeset [
+		item "Provide an `augment` keyword which will work in Moose/Mouse, but not Moo."^^Addition;
+		item "Provide an `override` keyword which will work in Moose/Mouse, but not Moo."^^Addition;
+		item "Allow named parameters to be passed in as a hashref rather than a hash."^^Change;
+		item "Split out some of the Kavorka::Parameter features (aliases, locked hashrefs, read-only parameters) into parameter traits."^^Change;
+	].
