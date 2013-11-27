@@ -379,7 +379,7 @@ The traits Kavorka understands natively are:
 This makes your lexical variable into an alias for an item within
 the C<< @_ >> array.
 
-   fun increment (Int $i) { ++$i }
+   fun increment (Int $i is alias) { ++$i }
    
    my $count = 0;
    increment($count);
@@ -390,6 +390,20 @@ the C<< @_ >> array.
 But please don't use this for parameters with coercions!
 
 This feature is shared with L<Method::Signatures>.
+
+=head3 assumed
+
+Switches off the type constraint check, though the original type
+constraint is still visible through the introspection API.
+
+   fun increment (Int $i is alias but assumed) { ++$i }
+   
+   my $count = 1.1;
+   increment($count);  # called incorrectly but will not die
+
+This can be used to switch off slow type constraint checks while
+keeping the original type constraint in the signature to express your
+intent.
 
 =head3 coerce
 

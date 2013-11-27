@@ -11,7 +11,6 @@ our @CARP_NOT  = qw( Kavorka::Signature Kavorka::Sub Kavorka );
 use Carp qw( croak );
 use Parse::Keyword {};
 use Parse::KeywordX qw(parse_trait);
-use Types::Standard qw(Any);
 
 use Moo;
 use namespace::sweep;
@@ -30,7 +29,6 @@ sub BUILD
 	
 	# traits handled natively
 	state $native_traits = {
-		assumed   => 1,
 		coerce    => 1,
 		list      => 1,
 		scalar    => 1,
@@ -125,7 +123,7 @@ sub sanity_check
 sub _effective_type
 {
 	my $self = shift;
-	$self->assumed ? Any : $self->type;
+	$self->type;
 }
 
 1;
