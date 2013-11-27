@@ -251,3 +251,13 @@
 		item "Allow named parameters to be passed in as a hashref rather than a hash."^^Change;
 		item "Split out some of the Kavorka::Parameter features (aliases, locked hashrefs, read-only parameters) into parameter traits."^^Change;
 	].
+
+`Kavorka 0.020 cpan:TOBYINK`
+	issued  2013-11-27;
+	changeset [
+		item "Split out the assumed trait for return types as Kavorka::TraitFor::ReturnType::assumed."^^Change;
+		item "Kavorka::TraitFor::Parameter::assumed."^^Addition;
+		item "Can now use 'but' as another alias for 'is'/'does'."^^Change;
+		item "Explain different ways to extend Kavorka."^^Documentation;
+		item "Subs can now have traits."^^Change;
+	].
