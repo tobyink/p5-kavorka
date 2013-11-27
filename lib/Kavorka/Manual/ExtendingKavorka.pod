@@ -19,7 +19,7 @@ to be given. Subs can have traits:
 
 So can parameters within signatures:
 
-   method xyz ($x is hot, $y does warm, $z is cool) { ... }
+   method xyz ($x is hot, $y does warm, $z but cool) { ... }
 
 And return types:
 

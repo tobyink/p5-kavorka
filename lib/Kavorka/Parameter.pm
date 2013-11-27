@@ -249,7 +249,7 @@ sub parse
 		lex_read_space;
 	}
 	
-	while (lex_peek(5) =~ m{ \A (is|does) \s }xsm)
+	while (lex_peek(5) =~ m{ \A (is|does|but) \s }xsm)
 	{
 		lex_read(length($1));
 		lex_read_space;

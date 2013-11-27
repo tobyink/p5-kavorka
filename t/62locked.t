@@ -32,7 +32,7 @@ use Test::Fatal;
 		$x->{foo} = 1;
 	}
 	
-	fun bar ( %x is locked ) {
+	fun bar ( %x but locked ) {
 		$x{foo} = 1;
 	}
 	
@@ -41,7 +41,7 @@ use Test::Fatal;
 		push @{ $x->{bar} ||= [] }, 1;
 	}
 	
-	fun quux ( Dict[bar => Optional[ArrayRef]] $x is locked ) {
+	fun quux ( Dict[bar => Optional[ArrayRef]] $x does locked ) {
 		$x->{foo} = 1;
 		push @{ $x->{bar} ||= [] }, 1;
 	}

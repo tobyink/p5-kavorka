@@ -327,9 +327,10 @@ Traits may be added to each parameter using the C<is> keyword:
    
    fun bar ( $baz is quux is xyzzy ) { ... }
 
-The keyword C<does> is also available which acts as an alias for C<is>.
-
 This feature is shared with Perl 6 signatures and L<Method::Signatures>.
+
+The keywords C<does> and C<but> are also available which are simply
+aliases for C<is>.
 
 Many traits are recognized by Kavorka natively. If you use an
 unrecognized trait, such as C<foo>, Kavorka will attempt to apply a
@@ -536,7 +537,7 @@ returning an appropriate value. This avoids the overhead of checking
 return types at run time, but still includes the return type constraint
 in the introspection API.
 
-   fun plus_one (Int $x → Int is assumed)
+   fun plus_one (Int $x → Int but assumed)
    {
       # No need to check return type.
       # If $x is an Int, then $x+1 must be too!

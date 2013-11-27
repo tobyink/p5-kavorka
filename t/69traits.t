@@ -38,7 +38,7 @@ BEGIN {
 	$INC{'Kavorka/TraitFor/Sub/superbad.pm'} = __FILE__;
 };
 
-fun foo ($x is superbad) {
+fun foo ($x but superbad) {
 	42;
 }
 
@@ -59,7 +59,7 @@ subtest "Parameter traits" => sub
 	);
 };
 
-fun foo2 ($x) is superbad {
+fun foo2 ($x) but superbad {
 	42;
 }
 

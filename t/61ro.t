@@ -28,7 +28,7 @@ use Test::Fatal;
 	package Example;
 	use Kavorka;
 	
-	fun foo ($x is ro) {
+	fun foo ($x but ro) {
 		++$x;
 	}
 	
