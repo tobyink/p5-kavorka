@@ -405,6 +405,13 @@ This can be used to switch off slow type constraint checks while
 keeping the original type constraint in the signature to express your
 intent.
 
+This trait cannot be used in multi subs, where the type check is
+instrumental in deciding which candidate sub to dispatch to. It I<can>
+be used in conjunction with the C<coerce> trait, in which case the type
+constraint I<will> be checked to determine whether coercion is
+necessary, but no type check will be performed on the result of the
+coercion.
+
 =head3 coerce
 
 See L</Type coercion> below.
@@ -479,7 +486,7 @@ Coercion can be enabled for a parameter using the C<coerce> trait.
 
    use Types::Path::Tiny qw(AbsPath);
    
-   method print_to_file ( AbsFile $file does coerce, @lines ) {
+   method print_to_file ( AbsFile $file does coerce, Str @lines ) {
       $file->spew(@lines);
    }
 
