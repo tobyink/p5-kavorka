@@ -31,13 +31,17 @@ The signature (optional).
 
 =item 4.
 
-The prototype (optional).
+Traits (optional).
 
 =item 5.
 
-The attribute list (optional).
+The prototype (optional).
 
 =item 6.
+
+The attribute list (optional).
+
+=item 7.
 
 The function body.
 
@@ -45,8 +49,8 @@ The function body.
 
 Example:
 
-   #  (1) (2)    (3)          (4)   (5)     (6)
-      fun foobar ($foo, $bar) :($$) :cached { return $foo + $bar }
+   #  (1) (2)    (3)          (4)     (5)   (6)     (7)
+      fun foobar ($foo, $bar) is cool :($$) :cached { return $foo + $bar }
    
    #          (1) (6)
       my $f = fun { return $_[0] + $_[1] };
@@ -89,6 +93,10 @@ for a function name:
 =head2 The Signature
 
 See L<Kavorka::Manual::Signature>.
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
 
 =head2 The Prototype
 

@@ -25,6 +25,7 @@ has signature_class => (is => 'ro', default => sub { 'Kavorka::Signature' });
 has package         => (is => 'ro');
 has declared_name   => (is => 'rwp');
 has signature       => (is => 'rwp');
+has traits          => (is => 'ro', default => sub { +{} });
 has prototype       => (is => 'rwp');
 has attributes      => (is => 'ro', default => sub { [] });
 has body            => (is => 'rwp');
@@ -102,6 +103,22 @@ sub parse
 		my @defaults = $self->default_invocant;
 		unshift @{$sig->params}, @defaults;
 		$sig->_set_has_invocants(scalar @defaults);
+	}
+	
+	# traits
+	$self->parse_traits;
+	my $traits = $self->traits;
+	if (keys %$traits)
+	{
+		# traits handled natively (none so far)
+		state $native_traits = {};
+		
+		my @custom_traits =
+			map  "Kavorka::TraitFor::Sub::$_",
+			grep !exists($native_traits->{$_}),
+			keys %$traits;
+		
+		'Moo::Role'->apply_roles_to_object($self, @custom_traits) if @custom_traits;
 	}
 	
 	# prototype and attributes
@@ -204,6 +221,23 @@ sub parse_prototype
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
 		
 		$self->_set_prototype($extracted);
+	}
+	
+	();
+}
+
+sub parse_traits
+{
+	my $self = shift;
+	lex_read_space;
+	
+	while (lex_peek(5) =~ m{ \A (is|does) \s }xsm)
+	{
+		lex_read(length($1));
+		lex_read_space;
+		my ($name, undef, $args) = parse_trait;
+		$self->traits->{$name} = $args;
+		lex_read_space;
 	}
 	
 	();
@@ -467,6 +501,10 @@ declared name.
 
 An instance of L<Kavorka::Signature>, or undef.
 
+=item C<traits>
+
+A hashref of traits.
+
 =item C<prototype>
 
 The function prototype as a string.
@@ -490,6 +528,7 @@ the signature code injected into it.
 =item C<parse>,
 C<parse_subname>,
 C<parse_signature>,
+C<parse_traits>,
 C<parse_prototype>,
 C<parse_attributes>,
 C<parse_body> 

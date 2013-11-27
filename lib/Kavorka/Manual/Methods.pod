@@ -31,13 +31,17 @@ The signature (optional).
 
 =item 4.
 
-The prototype (optional).
+Traits (optional).
 
 =item 5.
 
-The attribute list (optional).
+The prototype (optional).
 
 =item 6.
+
+The attribute list (optional).
+
+=item 7.
 
 The method body.
 
@@ -45,8 +49,8 @@ The method body.
 
 Example:
 
-   #  (1)    (2)    (3)    (4)  (5)     (6)
-      method foobar ($foo) :($) :cached { return $foo + $self->bar }
+   #  (1)    (2)    (3)    (4)     (5)  (6)     (7)
+      method foobar ($foo) is cool :($) :cached { return $foo + $self->bar }
    
    #          (1)    (6)
       my $m = method { return $_[0] + $self->bar };
@@ -103,6 +107,10 @@ In any case, it is perfectly possible to define your own name and type
 constraint for the invocant:
 
    method foo ( ClassName $me: Int $foo ) { ... }
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
 
 =head2 The Prototype
 

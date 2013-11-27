@@ -39,13 +39,17 @@ The signature (optional).
 
 =item 4.
 
-The prototype (optional).
+Traits (optional).
 
 =item 5.
 
-The attribute list (optional).
+The prototype (optional).
 
 =item 6.
+
+The attribute list (optional).
+
+=item 7.
 
 The modifier body.
 
@@ -53,8 +57,8 @@ The modifier body.
 
 Example:
 
-   #  (1)   (2)    (3)    (4)  (5)     (6)
-      after foobar ($foo) :($) :cached { $self->log("foobar $foo") }
+   #  (1)   (2)    (3)    (4)     (5)  (6)     (7)
+      after foobar ($foo) is cool :($) :cached { $self->log("foobar $foo") }
 
 =head2 The Keyword
 
@@ -87,6 +91,10 @@ C<< $next >> for backwards compatibility with Moops::MethodModifiers.)
 Beware using type constraints for method modifiers (which are
 essentially wrappers); constraints will be checked at each level of
 wrapping which will slow down method calls.
+
+=head2 Traits
+
+See L<Kavorka::Manual::ExtendingKavorka>.
 
 =head2 The Prototype
 

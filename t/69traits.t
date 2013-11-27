@@ -32,6 +32,12 @@ BEGIN {
 	$INC{'Kavorka/TraitFor/Parameter/superbad.pm'} = __FILE__;
 };
 
+BEGIN {
+	package Kavorka::TraitFor::Sub::superbad;
+	use Moo::Role;
+	$INC{'Kavorka/TraitFor/Sub/superbad.pm'} = __FILE__;
+};
+
 fun foo ($x is superbad) {
 	42;
 }
@@ -40,15 +46,37 @@ fun bar ($x is superbad(boom)) {
 	42;
 }
 
-my ($foo,   $bar)   = map Kavorka->info( 'main'->can($_) ), qw/ foo bar /;
-my ($foo_x, $bar_x) = map $_->signature->params->[0], $foo, $bar;
+subtest "Parameter traits" => sub
+{
+	my ($foo,   $bar)   = map Kavorka->info( 'main'->can($_) ), qw/ foo bar /;
+	my ($foo_x, $bar_x) = map $_->signature->params->[0], $foo, $bar;
+	
+	ok $foo_x->DOES('Kavorka::TraitFor::Parameter::superbad');
+	ok $bar_x->DOES('Kavorka::TraitFor::Parameter::superbad');
+	is_deeply(
+		$bar_x->traits->{superbad},
+		['boom'],
+	);
+};
 
-ok $foo_x->DOES('Kavorka::TraitFor::Parameter::superbad');
-ok $bar_x->DOES('Kavorka::TraitFor::Parameter::superbad');
-is_deeply(
-	$bar_x->traits->{superbad},
-	['boom'],
-);
+fun foo2 ($x) is superbad {
+	42;
+}
+
+fun bar2 ($x) is superbad(boom) {
+	42;
+}
+
+subtest "Sub traits" => sub
+{
+	my ($foo, $bar) = map Kavorka->info( 'main'->can($_) ), qw/ foo2 bar2 /;
+	
+	ok $foo->DOES('Kavorka::TraitFor::Sub::superbad');
+	ok $bar->DOES('Kavorka::TraitFor::Sub::superbad');
+	is_deeply(
+		$bar->traits->{superbad},
+		['boom'],
+	);
+};
 
 done_testing;
-
