@@ -42,7 +42,6 @@ sub optional  { !!shift->traits->{optional} }
 sub invocant  { !!shift->traits->{invocant} }
 sub coerce    { !!shift->traits->{coerce} }
 sub locked    { !!shift->traits->{locked} }
-sub ref_alias { !!shift->traits->{ref_alias} }
 
 our @PARAMS;
 sub BUILD
@@ -186,6 +185,13 @@ sub parse
 		lex_read_space;
 	}
 	
+	if (lex_peek eq '\\')
+	{
+		$traits{ref_alias} = 1;
+		lex_read(1);
+		lex_read_space;
+	}
+	
 	if (lex_peek(3) =~ /\A(my|our)/)
 	{
 		$varkind = $1;
@@ -195,7 +201,7 @@ sub parse
 	
 	if (lex_peek eq '\\')
 	{
-		$traits{ref_alias} = 1;
+		croak("cannot be a double-ref-alias") if $traits{ref_alias}++;
 		lex_read(1);
 		lex_read_space;
 	}
