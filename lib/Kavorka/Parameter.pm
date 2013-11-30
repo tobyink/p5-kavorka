@@ -42,6 +42,7 @@ sub optional  { !!shift->traits->{optional} }
 sub invocant  { !!shift->traits->{invocant} }
 sub coerce    { !!shift->traits->{coerce} }
 sub locked    { !!shift->traits->{locked} }
+sub ref_alias { !!shift->traits->{ref_alias} }
 
 our @PARAMS;
 sub BUILD
@@ -192,6 +193,13 @@ sub parse
 		lex_read_space;
 	}
 	
+	if (lex_peek eq '\\')
+	{
+		$traits{ref_alias} = 1;
+		lex_read(1);
+		lex_read_space;
+	}
+	
 	lex_stuff(':') if $saw_colon; # re-insert colon
 	$peek = lex_peek;
 	
@@ -224,7 +232,10 @@ sub parse
 		lex_read_space;
 	}
 	
-	$traits{slurpy} = 1 if defined($varname) && $varname =~ /\A[\@\%]/;
+	$traits{slurpy} = 1
+		if defined($varname)
+		&& !$traits{ref_alias}
+		&& $varname =~ /\A[\@\%]/;
 	
 	if (lex_peek eq '!')
 	{
