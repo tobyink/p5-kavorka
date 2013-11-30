@@ -76,7 +76,6 @@ sub BUILD
 		coerce    => 1,
 		copy      => 1,
 		invocant  => 1,
-		optional  => 1,
 		rw        => 1,
 		slurpy    => 1,
 	};
@@ -327,7 +326,6 @@ sub sanity_check
 		croak("Bad name for package variable: $name") if length($name) < 2;
 	}
 	
-	croak("Bad parameter $name") if $self->invocant && $self->optional;
 	croak("Bad parameter $name") if $self->invocant && $self->slurpy;
 }
 
@@ -461,6 +459,30 @@ sub _injection_extract_and_coerce_value
 	wantarray ? ($val, $condition) : $val;
 }
 
+sub _injection_default_value
+{
+	my $self = shift;
+	my ($fallback) = @_;
+	
+	return sprintf('$%s::PARAMS[%d]{default}->()', __PACKAGE__, $self->ID) if $self->default;
+	return $fallback if defined $fallback;
+	
+	return sprintf(
+		'Carp::croak(sprintf q/Named parameter `%%s` is required/, %s)',
+		B::perlstring($self->named_names->[0]),
+	) if $self->named;
+	
+	return sprintf(
+		'Carp::croak(q/Invocant %s is required/)',
+		$self->name,
+	) if $self->invocant;
+	
+	return sprintf(
+		'Carp::croak(q/Positional parameter %d is required/)',
+		$self->position,
+	);
+}
+
 sub _injection_extract_value
 {
 	my $self = shift;
@@ -468,7 +490,6 @@ sub _injection_extract_value
 	
 	my $condition;
 	my $val;
-	my $default = $self->default ? sprintf('$%s::PARAMS[%d]->{default}->()', __PACKAGE__, $self->ID) : '';
 	my $slurpy_style = '';
 	
 	if ($self->slurpy)
@@ -493,7 +514,7 @@ sub _injection_extract_value
 					'do { use warnings FATAL => qw(all); my %%tmp = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]; %s %%tmp ? %%tmp : (%s) }',
 					($ix) x 4,
 					$delete,
-					($default // ''),
+					$self->_injection_default_value('()'),
 				);
 			}
 			else
@@ -502,7 +523,7 @@ sub _injection_extract_value
 					'do { use warnings FATAL => qw(all); my %%tmp = @_[ %d .. $#_ ]; %%tmp ? @_[ %d .. $#_ ] : (%s) }',
 					$sig->last_position + 1,
 					$sig->last_position + 1,
-					($default // ''),
+					$self->_injection_default_value('()'),
 				);
 			}
 			$condition = 1;
@@ -516,7 +537,7 @@ sub _injection_extract_value
 				'($#_ >= %d) ? @_[ %d .. $#_ ] : (%s)',
 				$sig->last_position + 1,
 				$sig->last_position + 1,
-				($default // ''),
+				$self->_injection_default_value('()'),
 			);
 			$condition = 1;
 			$slurpy_style = '@';
@@ -530,11 +551,6 @@ sub _injection_extract_value
 	}
 	elsif ($self->named)
 	{
-		my $defaultish =
-			length($default) ? $default :
-			$self->optional  ? 'undef'  :
-			sprintf('Carp::croak(sprintf q/Named parameter `%%s` is required/, %s)', B::perlstring $self->named_names->[0]);
-		
 		no warnings 'uninitialized';
 		my $when = +{
 			'//='   => 'defined',
@@ -545,7 +561,7 @@ sub _injection_extract_value
 		$val = join '', map(
 			sprintf('%s($_{%s}) ? $_{%s} : ', $when, $_, $_),
 			map B::perlstring($_), @{$self->named_names}
-		), $defaultish;
+		), $self->_injection_default_value();
 		
 		$condition = join ' or ', map(
 			sprintf('%s($_{%s})', $when, $_),
@@ -554,18 +570,11 @@ sub _injection_extract_value
 	}
 	elsif ($self->invocant)
 	{
-		my $defaultish = sprintf('Carp::croak(q/Invocant %s is required/)', $self->name);
-		$val = sprintf('@_ ? shift(@_) : %s', $defaultish);
+		$val = sprintf('@_ ? shift(@_) : %s', $self->_injection_default_value());
 		$condition = 1;
 	}
 	else
 	{
-		my $pos        = $self->position;
-		my $defaultish =
-			length($default) ? $default :
-			$self->optional  ? 'undef'  :
-			sprintf('Carp::croak(q/Positional parameter %d is required/)', $pos);
-		
 		no warnings 'uninitialized';
 		my $when = +{
 			'//='   => 'defined($_[%d])',
@@ -573,12 +582,12 @@ sub _injection_extract_value
 			'='     => '($#_ >= %d)',
 		}->{ $self->default_when } || '($#_ >= %d)';
 		
-		$val = sprintf($when.' ? $_[%d] : %s', $pos, $pos, $defaultish);
-		
+		my $pos = $self->position;
+		$val       = sprintf($when.' ? $_[%d] : %s', $pos, $pos, $self->_injection_default_value());
 		$condition = sprintf($when, $self->position);
 	}
 	
-	$condition = 1 if length $default;
+	$condition = 1 if $self->_injection_default_value('@@') ne '@@';
 	
 	wantarray ? ($val, $condition) : $val;
 }
