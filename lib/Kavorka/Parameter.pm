@@ -238,11 +238,6 @@ sub parse
 		lex_read_space;
 	}
 	
-	$traits{slurpy} = 1
-		if defined($varname)
-		&& !$traits{ref_alias}
-		&& $varname =~ /\A[\@\%]/;
-	
 	if (lex_peek eq '!')
 	{
 		$traits{optional} = 0;
@@ -287,6 +282,11 @@ sub parse
 	
 	$traits{optional} //= $traits{_optional};
 	delete($traits{_optional});
+	
+	$traits{slurpy} = 1
+		if defined($varname)
+		&& !$traits{ref_alias}
+		&& $varname =~ /\A[\@\%]/;
 	
 	return $class->new(
 		%args,
