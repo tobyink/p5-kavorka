@@ -87,5 +87,20 @@ is(Example3::foo(z => $z), 4);
 is(Example3::bar(z => $z), 5);
 is($z, 5);
 
+{
+	package Example4;
+	use Kavorka;
+	
+	fun foo (:\%foo)
+	{
+		$foo{yyy} = 42;
+		return $foo{xxx};
+	}
+}
+
+my $foo = { xxx => 666 };
+is(Example4::foo(foo => $foo), 666);
+is_deeply($foo, { xxx => 666, yyy => 42 });
+
 done_testing;
 
