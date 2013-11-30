@@ -48,6 +48,39 @@ C<< Kavorka::TraitFor::ReturnType::* >>
 
 For example, C<Kavorka::TraitFor::Sub::friendly>.
 
+=head2 Trait Parameters
+
+Although none of Kavorka's native traits make use of this syntax,
+traits can be followed by trait parameters in parentheses:
+
+   BEGIN {
+      package Kavorka::TraitFor::Parameter::debug;
+      use Moo::Role;
+      around injection => sub
+      {
+         my $next = shift;
+         my $self = shift;
+         my $code = $self->$next(@_);
+         $code .= sprintf(
+            "printf STDERR %s, %s, %s;",
+            B::perlstring($self->traits->{debug}[0]),
+            B::perlstring($self->name),
+            $self->name,
+         );
+         return $code;
+      };
+   }
+   
+   use Kavorka;
+   
+   fun foo ( $x but debug("%s is %s\n") ) {
+      ## Injected:
+      ## printf STDERR "%s is %s\n", "\$x", $x;
+      return $x;
+   }
+   
+   foo(42);  # says to STDERR: '$x is 42'
+
 =head2 Keywords
 
 Traits are not applied to subs until I<after> they've been parsed,
