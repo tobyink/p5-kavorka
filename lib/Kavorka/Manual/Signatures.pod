@@ -456,6 +456,31 @@ applying this trait.
    fun foo ($x is optional) { ... }            # These two declarations
    fun foo ($x?) { ... }                       # are equivalent.
 
+=head3 ref_alias
+
+The C<ref_alias> trait allows you to pass an arrayref, hashref or
+scalarref to the function, and have it available as a plain array,
+hash or scalar. For example:
+
+   fun get_key_from_hash(%h is ref_alias, $key) {
+      return $h{$key};
+   }
+   
+   my %data = ( foo => 42 );
+   get_key_from_hash(\%data, 'foo');   # returns 42
+
+It's the only useful way to define non-slurpy hash or array parameters
+within a signature.
+
+A backslash before the variable name can be used as a shortcut for
+this trait:
+
+   fun get_key_from_hash(\%h, $key) {
+      return $h{$key};
+   }
+
+This feature is shared with L<Method::Signatures>.
+
 =head3 ro
 
 This makes the parameter a (shallow) read-only variable.
