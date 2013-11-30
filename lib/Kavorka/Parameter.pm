@@ -329,10 +329,6 @@ sub sanity_check
 	
 	croak("Bad parameter $name") if $self->invocant && $self->optional;
 	croak("Bad parameter $name") if $self->invocant && $self->slurpy;
-	croak("Parameter $name cannot be an alias and coerce") if $traits->{alias} && $traits->{coerce};
-	croak("Parameter $name cannot be an alias and a copy") if $traits->{alias} && $traits->{copy};
-	croak("Parameter $name cannot be an alias and locked") if $traits->{alias} && $traits->{locked};
-	croak("Parameter $name cannot be rw and ro") if $traits->{ro} && $traits->{rw};
 }
 
 sub injection

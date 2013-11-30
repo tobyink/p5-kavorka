@@ -25,4 +25,14 @@ around _injection_assignment => sub
 	return $str;
 };
 
+after sanity_check => sub
+{
+	my $self = shift;
+	
+	my $traits = $self->traits;
+	my $name   = $self->name;
+	
+	croak("Parameter $name cannot be rw and ro") if $traits->{rw};
+};
+
 1;

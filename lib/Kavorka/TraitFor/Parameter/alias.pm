@@ -32,4 +32,16 @@ around _injection_assignment => sub
 	}
 };
 
+after sanity_check => sub
+{
+	my $self = shift;
+	
+	my $traits = $self->traits;
+	my $name   = $self->name;
+	
+	croak("Parameter $name cannot be an alias and coerce") if $traits->{coerce};
+	croak("Parameter $name cannot be an alias and a copy") if $traits->{copy};
+	croak("Parameter $name cannot be an alias and locked") if $traits->{locked};
+};
+
 1;
