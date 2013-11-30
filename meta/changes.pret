@@ -261,3 +261,13 @@
 		item "Explain different ways to extend Kavorka."^^Documentation;
 		item "Subs can now have traits."^^Change;
 	].
+
+`Kavorka 0.021 cpan:TOBYINK`
+	issued  2013-11-30;
+	changeset [
+		item "Disallow the `assumed` parameter trait for multi subs."^^Change;
+		item "Implement a `ref_alias` trait, inspired by Method::Signatures."^^Addition;
+		item "Rearrange some of the traits documentation."^^Documentation;
+		item "Split out most of the implementation for the `optional` trait (except for special parsing rules) into Kavorka::TraitFor::ReturnType::optional."^^Change;
+		item "Split out some sanity_check stuff into the trait modules."^^Change;
+	].
