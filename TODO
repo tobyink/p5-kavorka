@@ -1,0 +1,1 @@
+new auto-deref of hashrefs for named arguments might break arity calculations (min_args/max_args) which are required for multisubs to work! this needs testing!!!
