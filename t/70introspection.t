@@ -53,9 +53,13 @@ is($foo->prototype, '@', '$foo->prototype');
 ok($bar->DOES('Kavorka::Sub'), q/$bar->DOES('Kavorka::Sub')/);
 is($bar->keyword, 'fun', '$bar->keyword');
 is($bar->declared_name, 'bar', '$bar->declared_name');
-is($bar->qualified_name, 'Example::bar', '$bar->qualified_name');
+is($bar->qualified_name, 'Example::bar', '$bar->qualified_name');;
+is($bar->prototype, undef, '$bar->prototype');
+
 my $sig = $bar->signature;
 ok($sig->DOES('Kavorka::Signature'), q/$bar->signature->DOES('Kavorka::Signature')/);
+is($sig->args_min, 1, '$bar->signature->args_min');
+is($sig->args_max, undef, '$bar->signature->args_max');
 is_deeply(
 	[ map $_->name, $sig->invocants ],
 	[ '$Debbie' ],
@@ -76,7 +80,6 @@ is(
 	'%z',
 	q/$bar->signature->slurpy_param/,
 );
-is($bar->prototype, undef, '$bar->prototype');
 
 {
 	package ZZZZ;
