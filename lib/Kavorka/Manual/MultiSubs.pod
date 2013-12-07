@@ -65,7 +65,7 @@ of a multi method or multi sub using the C<:long> attribute:
 syntax. If you try to use L<attributes>' introspection stuff, you won't
 find it.)
 
-Prototypes, subroutine attributes, etc declared on the multi subs will
+Prototypes, subroutine attributes, etc. declared on the multi subs will
 appear on the "long name" subs, but not the multi sub.
 
 =head2 Definition at run time
@@ -82,7 +82,7 @@ then further define it, before calling it again.
    multi fun plus_one (Int $x) { $x + 1 }
    
    try {
-      plus_one(41;       # 42
+      plus_one(41);       # 42
       plus_one(1.1);     # throws
    };
    
