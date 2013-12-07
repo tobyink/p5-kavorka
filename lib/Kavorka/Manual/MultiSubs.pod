@@ -82,7 +82,7 @@ then further define it, before calling it again.
    multi fun plus_one (Int $x) { $x + 1 }
    
    try {
-      plus_one(41);       # 42
+      plus_one(41);      # 42
       plus_one(1.1);     # throws
    };
    
