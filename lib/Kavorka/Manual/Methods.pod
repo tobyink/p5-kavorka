@@ -112,6 +112,22 @@ constraint for the invocant:
 
 See L<Kavorka::Manual::ExtendingKavorka>.
 
+Two traits for methods are bundled with Kavorka: C<override> and
+C<fresh>.
+
+The C<fresh> trait will throw an exception if the method you are
+defining already exists in the inheritance hierarcy for this class.
+The idea of this trait is to increase safety when subclassing.
+
+Suppose a future release of your parent class adds a new method with
+the same name as one of yours, but differing functionality; your
+method would normally override the one in the parent class. With the
+C<fresh> trait, an exception would be thrown, giving you opportunity to
+resolve the conflict.
+
+The C<override> trait does the opposite; it will throw an exception if
+the method being defined I<< does not >> already exist.
+
 =head2 The Prototype
 
 See L<Kavorka::Manual::PrototypeAndAttributes>.
