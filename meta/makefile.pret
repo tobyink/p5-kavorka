@@ -13,6 +13,7 @@
 	:runtime-requirement    [ :on "Parse::Keyword 0.06"^^:CpanId ];
 	:runtime-requirement    [ :on "Return::Type 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Sub::Name 0"^^:CpanId ];
+	:runtime-requirement    [ :on "Sub::Identify 0"^^:CpanId ];
 	:runtime-requirement    [ :on "Type::Parser 0.032"^^:CpanId; comment "Fix for comma-delimited type lists." ];
 	:runtime-requirement    [ :on "Type::Registry 0.032"^^:CpanId ];
 	:runtime-requirement    [ :on "Type::Utils 0.032"^^:CpanId ];
