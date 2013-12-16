@@ -116,7 +116,7 @@ Two traits for methods are bundled with Kavorka: C<override> and
 C<fresh>.
 
 The C<fresh> trait will throw an exception if the method you are
-defining already exists in the inheritance hierarcy for this class.
+defining already exists in the inheritance hierarchy for this class.
 The idea of this trait is to increase safety when subclassing.
 
 Suppose a future release of your parent class adds a new method with
