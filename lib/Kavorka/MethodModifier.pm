@@ -39,7 +39,7 @@ my $DETECT_OO = do {
 package Kavorka::MethodModifier;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.021';
+our $VERSION   = '0.022';
 
 use Devel::Pragma 'fqname';
 use Parse::Keyword {};

@@ -271,3 +271,16 @@
 		item "Split out most of the implementation for the `optional` trait (except for special parsing rules) into Kavorka::TraitFor::ReturnType::optional."^^Change;
 		item "Split out some sanity_check stuff into the trait modules."^^Change;
 	].
+
+`Kavorka 0.022 cpan:TOBYINK`
+	issued  2013-12-16;
+	changeset [
+		item "Kavorka::TraitFor::Sub::fresh."^^Addition;
+		item "Kavorka::TraitFor::Sub::override."^^Addition;
+		item [
+			a dcs:Documentation;
+			label "Fix typos in Kavorka::Manual::MultiSubs.";
+			seealso <https://github.com/tobyink/p5-kavorka/pull/1>;
+			dcs:blame cpan:XAERXESS;
+		];
+	].
