@@ -24,18 +24,22 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Moops;
-
 package Example1 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 }
 
-role R1 {
+package R1 {
+	use Moo::Role;
+	use Kavorka;
 	method blammo () { 2 }
 }
 
-class Example2 extends Example1 with R1 {
+package Example2 {
+	use Moo;
+	use Kavorka;
+	extends 'Example1';
+	with 'R1';
 	
 	::like(
 		::exception {
@@ -52,10 +56,12 @@ class Example2 extends Example1 with R1 {
 		undef,
 		"the `fresh` trait does not complain when installing a fresh, new method",
 	);
-	
 }
 
-class Example3 extends Example2 {
+package Example3 {
+	use Moo;
+	use Kavorka;
+	extends 'Example2';
 	
 	::like(
 		::exception {
@@ -96,7 +102,6 @@ class Example3 extends Example2 {
 		qr/^Method 'blighty' does not exist in inheritance hierarchy; cannot override/,
 		"the `override` trait complains when installing a fresh, new method",
 	);
-	
 }
 
 done_testing;
