@@ -9,4 +9,6 @@ cpan:TOBYINK
 
 cpan:XAERXESS
 	:name  "Grzegorz Rożniecki".
-	
+
+cpan:SYOHEX
+	:name  "Syohei Yoshida".

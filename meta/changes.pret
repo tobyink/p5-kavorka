@@ -281,6 +281,19 @@
 			a dcs:Documentation;
 			label "Fix typos in Kavorka::Manual::MultiSubs.";
 			seealso <https://github.com/tobyink/p5-kavorka/pull/1>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issue/1>;
 			dcs:blame cpan:XAERXESS;
+		];
+	].
+
+`Kavorka 0.023 cpan:TOBYINK`
+	issued  2013-12-17;
+	changeset [
+		item [
+			a dcs:Bugfix;
+			label "Fix test case - should not depend on Moops!";
+			seealso <https://github.com/tobyink/p5-kavorka/issue/2>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issue/2>;
+			dcs:thanks cpan:SYOHEX;
 		];
 	].
