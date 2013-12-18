@@ -11,7 +11,7 @@ use Moo::Role;
 use Types::Standard qw(Any);
 use Sub::Identify qw(stash_name);
 use Carp qw(croak);
-use namespace::clean;
+use namespace::sweep;
 
 before install_sub => sub
 {
