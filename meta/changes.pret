@@ -297,3 +297,9 @@
 			dcs:thanks cpan:SYOHEX;
 		];
 	].
+
+`Kavorka 0.024 cpan:TOBYINK`
+	issued  2013-12-18;
+	changeset [
+		item "s/namespace::clean/namespace::sweep/"^^Bugfix;
+	].
