@@ -36,6 +36,10 @@ fun bar (Int $x where { match $_, [2,4,6,8] } = 4) {
 	return $x;
 }
 
+fun baz ($x where { match $_, [2,4,6,8] } = 6) {
+	return $x;
+}
+
 subtest "smartmatch-style value constraint" => fun
 {
 	is(foo(), 2);
@@ -51,6 +55,15 @@ subtest "block value constraint" => fun
 	is(bar(8), 8);
 	like(exception { bar(1.1) }, qr/^Value "?1\.1"? did not pass type constraint "?Int"?/);
 	like(exception { bar(111) }, qr/^\$x failed value constraint/);
+	done_testing;
+};
+
+subtest "value constraint with no type constraint" => fun
+{
+	is(baz(), 6);
+	is(baz(8), 8);
+	like(exception { baz(1.1) }, qr/^\$x failed value constraint/);
+	like(exception { baz(111) }, qr/^\$x failed value constraint/);
 	done_testing;
 };
 
