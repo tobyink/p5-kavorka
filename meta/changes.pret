@@ -303,3 +303,11 @@
 	changeset [
 		item "s/namespace::clean/namespace::sweep/"^^Bugfix;
 	].
+
+`Kavorka 0.025 cpan:TOBYINK`
+	issued  2013-12-23;
+	changeset [
+		item "Value constraints for parameters without type constraints were being ignored."^^Bugfix;
+		item "Support non-block form of value constraints, taken from Perl 6 / Method::Signatures."^^Addition;
+		item "Tests for value constraints."^^Tests;
+	].

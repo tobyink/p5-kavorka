@@ -15,7 +15,7 @@ use Sub::Identify ();
 {
 	package MooseX::KavorkaInfo;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.024';
+	our $VERSION   = '0.025';
 	
 	sub import
 	{
@@ -36,7 +36,7 @@ use Sub::Identify ();
 {
 	package MooseX::KavorkaInfo::Trait::Method;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.024';
+	our $VERSION   = '0.025';
 	
 	use Moose::Role;
 	
@@ -66,7 +66,7 @@ use Sub::Identify ();
 {
 	package MooseX::KavorkaInfo::Trait::WrappedMethod;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.024';
+	our $VERSION   = '0.025';
 	
 	use Moose::Role;
 	with 'MooseX::KavorkaInfo::Trait::Method';
