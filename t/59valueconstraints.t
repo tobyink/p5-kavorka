@@ -28,22 +28,22 @@ use Test::Fatal;
 use Kavorka;
 use match::simple qw(match);
 
-fun foo (Int $x where [2,4,6,8] = 2) {
-	return $x;
+fun foo (Int $x where [2,4,6,8] = 2, $y = 0) {
+	return $x + $y;
 }
 
-fun bar (Int $x where { match $_, [2,4,6,8] } = 4) {
-	return $x;
+fun bar (Int $x where { match $_, [2,4,6,8] } = 4, $y = 0) {
+	return $x + $y;
 }
 
-fun baz ($x where { match $_, [2,4,6,8] } = 6) {
-	return $x;
+fun baz ($x where { match $_, [2,4,6,8] } = 6, $y = 0) {
+	return $x + $y;
 }
 
 subtest "smartmatch-style value constraint" => fun
 {
 	is(foo(), 2);
-	is(foo(8), 8);
+	is(foo(8, 1), 9);
 	like(exception { foo(1.1) }, qr/^Value "?1\.1"? did not pass type constraint "?Int"?/);
 	like(exception { foo(111) }, qr/^\$x failed value constraint/);
 	done_testing;
@@ -52,7 +52,7 @@ subtest "smartmatch-style value constraint" => fun
 subtest "block value constraint" => fun
 {
 	is(bar(), 4);
-	is(bar(8), 8);
+	is(bar(8, 1), 9);
 	like(exception { bar(1.1) }, qr/^Value "?1\.1"? did not pass type constraint "?Int"?/);
 	like(exception { bar(111) }, qr/^\$x failed value constraint/);
 	done_testing;
