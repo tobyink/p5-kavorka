@@ -10,10 +10,11 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.024';
 
 use Text::Balanced qw( extract_bracketed );
+use PadWalker qw( closed_over set_closed_over peek_my );
 use Parse::Keyword {};
 
 our @ISA    = qw( Exporter::Tiny );
-our @EXPORT = qw( parse_name parse_variable parse_trait );
+our @EXPORT = qw( parse_name parse_variable parse_trait parse_block_or_match );
 
 #### From p5-mop-redux
 sub read_tokenish ()
@@ -136,6 +137,23 @@ sub parse_trait
 	}
 	
 	($name, $extracted, $evaled);
+}
+
+sub parse_block_or_match
+{
+	lex_read_space;
+	return parse_block(@_) if lex_peek eq '{';
+	
+	require match::simple;
+	
+	my $___term = parse_arithexpr(@_);
+	
+	eval <<"CODE" or die("could not eval implied match::simple comparison: $@");
+		sub {
+			local \$_ = \@_ ? \$_[0] : \$_;
+			match::simple::match(\$_, \$___term->());
+		};
+CODE
 }
 
 1;

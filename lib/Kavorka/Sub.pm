@@ -438,7 +438,8 @@ sub _poke_pads
 	for my $code (@{$self->_pads_to_poke})
 	{
 		my $closed_over = PadWalker::closed_over($code);
-		$closed_over->{$_} = $vars->{$_} for keys %$closed_over;
+		ref($vars->{$_}) && ($closed_over->{$_} = $vars->{$_})
+			for keys %$closed_over;
 		PadWalker::set_closed_over($code, $closed_over);
 	}
 }

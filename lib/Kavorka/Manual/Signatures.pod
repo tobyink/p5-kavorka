@@ -245,20 +245,23 @@ Multiple C<where> blocks may be provided:
 
 This feature is shared with Perl 6 signatures and L<Method::Signatures>.
 
-The non-block form of C<where> supported by L<Method::Signatures> is
-not supported by Kavorka, but can be emulated using L<match::simple>:
+A smartmatch-like shortcut is supported:
 
-   # Method::Signatures allows this (performing smart match):
+   # This is a shortcut:
    #
-   method foo ( Int $x where $y ) {
+   method foo ( Int $x where TERM ) {
       ...
    }
    
-   # For Kavorka, try this:
+   # For this:
    #
-   method foo ( Int $x where { match($_, $y) } ) {
+   use match::simple ();
+   method foo ( Int $x where { match::simple::match($_, TERM) } ) {
       ...
    }
+
+However, the use of any lexical variables within the term is currently
+broken.
 
 =head2 Defaults
 

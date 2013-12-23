@@ -256,7 +256,7 @@ sub parse
 	{
 		lex_read(5);
 		lex_read_space;
-		push @constraints, parse_block;
+		push @constraints, parse_block_or_match;
 		lex_read_space;
 	}
 	
@@ -598,28 +598,29 @@ sub _injection_type_check
 	my ($var) = @_;
 	
 	my $check = '';
-	return $check unless my $type = $self->type;
-	
-	my $can_xs =
-		$INC{'Mouse/Util.pm'}
-		&& Mouse::Util::MOUSE_XS()
-		&& ($type->{_is_core} or $type->is_parameterized && $type->parent->{_is_core});
-	
-	if (!$can_xs and $type->can_be_inlined)
+	if ( my $type = $self->type )
 	{
-		$check .= sprintf(
-			'%s;',
-			$type->inline_assert($var),
-		);
-	}
-	else
-	{
-		$check .= sprintf(
-			'$%s::PARAMS[%d]->{type}->assert_valid(%s);',
-			__PACKAGE__,
-			$self->ID,
-			$var,
-		);
+		my $can_xs =
+			$INC{'Mouse/Util.pm'}
+			&& Mouse::Util::MOUSE_XS()
+			&& ($type->{_is_core} or $type->is_parameterized && $type->parent->{_is_core});
+		
+		if (!$can_xs and $type->can_be_inlined)
+		{
+			$check .= sprintf(
+				'%s;',
+				$type->inline_assert($var),
+			);
+		}
+		else
+		{
+			$check .= sprintf(
+				'$%s::PARAMS[%d]->{type}->assert_valid(%s);',
+				__PACKAGE__,
+				$self->ID,
+				$var,
+			);
+		}
 	}
 	
 	for my $i (0 .. $#{$self->constraints})
