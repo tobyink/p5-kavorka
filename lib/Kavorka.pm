@@ -54,7 +54,7 @@ sub guess_implementation
 	$IMPLEMENTATION{$_[0]};
 }
 
-sub _exporter_expand_sub
+sub _exporter_fail
 {
 	my $me = shift;
 	my ($name, $args, $globals) = @_;
