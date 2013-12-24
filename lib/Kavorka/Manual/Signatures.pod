@@ -2,7 +2,7 @@
 
 =encoding utf-8
 
-=for stopwords invocant invocants lexicals unintuitive yada globals ro rw boolification rightwards scalarref
+=for stopwords invocant invocants lexicals unintuitive yada globals ro rw boolification rightwards scalarref smartmatch smartmatch-like
 
 =head1 NAME
 
