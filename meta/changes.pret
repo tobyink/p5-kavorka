@@ -311,3 +311,10 @@
 		item "Support non-block form of value constraints, taken from Perl 6 / Method::Signatures."^^Addition;
 		item "Tests for value constraints."^^Tests;
 	].
+
+`Kavorka 0.026 cpan:TOBYINK`
+	issued  2014-01-30;
+	changeset [
+		item "Allow keywords to detect when the keyword sub has been called in a way that bypasses the Perl keyword API's custom parsing (e.g. using a prototype, or as a coderef). By default, keywords croak when this is detected."^^Change;
+		item "Method modifier keywords can now detect when the keyword sub has been called bypassing custom parsing, and act sanely rather than croaking."^^Change;
+	].
