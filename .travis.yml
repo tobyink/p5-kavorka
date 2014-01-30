@@ -2,6 +2,7 @@ language: perl
 script: HARNESS_IS_VERBOSE=1 prove -Iinc -Ilib t
 install:
   - cpanm "Class::Method::Modifiers" "Class::Tiny" "Data::Alias" "Devel::Pragma" "Exporter::Tiny" "Module::Runtime" "Moo" "Moose" "Mouse" "PadWalker" "Parse::Keyword" "Return::Type" "Role::Tiny" "Sub::Identify" "Sub::Name" "Test::Fatal" "Test::More" "Test::Requires" "Type::Parser" "Type::Registry" "Type::Utils" "Types::Standard" "match::simple" "namespace::sweep"
+  - cpanm indirect multidimensional bareword::filehandles
 perl:
   - "5.14"
   - "5.16"
