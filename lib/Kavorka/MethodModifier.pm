@@ -89,7 +89,7 @@ my $INSTALL_MM = sub {
 package Kavorka::MethodModifier;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.026';
+our $VERSION   = '0.027';
 
 use Devel::Pragma 'fqname';
 use Parse::Keyword {};

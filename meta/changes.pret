@@ -318,3 +318,9 @@
 		item "Allow keywords to detect when the keyword sub has been called in a way that bypasses the Perl keyword API's custom parsing (e.g. using a prototype, or as a coderef). By default, keywords croak when this is detected."^^Change;
 		item "Method modifier keywords can now detect when the keyword sub has been called bypassing custom parsing, and act sanely rather than croaking."^^Change;
 	].
+
+`Kavorka 0.027 cpan:TOBYINK`
+	issued  2014-01-30;
+	changeset [
+		item "Minor change to the hook allowing keywords to deal with calls that bypass the Perl keyword API."^^Change;
+	].
