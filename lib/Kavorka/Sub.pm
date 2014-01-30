@@ -46,7 +46,7 @@ sub forward_declare_sub  { return; }
 sub bypass_custom_parsing
 {
 	my $class = shift;
-	my ($keyword, $caller, $args) = @_;	
+	my ($keyword, $caller, $args) = @_;
 	croak("Attempt to call keyword '$keyword' bypassing prototype not supported");
 }
 
