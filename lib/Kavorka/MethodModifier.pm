@@ -115,7 +115,7 @@ sub bypass_custom_parsing
 		or croak('Not a valid coderef');
 	
 	my @qnames =
-		map { /::/ ? $_ : sprintf('%s::%s', $caller->[0], $_) }
+		map { /::/ ? $_ : sprintf('%s::%s', $caller, $_) }
 		map { !ref($_) ? $_ : reftype($_) eq reftype([]) ? @$_ : croak("Not an array or string: $_") }
 		@$args;
 	

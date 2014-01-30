@@ -64,6 +64,8 @@ sub _exporter_fail
 		// $me->guess_implementation($name)
 		// $me;
 	
+	my $into = $globals->{into};
+	
 	Module::Runtime::use_package_optimistically($implementation)->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
 	
@@ -78,8 +80,7 @@ sub _exporter_fail
 		sub {
 			unless (Scalar::Util::blessed($_[0]) and $_[0]->DOES('Kavorka::Sub'))
 			{
-				my @caller = caller(0);
-				return $implementation->bypass_custom_parsing($name, \@caller, \@_);
+				return $implementation->bypass_custom_parsing($name, $into, \@_);
 			}
 
 			my $subroutine = shift;
