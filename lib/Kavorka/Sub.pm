@@ -43,6 +43,13 @@ sub default_attributes   { return; }
 sub default_invocant     { return; }
 sub forward_declare_sub  { return; }
 
+sub bypass_custom_parsing
+{
+	my $class = shift;
+	my ($keyword, $caller, $args) = @_;	
+	croak("Attempt to call keyword '$keyword' bypassing prototype not supported");
+}
+
 sub install_sub
 {
 	my $self = shift;
@@ -597,6 +604,25 @@ attributes. (Only used for named subs.)
 =item C<inject_prelude>
 
 Returns a string of Perl code to inject into the body of the sub.
+
+=item C<bypass_custom_parsing>
+
+A I<class method> that is called when people attempt to use the
+keyword while bypassing the Perl keyword API's custom parsing.
+Examples of how they can do that are:
+
+   use Kavorka 'method';
+   
+   &method(...);
+   
+   __PACKAGE__->can("method")->(...);
+
+The default implementation of C<bypass_custom_parsing> is to croak,
+but this can be overridden in cases where it may be possible to do
+something useful. (L<Kavorka::MethodModifier> does this.)
+
+It is passed the name of the keyword, an arrayref representing
+C<< caller(0) >>, and an arrayref representing C<< @_ >>.
 
 =back
 

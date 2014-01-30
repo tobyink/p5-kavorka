@@ -76,9 +76,14 @@ sub _exporter_fail
 	my $code = Sub::Name::subname(
 		"$me\::$name",
 		sub {
+			unless (Scalar::Util::blessed($_[0]) and $_[0]->DOES('Kavorka::Sub'))
+			{
+				my @caller = caller(0);
+				return $implementation->bypass_custom_parsing($name, \@caller, \@_);
+			}
+
 			my $subroutine = shift;
-			$name; # close over name to prevent optimization
-			
+						
 			# Post-parse clean-up
 			$subroutine->_post_parse();
 			

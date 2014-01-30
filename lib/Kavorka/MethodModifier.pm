@@ -36,61 +36,10 @@ my $DETECT_OO = do {
 	}
 };
 
-package Kavorka::MethodModifier;
-
-our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.025';
-
-use Devel::Pragma 'fqname';
-use Parse::Keyword {};
-use Parse::KeywordX;
-
-use Moo::Role;
-with 'Kavorka::Sub';
-use namespace::sweep;
-
-requires 'method_modifier';
-
-has more_names => (is => 'ro', default => sub { [] });
-
-after parse_subname => sub
-{
-	my $self = shift;
-	lex_read_space;
-	while (lex_peek eq ',')
-	{
-		lex_read(1);
-		lex_read_space;
-		push @{$self->more_names}, scalar fqname(parse_name('method', 1));
-		lex_read_space;
-	}
-};
-
-sub allow_anonymous { 0 }
-sub allow_lexical   { 0 }
-
-sub default_invocant
-{
-	my $self = shift;
-	return (
-		'Kavorka::Parameter'->new(
-			name      => '$self',
-			traits    => { invocant => 1 },
-		),
-	);
-}
-
-sub install_sub
-{
-	my $self = shift;
-	my $code = $self->body;
+my $INSTALL_MM = sub {
+	my ($modification, $names, $code) = @_;
 	
-	my $modification = $self->method_modifier;
-	
-	my @names = $self->qualified_name or die;
-	push @names, @{$self->more_names};
-	
-	for my $name (@names)
+	for my $name (@$names)
 	{
 		my ($package, $method) = ($name =~ /\A(.+)::(\w+)\z/);
 		my $OO = $package->$DETECT_OO;
@@ -135,6 +84,86 @@ sub install_sub
 			Class::Method::Modifiers::install_modifier($package, $modification, $method, $code);
 		}
 	}
+};
+
+package Kavorka::MethodModifier;
+
+our $AUTHORITY = 'cpan:TOBYINK';
+our $VERSION   = '0.025';
+
+use Devel::Pragma 'fqname';
+use Parse::Keyword {};
+use Parse::KeywordX;
+use Scalar::Util qw(reftype);
+
+use Moo::Role;
+with 'Kavorka::Sub';
+use namespace::sweep;
+
+requires 'method_modifier';
+
+has more_names => (is => 'ro', default => sub { [] });
+
+sub bypass_custom_parsing
+{
+	my $class = shift;
+	my ($keyword, $caller, $args) = @_;
+	
+	my $coderef = pop @$args;
+	
+	reftype($coderef) eq reftype(sub {})
+		or croak('Not a valid coderef');
+	
+	my @qnames =
+		map { /::/ ? $_ : sprintf('%s::%s', $caller->[0], $_) }
+		map { !ref($_) ? $_ : reftype($_) eq reftype([]) ? @$_ : croak("Not an array or string: $_") }
+		@$args;
+	
+	$INSTALL_MM->(
+		$class->method_modifier,
+		\@qnames,
+		$coderef,
+	);
+}
+
+after parse_subname => sub
+{
+	my $self = shift;
+	lex_read_space;
+	while (lex_peek eq ',')
+	{
+		lex_read(1);
+		lex_read_space;
+		push @{$self->more_names}, scalar fqname(parse_name('method', 1));
+		lex_read_space;
+	}
+};
+
+sub allow_anonymous { 0 }
+sub allow_lexical   { 0 }
+
+sub default_invocant
+{
+	my $self = shift;
+	return (
+		'Kavorka::Parameter'->new(
+			name      => '$self',
+			traits    => { invocant => 1 },
+		),
+	);
+}
+
+sub install_sub
+{
+	my $self = shift;
+	my $code = $self->body;
+	
+	my $modification = $self->method_modifier;
+	
+	my @names = $self->qualified_name or die;
+	push @names, @{$self->more_names};
+	
+	$INSTALL_MM->($modification, \@names, $code);
 }
 
 1;
