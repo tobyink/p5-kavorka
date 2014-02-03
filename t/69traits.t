@@ -79,4 +79,20 @@ subtest "Sub traits" => sub
 	);
 };
 
+use Kavorka funny => {
+	implementation => 'Kavorka::Sub::Fun',
+	traits         => [ 'Kavorka::TraitFor::Sub::superbad' ],
+};
+
+funny foo3 () {
+	43
+}
+
+subtest "Passing traits to import" => sub
+{
+	my $foo = Kavorka->info( 'main'->can('foo3') );	
+	ok $foo->DOES('Kavorka::TraitFor::Sub::superbad');
+	is foo3(), 43;
+};
+
 done_testing;

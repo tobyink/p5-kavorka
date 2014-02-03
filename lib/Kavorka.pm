@@ -54,6 +54,14 @@ sub guess_implementation
 	$IMPLEMENTATION{$_[0]};
 }
 
+sub compose_implementation
+{
+	shift;
+	require Moo::Role;
+	Moo::Role->create_class_with_roles(@_);
+}
+
+
 sub _exporter_fail
 {
 	my $me = shift;
@@ -66,7 +74,15 @@ sub _exporter_fail
 	
 	my $into = $globals->{into};
 	
-	Module::Runtime::use_package_optimistically($implementation)->can('parse')
+	Module::Runtime::use_package_optimistically($implementation);
+	
+	{
+		my $traits = $globals->{traits} // $args->{traits};
+		$implementation = $me->compose_implementation($implementation, @$traits)
+			if $traits;
+	}
+	
+	$implementation->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
 	
 	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
@@ -247,6 +263,10 @@ You can provide alternative implementations:
 
    # use My::Sub::Method instead of Kavorka::Sub::Method
    use Kavorka method => { implementation => 'My::Sub::Method' };
+
+Or add traits to the default implementation:
+
+   use Kavorka method => { traits => ['My::Sub::Role::Foo'] };
 
 See L<Exporter::Tiny> for more tips.
 
