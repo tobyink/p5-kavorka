@@ -88,6 +88,8 @@ is(
 	
 	::is($info->package, 'ZZZZ', 'introspection of anon function - A');
 	::is($info->signature->params->[0]->name, '$x', 'introspection of anon function - B');
+	
+	::is($info->(undef), 42, 'overload &{}');
 }
 
 done_testing;

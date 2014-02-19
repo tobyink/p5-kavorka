@@ -20,6 +20,14 @@ our @CARP_NOT = qw(Kavorka);
 use Moo::Role;
 use namespace::sweep;
 
+use overload (
+	q[&{}]   => sub { shift->body },
+	q[bool]  => sub { 1 },
+	q[""]    => sub { shift->qualified_name // '__ANON__' },
+	q[0+]    => sub { 1 },
+	fallback => 1,
+);
+
 has keyword         => (is => 'ro');
 has signature_class => (is => 'ro', default => sub { 'Kavorka::Signature' });
 has package         => (is => 'ro');
