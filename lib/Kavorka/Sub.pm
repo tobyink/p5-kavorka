@@ -420,6 +420,8 @@ sub _apply_return_types
 		$self->_set__unwrapped_body($self->body);
 		$self->_set_body($wrapped);
 	}
+	
+	();
 }
 
 sub _build__pads_to_poke
@@ -449,6 +451,8 @@ sub _poke_pads
 			for keys %$closed_over;
 		PadWalker::set_closed_over($code, $closed_over);
 	}
+	
+	();
 }
 
 1;
