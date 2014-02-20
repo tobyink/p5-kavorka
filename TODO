@@ -1,1 +1,2 @@
 Calling Kavorka->info(\&sub) on a multisub returns undef because the candidate subs are Kavorka::Sub consumers, but the main entry point is not. This needs work.
+Optimize `my $x = $_[0]; my $y = $_[1];` to `my ($x, $y); $x = $_[0]; $y = $_[1];` which may be about 7% faster on Perl 5.18 and above.
