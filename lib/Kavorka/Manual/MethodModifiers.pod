@@ -104,6 +104,8 @@ Note however that prototypes are fairly useless for methods.
 
 =head2 The Attributes
 
+Attributes may alternatively be provided I<< before the signature >>.
+
 See L<Kavorka::Manual::PrototypeAndAttributes>.
 
 Note that this applies the attribute to the modifier code, and not to

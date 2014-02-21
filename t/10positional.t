@@ -175,6 +175,46 @@ is_deeply(
 	'positional parameter with ||=default omitted'
 );
 
+{
+	package Example3;
+	use Kavorka;
+	fun foo ($x, @) {
+		return { '@_' => \@_, '$x' => $x, };
+	}
+	fun bar ($x, %) {
+		return { '@_' => \@_, '$x' => $x, };
+	}
+	fun baz ($x, ...) {
+		return { '@_' => \@_, '$x' => $x, };
+	}
+}
+
+is_deeply(
+	Example3::foo(42, quux => 'xyzzy'),
+	{ '@_' => [42, quux => 'xyzzy'], '$x' => 42 },
+	'Signature ($x, @) works',
+);
+
+is_deeply(
+	Example3::bar(42, quux => 'xyzzy'),
+	{ '@_' => [42, quux => 'xyzzy'], '$x' => 42 },
+	'Signature ($x, %) works',
+);
+
+is_deeply(
+	Example3::baz(42, quux => 'xyzzy'),
+	{ '@_' => [42, quux => 'xyzzy'], '$x' => 42 },
+	'Signature ($x, ...) works',
+);
+
+like(
+	exception { Example3::bar(42, 'xyzzy') },
+	qr/^Odd number of elements in anonymous hash/,
+);
+
+is(
+	exception { Example3::baz(42, 'xyzzy') },
+	undef,
+);
 
 done_testing;
-

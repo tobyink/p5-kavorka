@@ -1,5 +1,3 @@
 Calling Kavorka->info(\&sub) on a multisub returns undef because the candidate subs are Kavorka::Sub consumers, but the main entry point is not. This needs work.
 Parity with Perl's new built-in sub signatures:
-	- Allow attributes *before* signature??  (Seems ambiguous!)
 	- Allow "=" followed by no expression.
-	- Test that ($foo, @) and ($foo, %) work as rough aliases for ($foo, ...)

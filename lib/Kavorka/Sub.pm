@@ -110,6 +110,13 @@ sub parse
 		$self->forward_declare_sub;
 	}
 	
+	# Thanks to Perl 5.20 subs, we have to allow attributes before
+	# the signature too.
+	lex_read_space;
+	$self->parse_attributes
+		if lex_peek    eq ':'
+		&& lex_peek(2) ne ':(';
+	
 	# signature
 	$self->parse_signature;
 	my $sig = $self->signature;
@@ -273,8 +280,7 @@ sub parse_attributes
 		return;
 	}
 	
-	my $peek = lex_peek(1000);
-	while ($peek =~ /\A([^\W0-9]\w+)/)
+	while (lex_peek(4) =~ /\A([^\W0-9]\w+)/)
 	{
 		my $parsed = [parse_trait];
 		lex_read_space;
@@ -293,10 +299,8 @@ sub parse_attributes
 			lex_read(1);
 			lex_read_space;
 		}
-		
-		$peek = lex_peek(1000);
 	}
-	
+
 	();
 }
 

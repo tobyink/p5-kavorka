@@ -4,7 +4,7 @@
 
 =head1 PURPOSE
 
-Check prototypes work.
+Check prototypes and attributes work.
 
 =head1 AUTHOR
 
@@ -34,5 +34,49 @@ is(prototype(\&foo), '$');
 is(prototype(\&bar), '$');
 is(prototype($baz),  '$');
 is(prototype($quux), '$');
+
+fun xyzzy :prototype($$$) ($X, $Y, $Z) { 1 }
+is(prototype(\&xyzzy), '$$$');
+
+{
+	use Attribute::Handlers;
+	sub UNIVERSAL::Fooble :ATTR { };
+}
+
+subtest "Can distinguish between early attributes and signatures" => sub
+{
+	my $one = fun :Fooble ($x) { 1 };
+	my $two = fun :Fooble($x)  { 2 };
+	
+	is(
+		Kavorka->info($one)->attributes->[0][0],
+		'Fooble',
+	);
+	
+	is(
+		Kavorka->info($one)->attributes->[0][1],
+		undef,
+	);
+	
+	is(
+		Kavorka->info($one)->signature->params->[0]->name,
+		'$x',
+	);
+	
+	is(
+		Kavorka->info($two)->attributes->[0][0],
+		'Fooble',
+	);
+	
+	is(
+		Kavorka->info($two)->attributes->[0][1],
+		'$x',
+	);
+	
+	is(
+		Kavorka->info($two)->signature,
+		undef,
+	);
+};
 
 done_testing;

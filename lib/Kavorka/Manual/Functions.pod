@@ -104,6 +104,8 @@ See L<Kavorka::Manual::PrototypeAndAttributes>.
 
 =head2 The Attributes
 
+Attributes may alternatively be provided I<< before the signature >>.
+
 See L<Kavorka::Manual::PrototypeAndAttributes>.
 
 =head2 The Function Body

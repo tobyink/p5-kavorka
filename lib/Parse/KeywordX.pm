@@ -117,7 +117,7 @@ sub parse_variable
 sub parse_trait
 {
 	my $name = parse_name('trait', 0);
-	lex_read_space;
+	#lex_read_space;
 	
 	my $extracted;
 	if (lex_peek eq '(')

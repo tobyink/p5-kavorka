@@ -136,6 +136,8 @@ Note however that prototypes are fairly useless for methods.
 
 =head2 The Attributes
 
+Attributes may alternatively be provided I<< before the signature >>.
+
 See L<Kavorka::Manual::PrototypeAndAttributes>.
 
 The C<method>, C<objectmethod> and C<classmethod> keywords
