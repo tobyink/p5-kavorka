@@ -324,3 +324,12 @@
 	changeset [
 		item "Minor change to the hook allowing keywords to deal with calls that bypass the Perl keyword API."^^Change;
 	].
+
+`Kavorka 0.028 cpan:TOBYINK`
+	issued  2014-02-21;
+	label   "The 'perlsub-compat' Release";
+	changeset [
+		item "Make parsing of parameter defaults laxer so that an equals sign followed by no expression is allowed."^^Change;
+		item "Allow attributes to *precede* signatures."^^Change;
+		item "Add test cases covering bare @ and % sigils."^^Tests;
+	].
