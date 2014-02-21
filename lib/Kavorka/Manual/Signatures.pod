@@ -12,6 +12,9 @@ Kavorka::Manual::Signatures - experience the lure of the animal
 
 The signature consists of a list of parameters for the function.
 
+Kavorka signatures are a superset of the sub signature syntax
+introduced in Perl 5.19.9. See L<perlsub>.
+
 Each parameter is a variable name which will be available within the
 body of the function. Variable names are assumed to be lexicals unless
 they look like punctuation variables or escape-character global
@@ -24,7 +27,7 @@ invocants and are shifted off C<< @_ >>. If no invocants are explicitly
 listed as part of the signature, the module implementing the keyword
 may assume a default invocant - for example, C<method> assumes an
 invocant called C<< $self >> while C<around> assumes two invocants
-called C<< ${^NEXT} >> and C<< $self >>.
+called C<< $next >> and C<< $self >>.
 
 =head2 Positional parameters
 
@@ -302,7 +305,8 @@ For slurpy references, the syntax is a little unintuitive:
 
    fun foo ( slurpy ArrayRef $bar = (1, 2, 3) ) { ... }
 
-B<< Caveat: >> the following does not work:
+B<< Caveat: >> unlike Perl 5.19.9+'s built-in signatures, the following
+B<< does not work >>:
 
    fun foo ($x, $y = $x) { ... }
 

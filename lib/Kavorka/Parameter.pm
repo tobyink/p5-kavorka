@@ -274,7 +274,9 @@ sub parse
 		$default_when = $1;
 		lex_read(length($1));
 		lex_read_space;
-		$default = parse_arithexpr;
+		$default = lex_peek(5) =~ m{ \A (?: when\b | [,)] ) }x
+			? sub { (); }
+			: parse_arithexpr;
 		lex_read_space;
 		$traits{_optional} = 1;
 	}

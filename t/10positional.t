@@ -89,6 +89,10 @@ is_deeply(
 	fun quux ($x ||= 42) {
 		return { '@_' => \@_, '$x' => $x, };
 	}
+	
+	fun xyzzy ($x=,$=,$y=) {
+		return { '@_' => \@_, '$x' => $x, '$y' => $y };
+	}
 }
 
 is_deeply(
@@ -175,6 +179,24 @@ is_deeply(
 	'positional parameter with ||=default omitted'
 );
 
+is_deeply(
+	Example2::xyzzy(42),
+	{ '@_' => [42], '$x' => 42, '$y' => undef },
+	'crazy bare =',
+);
+
+is_deeply(
+	Example2::xyzzy(42, 4),
+	{ '@_' => [42, 4], '$x' => 42, '$y' => undef },
+	'crazy bare =',
+);
+
+is_deeply(
+	Example2::xyzzy(42, 4, 2),
+	{ '@_' => [42, 4, 2], '$x' => 42, '$y' => 2 },
+	'crazy bare =',
+);
+
 {
 	package Example3;
 	use Kavorka;
@@ -210,11 +232,13 @@ is_deeply(
 like(
 	exception { Example3::bar(42, 'xyzzy') },
 	qr/^Odd number of elements in anonymous hash/,
+	'Signature ($x, %) can throw',
 );
 
 is(
 	exception { Example3::baz(42, 'xyzzy') },
 	undef,
+	"Signature (\$x, ...) won't throw",
 );
 
 done_testing;
