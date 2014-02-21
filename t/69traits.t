@@ -90,7 +90,7 @@ funny foo3 () {
 
 subtest "Passing traits to import" => sub
 {
-	my $foo = Kavorka->info( 'main'->can('foo3') );	
+	my $foo = Kavorka->info( 'main'->can('foo3') );
 	ok $foo->DOES('Kavorka::TraitFor::Sub::superbad');
 	is foo3(), 43;
 };
