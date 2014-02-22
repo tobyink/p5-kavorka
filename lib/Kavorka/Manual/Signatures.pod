@@ -19,7 +19,7 @@ Kavorka::Manual::Signatures - experience the lure of the animal
 The signature consists of a list of parameters for the function.
 
 Kavorka signatures are a superset of the sub signature syntax
-introduced in Perl 5.19.9. See L<perlsub>.
+introduced in Perl 5.20 (well, 5.19.9 to be exact). See L<perlsub>.
 
 Each parameter is a variable name which will be available within the
 body of the function. Variable names are assumed to be lexicals unless
@@ -51,8 +51,8 @@ Is roughly equivalent to:
       ...
    }
 
-This feature is shared with Perl 6 signatures, L<Function::Parameters>,
-and L<Method::Signatures>.
+This feature is shared with Perl 5.20 signatures, Perl 6 signatures,
+L<Function::Parameters>, and L<Method::Signatures>.
 
 =head2 Invocants
 
@@ -280,8 +280,8 @@ Defaults may be provided using an equals sign:
       ...
    }
 
-This feature is shared with Perl 6 signatures, L<Function::Parameters>,
-and L<Method::Signatures>.
+This feature is shared with Perl 5.20 signatures, Perl 6 signatures,
+L<Function::Parameters>, and L<Method::Signatures>.
 
 Kavorka will use the default if the argument is not given when the
 function is invoked. If an explicit undef is passed to the function
@@ -311,8 +311,8 @@ For slurpy references, the syntax is a little unintuitive:
 
    fun foo ( slurpy ArrayRef $bar = (1, 2, 3) ) { ... }
 
-B<< Caveat: >> unlike Perl 5.19.9+'s built-in signatures, the following
-B<< does not work >>:
+B<< Caveat: >> unlike Perl 5.20 signatures, the following B<< does
+not work >>:
 
    fun foo ($x, $y = $x) { ... }
 
