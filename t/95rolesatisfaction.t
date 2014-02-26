@@ -35,7 +35,7 @@ package MyClass {
 	use Moo;
 	use Kavorka;
 	$e = ::exception { with qw(MyRole) };
-	method my_method () {
+	method my_method () but begin {
 		return 42;
 	}
 }

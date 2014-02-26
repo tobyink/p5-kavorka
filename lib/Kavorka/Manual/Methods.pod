@@ -68,7 +68,9 @@ If present, it specifies the name of the method being defined. If no
 name is present, the declaration is an expression that evaluates to a
 reference to the method in question.
 
-Methods are added to the class at run-time. So this works:
+Although methods are compiled at compile-time (and variables are closed
+over then), methods are installed into the class at run-time. So this
+works:
 
    if ($ENV{DEBUG}) {
       method foobar { ... }
@@ -76,6 +78,15 @@ Methods are added to the class at run-time. So this works:
    else {
       method foobar { ... }
    }
+
+It is possible to add the method to the class at compile time using
+the C<begin> L<trait|/Traits>:
+
+   method foobar but begin { ... }
+
+This may be useful for role composition, if roles are composed before
+methods are defined, but the roles require certain methods to exist in
+your class.
 
 It is possible to define lexical (i.e. truly private) methods using a
 lexical variable for a method name:

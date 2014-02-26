@@ -41,6 +41,7 @@ has qualified_name  => (is => 'rwp');
 
 has _unwrapped_body => (is => 'rwp');
 has _pads_to_poke   => (is => 'lazy');
+has _tmp_name       => (is => 'lazy');
 
 sub allow_anonymous      { 1 }
 sub allow_lexical        { 1 }
@@ -304,6 +305,12 @@ sub parse_attributes
 	();
 }
 
+sub _build__tmp_name
+{
+	state $i = 0;
+	"Kavorka::Temp::f" . ++$i;
+}
+
 sub parse_body
 {
 	my $self = shift;
@@ -349,9 +356,9 @@ sub parse_body
 		if ($self->is_lexical)
 		{
 			$lex = sprintf(
-				'&Internals::SvREADONLY(\\(my %s = \&Kavorka::Temp::f%d), 1);',
+				'&Internals::SvREADONLY(\\(my %s = \&%s), 1);',
 				$self->declared_name,
-				$i + 1
+				$self->_tmp_name,
 			);
 		}
 		
@@ -359,14 +366,14 @@ sub parse_body
 		# Perl. We'll pick it up later from this name in _post_parse
 		lex_stuff(
 			sprintf(
-				"%s sub Kavorka::Temp::f%d %s { no warnings 'closure'; %s",
+				"%s sub %s %s { no warnings 'closure'; %s",
 				$lex,
-				++$i,
+				$self->_tmp_name,
 				$self->inject_attributes,
 				$self->inject_prelude,
 			)
 		);
-		$self->{argh} = "Kavorka::Temp::f$i";
+		$self->{argh} = $self->_tmp_name;
 	}
 	
 	();

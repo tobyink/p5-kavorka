@@ -81,6 +81,11 @@ but are installed into the symbol table at run-time. So this works:
       fun foobar { ... }
    }
 
+It is possible to install the function at compile time using the
+C<begin> L<trait|/Traits>:
+
+   fun foobar but begin { ... }
+
 It is possible to define lexical functions using a lexical variable
 for a function name:
 
