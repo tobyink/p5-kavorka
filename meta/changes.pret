@@ -333,3 +333,9 @@
 		item "Allow attributes to *precede* signatures."^^Change;
 		item "Add test cases covering bare @ and % sigils."^^Tests;
 	].
+
+`Kavorka 0.029 cpan:TOBYINK`
+	issued  2014-02-26;
+	changeset [
+		item "Kavorka::TraitFor::Sub::begin."^^Addition;
+	].

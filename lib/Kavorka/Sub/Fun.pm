@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::Sub::Fun;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.028';
+our $VERSION   = '0.029';
 
 use Moo;
 with 'Kavorka::Sub';
