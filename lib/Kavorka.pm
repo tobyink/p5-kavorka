@@ -30,6 +30,7 @@ our %IMPLEMENTATION = (
 	augment      => 'Kavorka::Sub::Augment',
 	before       => 'Kavorka::Sub::Before',
 	classmethod  => 'Kavorka::Sub::ClassMethod',
+	f            => 'Kavorka::Sub::Fun',
 	fun          => 'Kavorka::Sub::Fun',
 	func         => 'Kavorka::Sub::Fun',
 	function     => 'Kavorka::Sub::Fun',
