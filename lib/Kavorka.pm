@@ -62,6 +62,30 @@ sub compose_implementation
 	Moo::Role->create_class_with_roles(@_);
 }
 
+sub _exporter_validate_opts
+{
+	my $class = shift;
+	$^H{'Kavorka::PKG'} = $_[0]->{into};
+}
+
+sub fqname ($;$)
+{
+	my $name = shift;
+	my ($package, $subname);
+
+	$name =~ s{'}{::}g;
+
+	if ($name =~ /::/) {
+		($package, $subname) = $name =~ m{^(.+)::(\w+)$};
+	}
+	else {
+		my $caller = @_ ? shift : $^H{'Kavorka::PKG'};
+		($package, $subname) = ($caller, $name);
+	}
+
+	return wantarray ? ($package, $subname) : "$package\::$subname";
+}
+
 
 sub _exporter_fail
 {
