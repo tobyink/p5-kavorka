@@ -343,6 +343,7 @@
 `Kavorka 0.030 cpan:TOBYINK`
 	issued  2014-03-20;
 	changeset [
+		item "Introduce `f` as an alternative to `fun`."^^Addition;
 		item [
 			a dcs:Tests;
 			dcs:blame cpan:TEEJAY;

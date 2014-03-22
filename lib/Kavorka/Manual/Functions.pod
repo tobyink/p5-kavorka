@@ -119,6 +119,21 @@ This is more or less what you'd expect from the function body you'd
 write with L<sub|perlsub>, however the lexical variables for parameters
 are pre-declared and pre-populated.
 
+=head2 C<< f >>, C<< func >>, and C<< function >>
+
+These are all aliases for C<< fun >>, though not exported by default.
+
+   use v5.14;
+   use Kavorka qw( function f );
+   
+   function make_plusser (Num $x = 1)
+   {
+      return f(Num $y) { $x + $y };
+   }
+   
+   my $plusser = make_plusser();
+   say $plusser->(41);   # says 42
+
 =head1 BUGS
 
 Please report any bugs to
