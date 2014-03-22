@@ -12,3 +12,9 @@ cpan:XAERXESS
 
 cpan:SYOHEX
 	:name  "Syohei Yoshida".
+
+cpan:TEEJAY
+	:name  "Aaron James Trevena".
+
+cpan:PDCAWLEY
+	:name  "Piers Cawley".

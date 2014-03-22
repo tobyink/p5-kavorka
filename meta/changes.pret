@@ -339,3 +339,20 @@
 	changeset [
 		item "Kavorka::TraitFor::Sub::begin."^^Addition;
 	].
+
+`Kavorka 0.030 cpan:TOBYINK`
+	issued  2014-03-20;
+	changeset [
+		item [
+			a dcs:Tests;
+			dcs:blame cpan:TEEJAY;
+			label "Add test using Kavorka on threaded Perls.";
+			seealso RT#94015;
+		];
+		item [
+			a dcs:Bugfix;
+			dcs:blame cpan:PDCAWLEY;
+			label "Eliminate dependency on Devel::Pragma, which fixes Kavorka on threaded Perls.";
+			dcs:fixes RT#94015;
+		];
+	].
