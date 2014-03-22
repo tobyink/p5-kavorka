@@ -105,7 +105,7 @@ sub parse
 	$self->parse_subname;
 	unless ($self->is_anonymous or $self->is_lexical)
 	{
-		my $qualified = Kavorka::fqname($self->declared_name);
+		my $qualified = Kavorka::_fqname($self->declared_name);
 		$self->_set_qualified_name($qualified);
 		$self->forward_declare_sub;
 	}

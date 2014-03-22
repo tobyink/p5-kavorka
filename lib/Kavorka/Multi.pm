@@ -49,7 +49,7 @@ after parse_attributes => sub
 	my @filtered;
 
 	$_->[0] eq 'long'
-		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar Kavorka::fqname $_->[1]))
+		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar Kavorka::_fqname $_->[1]))
 		: push(@filtered, $_)
 		for @attr;
 	

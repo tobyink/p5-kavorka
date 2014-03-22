@@ -133,7 +133,7 @@ after parse_subname => sub
 	{
 		lex_read(1);
 		lex_read_space;
-		push @{$self->more_names}, scalar Kavorka::fqname(parse_name('method', 1));
+		push @{$self->more_names}, scalar Kavorka::_fqname(parse_name('method', 1));
 		lex_read_space;
 	}
 };
