@@ -12,7 +12,7 @@ before_install:
   - "perlbrew install-cpanm -f"
   - "perl -V"
 install:
-  - cpanm "Class::Method::Modifiers" "Class::Tiny" "Data::Alias" "Devel::Pragma" "Exporter::Tiny" "Module::Runtime" "Moo" "Moose" "Mouse" "PadWalker" "Parse::Keyword" "Return::Type" "Role::Tiny" "Sub::Identify" "Sub::Name" "Test::Fatal" "Test::More" "Test::Requires" "Type::Parser" "Type::Registry" "Type::Utils" "Types::Standard" "match::simple" "namespace::sweep"
+  - cpanm "Class::Method::Modifiers" "Class::Tiny" "Data::Alias" "Exporter::Tiny" "Module::Runtime" "Moo" "Moose" "Mouse" "PadWalker" "Parse::Keyword" "Return::Type" "Role::Tiny" "Sub::Identify" "Sub::Name" "Test::Fatal" "Test::More" "Test::Requires" "Type::Parser" "Type::Registry" "Type::Utils" "Types::Standard" "match::simple" "namespace::sweep"
   - cpanm indirect multidimensional bareword::filehandles
 script:
   - prove -Iinc -Ilib t

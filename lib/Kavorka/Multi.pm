@@ -7,13 +7,13 @@ package Kavorka::Multi;
 our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.029';
 
-use Devel::Pragma qw( fqname );
 use Parse::Keyword {};
 use Parse::KeywordX;
 
 use Moo;
 with 'Kavorka::Sub';
 use namespace::sweep;
+
 
 has multi_type          => (is => 'ro', required => 1);
 has declared_long_name  => (is => 'rwp');
@@ -47,8 +47,9 @@ after parse_attributes => sub
 	my @attr = @{$self->attributes};
 	
 	my @filtered;
+
 	$_->[0] eq 'long'
-		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar fqname $_->[1]))
+		? ($self->_set_declared_long_name($_->[1]), $self->_set_qualified_long_name(scalar Kavorka::fqname $_->[1]))
 		: push(@filtered, $_)
 		for @attr;
 	
