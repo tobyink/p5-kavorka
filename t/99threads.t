@@ -1,3 +1,26 @@
+=pod
+
+=encoding utf-8
+
+=head1 PURPOSE
+
+Check that Kavorka can be used on threaded Perls. Doesn't test any
+actual functionality under threading; merely that Kavorka can be
+loaded, and threads can be created.
+
+=head1 AUTHOR
+
+Aaron James Trevena E<lt>teejay@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Aaron James Trevena.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 use strict;
 use warnings;
 use Test::More;
