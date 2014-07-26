@@ -105,7 +105,7 @@ See also: L<Lexical::Accessor>.
 
 =head2 The Signature
 
-See L<Kavorka::Manual::Signature>.
+See L<Kavorka::Manual::Signatures>.
 
 The C<method> keyword has a default invocant called C<< $self >>, but
 it does not have a type constraint, so can equally be used for class or
@@ -169,7 +169,7 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 =head1 SEE ALSO
 
 L<Kavorka::Manual>,
-L<Kavorka::Manual::Signature>,
+L<Kavorka::Manual::Signatures>,
 L<Kavorka::Manual::PrototypeAndAttributes>,
 L<Kavorka::Manual::MultiSubs>,
 L<Kavorka::Manual::MethodModifiers>.
