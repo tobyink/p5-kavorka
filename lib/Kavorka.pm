@@ -18,7 +18,7 @@ our $VERSION   = '0.029';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );
-our @EXPORT_OK   = qw( fun method after around before override augment classmethod objectmethod );
+our @EXPORT_OK   = qw( fun method after around before override augment classmethod objectmethod multi );
 our %EXPORT_TAGS = (
 	modifiers    => [qw( after around before )],
 	allmodifiers => [qw( after around before override augment )],
