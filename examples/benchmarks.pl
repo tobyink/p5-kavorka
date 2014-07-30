@@ -101,42 +101,32 @@ L<MooseX::Method::Signatures>
 
 =back
 
+In all cases, L<Type::Tiny::XS> is installed. This gives a speed boost to
+Kavorka, Type::Params, and one of the Function::Parameters examples.
+
 =head1 RESULTS
 
 =head2 Standard Results
 
 Running C<< perl -Ilib examples/benchmarks.pl >>:
 
-             Rate     MXMS       MS FP_Moose    FP_TT  TParams  Kavorka
- MXMS       777/s       --     -91%     -92%     -93%     -95%     -96%
- MS        8980/s    1055%       --      -8%     -13%     -43%     -49%
- FP_Moose  9732/s    1152%       8%       --      -6%     -38%     -45%
- FP_TT    10367/s    1233%      15%       7%       --     -34%     -41%
- TParams  15756/s    1927%      75%      62%      52%       --     -10%
- Kavorka  17598/s    2164%      96%      81%      70%      12%       --
+             Rate     MXMS       MS FP_Moose  TParams    FP_TT  Kavorka
+ MXMS       654/s       --     -91%     -93%     -98%     -98%     -98%
+ MS        7129/s     990%       --     -18%     -78%     -82%     -83%
+ FP_Moose  8719/s    1233%      22%       --     -74%     -78%     -79%
+ TParams  32905/s    4933%     362%     277%       --     -17%     -20%
+ FP_TT    39648/s    5964%     456%     355%      20%       --      -3%
+ Kavorka  41008/s    6172%     475%     370%      25%       3%       --
 
 Kavorka is the winner.
 
-=head2 Any::Moose + Mouse Results
+Yes, that's right, it's about 60 or so times faster than
+MooseX::Method::Signatures.
 
-If L<Any::Moose> is loaded before L<Moose>, then L<Method::Signatures>
-will be able to use Mouse's type constraints instead of Moose's. Also,
-if L<Mouse> is loaded before a L<Type::Tiny> type constraint has been
-checked, L<Type::Tiny> can sometimes use Mouse's XSUBs to accelerate
-itself.
-
-Running C<< perl -mAny::Moose -Ilib examples/benchmarks.pl >>:
-
-             Rate     MXMS FP_Moose  TParams       MS  Kavorka    FP_TT
- MXMS       817/s       --     -92%     -95%     -98%     -98%     -98%
- FP_Moose 10353/s    1168%       --     -36%     -75%     -76%     -77%
- TParams  16236/s    1888%      57%       --     -61%     -63%     -64%
- MS       41684/s    5005%     303%     157%       --      -5%      -8%
- Kavorka  43689/s    5250%     322%     169%       5%       --      -4%
- FP_TT    45373/s    5457%     338%     179%       9%       4%       --
-
-Kavorka, L<Function::Parameters>+L<Type::Tiny>, and L<Method::Signatures>
-perform at comparable speed, clearly benefiting from the XSUB boost.
+Note that if L<Any::Moose> is loaded before L<Moose>, then Method::Signatures
+will be able to use Mouse's type constraints instead of Moose's. In that case,
+the Method::Signatures results are much closer to Kavorka. (In the table above
+they'd be about 30000/s.)
 
 =head1 AUTHOR
 
@@ -144,7 +134,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2014 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
