@@ -65,7 +65,8 @@ sub compose_implementation
 sub _exporter_validate_opts
 {
 	my $class = shift;
-	$^H{'Kavorka/package'} = $_[0]->{into};
+	$^H{'Kavorka/package'} = $_[0]{into};
+	$_[0]{replace} = 1 unless exists $_[0]{replace};
 }
 
 sub _fqname ($;$)
