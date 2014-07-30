@@ -1,0 +1,40 @@
+@prefix dbug:  <http://ontologi.es/doap-bugs#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/Kavorka/project>
+	dbug:issue           <http://purl.org/NET/cpan-uri/rt/ticket/91557>, <http://purl.org/NET/cpan-uri/rt/ticket/92634>, <http://purl.org/NET/cpan-uri/rt/ticket/94015>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/91557>
+	a                    dbug:Issue;
+	rdfs:label           "Perhaps make `fun` and `method` install methods at compile time.";
+	dbug:id              "91557";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=91557>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2013-12-21T11:00:32Z"^^xsd:dateTime;
+	dc:reporter          _:B1.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/92634>
+	a                    dbug:Issue;
+	rdfs:label           "Investigate compatibility with forthcoming native signatures";
+	dbug:id              "92634";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=92634>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/resolved>;
+	dc:created           "2014-02-01T08:10:12Z"^^xsd:dateTime;
+	dc:reporter          _:B1.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/94015>
+	a                    dbug:Issue;
+	rdfs:label           "segfault on joining multiple threads using Kavorka";
+	dbug:id              "94015";
+	dbug:page            <https://rt.cpan.org/Public/Bug/Display.html?id=94015>;
+	dbug:status          <http://purl.org/NET/cpan-uri/rt/status/patched>;
+	dc:created           "2014-03-19T20:25:02Z"^^xsd:dateTime;
+	dc:reporter          [ a foaf:Agent; foaf:mbox <mailto:ajt@thermeon.com> ].
+
+_:B1
+	a                    foaf:Agent;
+	foaf:mbox            <mailto:mail@tobyinkster.co.uk>.
+

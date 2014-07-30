@@ -14,7 +14,7 @@ use Sub::Name ();
 package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.029';
+our $VERSION   = '0.030';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );
@@ -65,24 +65,26 @@ sub compose_implementation
 sub _exporter_validate_opts
 {
 	my $class = shift;
-	$^H{'Kavorka::PKG'} = $_[0]->{into};
+	$^H{'Kavorka/package'} = $_[0]->{into};
 }
 
-sub fqname ($;$)
+sub _fqname ($;$)
 {
 	my $name = shift;
 	my ($package, $subname);
-
+	
 	$name =~ s{'}{::}g;
-
-	if ($name =~ /::/) {
+	
+	if ($name =~ /::/)
+	{
 		($package, $subname) = $name =~ m{^(.+)::(\w+)$};
 	}
-	else {
-		my $caller = @_ ? shift : $^H{'Kavorka::PKG'};
+	else
+	{
+		my $caller = @_ ? shift : $^H{'Kavorka/package'};
 		($package, $subname) = ($caller, $name);
 	}
-
+	
 	return wantarray ? ($package, $subname) : "$package\::$subname";
 }
 
