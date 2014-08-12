@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::Parameter;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.030';
+our $VERSION   = '0.031';
 our @CARP_NOT  = qw( Kavorka::Signature Kavorka::Sub Kavorka );
 
 use Carp qw( croak );

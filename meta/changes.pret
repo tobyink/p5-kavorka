@@ -357,3 +357,30 @@
 			dcs:fixes RT#94015;
 		];
 	].
+
+`Kavorka 0.031 cpan:TOBYINK`
+	issued  2014-08-13;
+	changeset [
+		item [
+			a dcs:Bugfix;
+			label "Add `multi` to @EXPORT_OK.";
+			dcs:blame cpan:THILP;
+		];
+		item [
+			a dcs:Bugfix, dcs:Documentation;
+			label "Fix link to Kavorka::Manual::Signatures.";
+			dcs:blame cpan:THILP;
+		];
+		item [
+			a dcs:Update;
+			label "Cope with changes to Exporter::Tiny; avoid triggering warnings.";
+		];
+		item [
+			a dcs:Update;
+			label "Bump required version of Return::Type.";
+		];
+		item [
+			a dcs:Documentation, a dcs:Update;
+			label "Update benchmarks given that Type::Tiny::XS is hellishly fast.";
+		];
+	].
