@@ -380,7 +380,7 @@
 			label "Bump required version of Return::Type.";
 		];
 		item [
-			a dcs:Documentation, a dcs:Update;
+			a dcs:Documentation, dcs:Update;
 			label "Update benchmarks given that Type::Tiny::XS is hellishly fast.";
 		];
 		item [
