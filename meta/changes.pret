@@ -383,4 +383,8 @@
 			a dcs:Documentation, a dcs:Update;
 			label "Update benchmarks given that Type::Tiny::XS is hellishly fast.";
 		];
+		item [
+			a dcs:Packaging;
+			label "Recommend Type::Tiny::XS.";
+		];
 	].
