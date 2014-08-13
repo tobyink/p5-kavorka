@@ -1,24 +1,37 @@
 language: perl
 perl:
   - "5.14"
-  - "5.14.2_thr"
   - "5.16"
-  - "5.16.2_thr"
   - "5.18"
-  - "5.18.2_thr"
   - "5.20"
-  - "5.20.0_thr"
+  - "5.14-thr"
+  - "5.20-thr"
+  - "blead"
+matrix:
+  include:
+    - perl: 5.18
+      env: COVERAGE=1         # enables coverage+coveralls reporting
 before_install:
-  - "source devel.travis/travis-perlbrew"
-  - "perlbrew install-cpanm -f"
-  - "perl -V"
+  - export DIST_INKT_PROFILE="Dist::Inkt::Profile::TOBYINK"
+  - git clone git://github.com/tobyink/perl-travis-helper
+  - source perl-travis-helper/init
+  - build-perl
+  - perl -V
+  - build-dist
+  - cd $BUILD_DIR             # $BUILD_DIR is set by the build-dist command
 install:
-  - cpanm "Class::Method::Modifiers" "Class::Tiny" "Data::Alias" "Exporter::Tiny" "Module::Runtime" "Moo" "Moose" "Mouse" "PadWalker" "Parse::Keyword" "Return::Type" "Role::Tiny" "Sub::Identify" "Sub::Name" "Test::Fatal" "Test::More" "Test::Requires" "Type::Parser" "Type::Registry" "Type::Utils" "Types::Standard" "match::simple" "namespace::sweep"
-  - cpanm indirect multidimensional bareword::filehandles Type::Tiny::XS
+  - cpan-install --toolchain  # installs a vaguely recent EUMM, Exporter
+  - cpan-install --deps       # installs prereqs, including recommends
+  - cpan-install --coverage   # installs converage prereqs, if enabled
+before_script:
+  - coverage-setup
 script:
-  - prove -Iinc -Ilib t
+  - prove -l -j$((SYSTEM_CORES + 1)) $(test-dirs)   # parallel testing
+after_success:
+  - coverage-report
 notifications:
   irc:
     channels:
       - "irc.perl.org#moops"
     on_success: change
+
