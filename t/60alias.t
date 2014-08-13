@@ -24,6 +24,10 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+BEGIN {
+	$INC{'Devel/Cover.pm'} and plan skip_all => "broken with Devel::Cover";
+};
+
 {
 	package Example;
 	use Kavorka;
