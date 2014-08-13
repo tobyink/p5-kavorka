@@ -85,6 +85,7 @@ sub install_sub
 sub inject_attributes
 {
 	my $self = shift;
+	no warnings; # Perl 5.21+ sprintf emits warnings for redundant arguments
 	join(' ', map sprintf($_->[1] ? ':%s(%s)' : ':%s', @$_), @{ $self->attributes }),
 }
 
