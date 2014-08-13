@@ -113,6 +113,9 @@ sub _exporter_fail
 	$implementation->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
 	
+#	require Sub::Defer;
+#	Sub::Defer::undefer_all();
+#	
 	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
 	# currently in scope.
 	$^H{'Kavorka'} .= "$name=$implementation ";

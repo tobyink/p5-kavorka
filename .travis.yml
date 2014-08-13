@@ -6,14 +6,15 @@ perl:
   - "5.16.2_thr"
   - "5.18"
   - "5.18.2_thr"
-  - "5.19"
+  - "5.20"
+  - "5.20.0_thr"
 before_install:
   - "source devel.travis/travis-perlbrew"
   - "perlbrew install-cpanm -f"
   - "perl -V"
 install:
   - cpanm "Class::Method::Modifiers" "Class::Tiny" "Data::Alias" "Exporter::Tiny" "Module::Runtime" "Moo" "Moose" "Mouse" "PadWalker" "Parse::Keyword" "Return::Type" "Role::Tiny" "Sub::Identify" "Sub::Name" "Test::Fatal" "Test::More" "Test::Requires" "Type::Parser" "Type::Registry" "Type::Utils" "Types::Standard" "match::simple" "namespace::sweep"
-  - cpanm indirect multidimensional bareword::filehandles
+  - cpanm indirect multidimensional bareword::filehandles Type::Tiny::XS
 script:
   - prove -Iinc -Ilib t
 notifications:
