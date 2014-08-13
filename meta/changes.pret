@@ -388,3 +388,14 @@
 			label "Recommend Type::Tiny::XS.";
 		];
 	].
+
+`Kavorka 0.032 cpan:TOBYINK`
+	issued  2014-08-13;
+	changeset [
+		item [
+			a dcs:Bugfix;
+			label "Work around a bug in Moo(?) or maybe the Perl keyword API(?) by undeferring Moo's deferred subs.";
+			dcs:thanks <urn:uuid:e56483ab-8752-412c-a519-294b8d83345c>;
+			dcs:fixes RT#95786;
+		];
+	].
