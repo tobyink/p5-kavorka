@@ -28,13 +28,13 @@ use overload (
 );
 
 has keyword         => (is => 'ro');
-has signature_class => (is => 'ro', default => sub { 'Kavorka::Signature' });
+has signature_class => (is => 'lazy', default => sub { 'Kavorka::Signature' });
 has package         => (is => 'ro');
 has declared_name   => (is => 'rwp');
 has signature       => (is => 'rwp');
-has traits          => (is => 'ro', default => sub { +{} });
+has traits          => (is => 'lazy', default => sub { +{} });
 has prototype       => (is => 'rwp');
-has attributes      => (is => 'ro', default => sub { [] });
+has attributes      => (is => 'lazy', default => sub { [] });
 has body            => (is => 'rwp');
 has qualified_name  => (is => 'rwp');
 
