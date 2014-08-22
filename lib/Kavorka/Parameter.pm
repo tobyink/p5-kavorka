@@ -127,7 +127,7 @@ sub parse
 			require Type::Utils;
 			my $tmp = 'Type::Registry::DWIM'->new;
 			$tmp->{'~~chained'} = $args{package};
-			$tmp->{'~~assume'}  = 'Type::Tiny::Class';
+			$tmp->{'~~assume'}  = 'make_class_type';
 			$tmp;
 		};
 		
