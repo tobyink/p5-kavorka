@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::TraitFor::Parameter::alias;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.032';
+our $VERSION   = '0.033';
 
 use Moo::Role;
 

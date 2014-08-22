@@ -399,3 +399,13 @@
 			dcs:fixes RT#95786;
 		];
 	].
+
+`Kavorka 0.033 cpan:TOBYINK`
+	issued  2014-08-22;
+	changeset [
+		item [
+			a dcs:Bugfix, dcs:Update;
+			label "Type::Registry::DWIM changed its API. (Kavorka probably shouldn't be using it anyway because it's an undocumented internal part of Type::Utils.)";
+			dcs:thanks [ foaf:nick "SpiceMan" ];
+		];
+	].
