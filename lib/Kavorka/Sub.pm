@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Kavorka::Signature ();
+use Sub::Util ();
 
 package Kavorka::Sub;
 
@@ -330,7 +331,7 @@ sub parse_body
 		&Scalar::Util::set_prototype($code, $self->prototype);
 		
 		# Fix sub name
-		$code = Sub::Name::subname(join('::', $self->package, '__ANON__'), $code);
+		$code = Sub::Util::set_subname(join('::', $self->package, '__ANON__'), $code);
 		
 		# Set up attributes - this doesn't much work
 		my $attrs = $self->attributes;
@@ -387,7 +388,7 @@ sub _post_parse
 	{
 		no strict 'refs';
 		my $code = $self->is_lexical ? \&{$self->{argh}} : \&{ delete $self->{argh} };
-		Sub::Name::subname(
+		Sub::Util::set_subname(
 			$self->is_anonymous || $self->is_lexical
 				? join('::', $self->package, '__ANON__')
 				: $self->qualified_name,

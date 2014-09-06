@@ -2,6 +2,8 @@ use 5.014;
 use strict;
 use warnings;
 
+use Sub::Util ();
+
 package Kavorka::Multi;
 
 our $AUTHORITY = 'cpan:TOBYINK';
@@ -13,7 +15,6 @@ use Parse::KeywordX;
 use Moo;
 with 'Kavorka::Sub';
 use namespace::sweep;
-
 
 has multi_type          => (is => 'ro', required => 1);
 has declared_long_name  => (is => 'rwp');
@@ -169,7 +170,7 @@ sub __compile
 	
 	my $error = "Carp::croak(qq/Arguments to $pkg\::$subname did not match any known signature for multi sub/);";
 	
-	Sub::Name::subname(
+	Sub::Util::set_subname(
 		"$pkg\::$subname",
 		eval("package $pkg; sub { $slowpath; my \@tmp; $compiled; $error }"),
 	);
@@ -178,7 +179,7 @@ sub __compile
 sub __defer_compile
 {
 	my ($pkg, $subname) = @_;
-	return Sub::Name::subname(
+	return Sub::Util::set_subname(
 		"$pkg\::$subname" => sub {
 			no strict "refs";
 			no warnings "redefine";

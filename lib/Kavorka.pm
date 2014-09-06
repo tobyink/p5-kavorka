@@ -9,7 +9,7 @@ use PadWalker ();
 use Parse::Keyword ();
 use Module::Runtime ();
 use Scalar::Util ();
-use Sub::Name ();
+use Sub::Util ();
 
 package Kavorka;
 
@@ -124,7 +124,7 @@ sub _exporter_fail
 	
 	# This is the code that gets called at run-time.
 	#
-	my $code = Sub::Name::subname(
+	my $code = Sub::Util::set_subname(
 		"$me\::$name",
 		sub {
 			unless (Scalar::Util::blessed($_[0]) and $_[0]->DOES('Kavorka::Sub'))
@@ -150,7 +150,7 @@ sub _exporter_fail
 			{
 				my $orig = $r[0];
 				my $caller_vars = PadWalker::peek_my(1);
-				@r = Sub::Name::subname($subroutine->package."::__ANON__", sub {
+				@r = Sub::Util::set_subname($subroutine->package."::__ANON__", sub {
 					$subroutine->_poke_pads($caller_vars);
 					goto $orig;
 				});
@@ -175,7 +175,7 @@ sub _exporter_fail
 	# Parse::Keyword
 	#
 	Parse::Keyword::install_keyword_handler(
-		$code => Sub::Name::subname(
+		$code => Sub::Util::set_subname(
 			"$me\::parse_$name",
 			sub {
 				local $Carp::CarpLevel = $Carp::CarpLevel + 1;

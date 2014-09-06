@@ -9,9 +9,13 @@ our $VERSION   = '0.033';
 
 use Moo::Role;
 use Types::Standard qw(Any);
-use Sub::Identify qw(stash_name);
+use Sub::Util ();
 use Carp qw(croak);
 use namespace::sweep;
+
+my $stash_name = sub {
+	Sub::Util::subname($_[0]) =~ m/^(.+)::(.+?)$/ ? $1 : undef;
+};
 
 before install_sub => sub
 {
@@ -28,7 +32,7 @@ before install_sub => sub
 	
 	my ($pkg, $name) = ($self->qualified_name =~ /^(.+)::(\w+)$/);
 	my $existing = $pkg->can($name) or return;
-	my $existing_source = stash_name($existing);
+	my $existing_source = $stash_name->($existing);
 	
 	if ($pkg->isa($existing_source) or $existing_source eq 'UNIVERSAL')
 	{

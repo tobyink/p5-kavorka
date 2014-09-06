@@ -5,7 +5,7 @@ use warnings;
 use Moose ();
 use Kavorka ();
 use Kavorka::Signature ();
-use Sub::Identify ();
+use Sub::Util ();
 
 {
 	package MooseX::KavorkaInfo::DummyInfo;
@@ -56,7 +56,7 @@ use Sub::Identify ();
 		Kavorka->info( $self->body )
 		or MooseX::KavorkaInfo::DummyInfo->new(
 			keyword         => 'sub',
-			qualified_name  => Sub::Identify::sub_fullname( $self->body ),
+			qualified_name  => Sub::Util::subname( $self->body ),
 			body            => $self->body,
 			signature       => 'Kavorka::Signature'->new(params => [], yadayada => 1),
 		);
