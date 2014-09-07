@@ -409,3 +409,16 @@
 			dcs:thanks [ foaf:nick "SpiceMan" ];
 		];
 	].
+
+`Kavorka 0.034 cpan:TOBYINK`
+	issued  2014-09-07;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Avoid triggering RT#98666.";
+		];
+		item [
+			a dcs:Update;
+			label "Switch from Sub::Name+Sub::Identify to the shiny new Sub::Util.";
+		];
+	].
