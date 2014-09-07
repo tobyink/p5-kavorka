@@ -115,8 +115,13 @@ sub _exporter_fail
 	
 	# Workaround for RT#95786 which might be caused by a bug in the Perl
 	# interpreter.
+	# Also RT#98666 is why we can't just call undefer_all.
 	require Sub::Defer;
-	Sub::Defer::undefer_all();
+	for (keys %Sub::Defer::DEFERRED) {
+		no warnings;
+		Sub::Defer::undefer_sub($_)
+			if $Sub::Defer::DEFERRED{$_}[0] =~ /^Kavorka\b/;
+	}
 	
 	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
 	# currently in scope.
