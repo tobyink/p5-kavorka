@@ -430,4 +430,9 @@
 			a dcs:Change;
 			label "Make it easier to do weird things subclassing Kavorka::Multi.";
 		];
+		item [
+			a dcs:Tests;
+			label "Add a test case for Sub::Defer-related weirdness.";
+			seealso RT#95786;
+		];
 	].
