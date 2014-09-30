@@ -6,8 +6,8 @@ package Local::Bad;
 use Kavorka;
 
 sub create {
-    my ($class, $config) = @_;
-    return $foo->bar($config);
+	my ($class, $config) = @_;
+	return $foo->bar($config);
 }
 
 method delete { ... }
