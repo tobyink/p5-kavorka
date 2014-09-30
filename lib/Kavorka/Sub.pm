@@ -8,7 +8,7 @@ use Sub::Util ();
 package Kavorka::Sub;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.034';
+our $VERSION   = '0.035';
 
 use Text::Balanced qw( extract_bracketed );
 use Parse::Keyword {};

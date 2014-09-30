@@ -422,3 +422,12 @@
 			label "Switch from Sub::Name+Sub::Identify to the shiny new Sub::Util.";
 		];
 	].
+
+`Kavorka 0.035 cpan:TOBYINK`
+	issued  2014-09-30;
+	changeset [
+		item [
+			a dcs:Change;
+			label "Make it easier to do weird things subclassing Kavorka::Multi.";
+		];
+	].
