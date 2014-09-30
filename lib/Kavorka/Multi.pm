@@ -29,17 +29,26 @@ around parse => sub
 	my $type = parse_name('keyword', 0);
 	lex_read_space;
 	
-	if ($^H{Kavorka} =~ /\b$type=(\S+)/)
+	$class->multi_parse($next, $type, @_);
+};
+
+sub multi_parse
+{
+	my $class = shift;
+	my ($parse_method, $keyword, @args) = @_;
+	
+	my $implementation;
+	if ($^H{Kavorka} =~ /\b$keyword=(\S+)/)
 	{
-		$type = $1;
+		$implementation = $1;
 	}
 	else
 	{
-		Carp::croak("Could not resolve keyword '$type'");
+		Carp::croak("Could not resolve keyword '$keyword'");
 	}
 	
-	return $class->$next(@_, multi_type => $type);
-};
+	return $class->$parse_method(@args, multi_type => $implementation);
+}
 
 after parse_attributes => sub
 {
