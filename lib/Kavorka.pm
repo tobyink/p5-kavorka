@@ -120,7 +120,7 @@ sub _exporter_fail
 	for (keys %Sub::Defer::DEFERRED) {
 		no warnings;
 		Sub::Defer::undefer_sub($_)
-			if $Sub::Defer::DEFERRED{$_}[0] =~ /\AKavorkaX?\b/;
+			if $Sub::Defer::DEFERRED{$_} && $Sub::Defer::DEFERRED{$_}[0] =~ /\AKavorkaX?\b/;
 	}
 	
 	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
