@@ -25,3 +25,6 @@ cpan:THILP
 <urn:uuid:e56483ab-8752-412c-a519-294b8d83345c>
 	:mbox_sha1sum "18b01a46900ed3428b71cacdf010d47c26cc6cff";
 	:name "Jonathan Cast".
+
+cpan:CAMSPI
+	:name  "Chris Tijerina".

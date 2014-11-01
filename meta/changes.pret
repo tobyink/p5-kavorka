@@ -436,3 +436,13 @@
 			seealso RT#95786;
 		];
 	].
+
+`Kavorka 0.036 cpan:TOBYINK`
+	issued  2014-11-01;
+	changeset [
+		item [
+			a dcs:Bugfix;
+			label "Avoid inadvertantly autovivifying things in Sub::Defer's big hash of deferred subs.";
+			dcs:blame cpan:CAMSPI;
+		];
+	].
