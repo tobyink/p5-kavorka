@@ -10,7 +10,7 @@ our $VERSION   = '0.039';
 use Moo::Role;
 use Types::Standard qw(Any);
 use Carp qw(croak);
-use namespace::sweep;
+use namespace::autoclean;
 
 before install_sub => sub
 {

@@ -8,7 +8,7 @@ our $AUTHORITY = 'cpan:TOBYINK';
 our $VERSION   = '0.039';
 
 use Moo::Role;
-use namespace::sweep;
+use namespace::autoclean;
 
 around _build__tmp_name => sub
 {

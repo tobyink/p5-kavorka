@@ -150,7 +150,7 @@ is_deeply(
 {
 	package Example4;
 	use Kavorka;
-	use namespace::sweep;
+	use namespace::autoclean;
 	method method { 42 }
 }
 

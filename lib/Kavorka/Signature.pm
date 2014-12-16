@@ -17,7 +17,7 @@ use Parse::Keyword {};
 use Parse::KeywordX;
 
 use Moo;
-use namespace::sweep;
+use namespace::autoclean;
 
 has package           => (is => 'ro');
 has _is_dummy         => (is => 'ro');

@@ -11,7 +11,7 @@ use Moo::Role;
 use Types::Standard qw(Any);
 use Sub::Util ();
 use Carp qw(croak);
-use namespace::sweep;
+use namespace::autoclean;
 
 my $stash_name = sub {
 	Sub::Util::subname($_[0]) =~ m/^(.+)::(.+?)$/ ? $1 : undef;

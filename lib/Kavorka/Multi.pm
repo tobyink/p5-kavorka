@@ -14,7 +14,7 @@ use Parse::KeywordX;
 
 use Moo;
 with 'Kavorka::Sub';
-use namespace::sweep;
+use namespace::autoclean;
 
 has multi_type          => (is => 'ro', required => 1);
 has declared_long_name  => (is => 'rwp');

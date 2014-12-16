@@ -18,7 +18,7 @@ use Carp;
 our @CARP_NOT = qw(Kavorka);
 
 use Moo::Role;
-use namespace::sweep;
+use namespace::autoclean;
 
 use overload (
 	q[&{}]   => sub { shift->body },
