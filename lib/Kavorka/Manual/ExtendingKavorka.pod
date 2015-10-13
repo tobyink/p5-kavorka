@@ -70,15 +70,15 @@ traits can be followed by trait parameters in parentheses:
          return $code;
       };
    }
-   
+
    use Kavorka;
-   
+
    fun foo ( $x but debug("%s is %s\n") ) {
       ## Injected:
       ## printf STDERR "%s is %s\n", "\$x", $x;
       return $x;
    }
-   
+
    foo(42);  # says to STDERR: '$x is 42'
 
 =head2 Keywords

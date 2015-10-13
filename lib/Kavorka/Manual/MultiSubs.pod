@@ -14,7 +14,7 @@ Kavorka supports multi methods and multi subs:
 
    multi method process (ArrayRef $x) { say "here" }
    multi method process (HashRef $x) { say "there" }
-   
+
    __PACKAGE__->process( [] );    # here
    __PACKAGE__->process( {} );    # there
 
@@ -52,11 +52,11 @@ of a multi method or multi sub using the C<:long> attribute:
    multi fun process (ArrayRef $x) :long(process_array) {
       say "here";
    }
-   
+
    multi fun process (HashRef $x) :long(process_hash) {
       say "there";
    }
-   
+
    process($a);          # multi dispatch
    process_array($b);    # single dispatch
    process_hash($c);     # single dispatch
@@ -78,16 +78,16 @@ then further define it, before calling it again.
 
    use Kavorka qw( multi fun );
    use Try::Tiny;
-   
+
    multi fun plus_one (Int $x) { $x + 1 }
-   
+
    try {
       plus_one(41);      # 42
       plus_one(1.1);     # throws
    };
-   
+
    multi fun plus_one (Num $x) { $x + 1 }
-   
+
    plus_one(41);      # 42
    plus_one(1.1);     # 2.1
 

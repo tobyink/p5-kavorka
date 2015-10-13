@@ -22,7 +22,7 @@ Demonstration of the elegance of multi subs.
    multi fun fib ( Int $i where { $_ <= 1 } ) {
       return $i;
    }
-   
+
    multi fun fib ( Int $i ) {
       return fib($i-1) + fib($i-2);
    }

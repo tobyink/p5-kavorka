@@ -6,11 +6,11 @@ use Benchmark 'cmpthese';
 	package Using_Kavorka;
 	use Moose;
 	use Kavorka 0.005 qw( multi method );
-	
+
 	multi method fib ( Int $i where { $_ <= 1 } ) {
 		return $i;
 	}
-	
+
 	multi method fib ( Int $i ) {
 		return $self->fib($i-1) + $self->fib($i-2);
 	}
@@ -20,11 +20,11 @@ use Benchmark 'cmpthese';
 	package Using_MXMM;
 	use Moose;
 	use MooseX::MultiMethods;
-	
+
 	multi method fib ( Int $i where { $_ <= 1 } ) {
 		return $i;
 	}
-	
+
 	multi method fib ( Int $i ) {
 		return $self->fib($i-1) + $self->fib($i-2);
 	}
@@ -34,13 +34,13 @@ use Benchmark 'cmpthese';
 	package Using_Plain;
 	use Moose;
 	use Scalar::Util;
-	
+
 	sub fib {
 		my $self = shift;
 		my ($i) = @_;
-		
+
 		defined($i) && !ref($i) && $i =~ /\A-?[0-9]+\z/ or die;
-		
+
 		return $i if $i <= 1;
 		return $self->fib($i-1) + $self->fib($i-2);
 	}
@@ -72,7 +72,7 @@ Benchmarking the following multi method:
    multi method fib ( Int $i where { $_ <= 1 } ) {
       return $i;
    }
-   
+
    multi method fib ( Int $i ) {
       return $self->fib($i-1) + $self->fib($i-2);
    }

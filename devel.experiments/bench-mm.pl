@@ -28,9 +28,9 @@ package Game_MXMM
 {
 	use Moose;
 	with 'PlayAll';
-	
+
 	use MooseX::MultiMethods;
-	 
+
 	multi method play (Paper    $x, Rock     $y) { 1 }
 	multi method play (Paper    $x, Spock    $y) { 1 }
 	multi method play (Scissors $x, Paper    $y) { 1 }
@@ -42,7 +42,7 @@ package Game_MXMM
 	multi method play (Spock    $x, Rock     $y) { 1 }
 	multi method play (Spock    $x, Scissors $y) { 1 }
 	multi method play (Any      $x, Any      $y) { 0 }
-	
+
 	__PACKAGE__->meta->make_immutable;
 }
 
@@ -50,9 +50,9 @@ package Game_Kavorka
 {
 	use Moose;
 	with 'PlayAll';
-	
+
 	use Kavorka qw( multi method );
-	 
+
 	multi method play (Paper    $x, Rock     $y) { 1 }
 	multi method play (Paper    $x, Spock    $y) { 1 }
 	multi method play (Scissors $x, Paper    $y) { 1 }
@@ -64,7 +64,7 @@ package Game_Kavorka
 	multi method play (Spock    $x, Rock     $y) { 1 }
 	multi method play (Spock    $x, Scissors $y) { 1 }
 	multi method play (Any      $x, Any      $y) { 0 }
-	
+
 	__PACKAGE__->meta->make_immutable;
 }
 

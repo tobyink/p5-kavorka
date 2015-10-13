@@ -16,7 +16,7 @@ use Sub::Util ();
 	package MooseX::KavorkaInfo;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '0.035';
-	
+
 	sub import
 	{
 		my $meta = Class::MOP::class_of(scalar caller);
@@ -37,9 +37,9 @@ use Sub::Util ();
 	package MooseX::KavorkaInfo::Trait::Method;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '0.035';
-	
+
 	use Moose::Role;
-	
+
 	has _info => (
 		is        => 'ro',
 		lazy      => 1,
@@ -49,7 +49,7 @@ use Sub::Util ();
 			signature            => 'signature',
 		},
 	);
-	
+
 	sub _build_info
 	{
 		my $self = shift;
@@ -67,10 +67,10 @@ use Sub::Util ();
 	package MooseX::KavorkaInfo::Trait::WrappedMethod;
 	our $AUTHORITY = 'cpan:TOBYINK';
 	our $VERSION   = '0.035';
-	
+
 	use Moose::Role;
 	with 'MooseX::KavorkaInfo::Trait::Method';
-	
+
 	around _build_info => sub
 	{
 		my $orig = shift;
@@ -104,7 +104,7 @@ MooseX::KavorkaInfo - make Kavorka->info available through Moose meta objects
       use Kavorka qw( -default -modifiers );
       method xxx (Int $x) { return $x ** 3 }
    }
-   
+
    package Foo::Verbose {
       use Moose;
       use MooseX::KavorkaInfo;
@@ -112,7 +112,7 @@ MooseX::KavorkaInfo - make Kavorka->info available through Moose meta objects
       extends "Foo";
       before xxx { warn "Called xxx" }
    }
-   
+
    my $method = Foo::Verbose->meta->get_method("xxx");
    say $method->signature->params->[1]->type->name;  # says "Int"
 
