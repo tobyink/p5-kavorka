@@ -7,7 +7,7 @@ use Sub::Util ();
 package Kavorka::Multi;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Parse::Keyword {};
 use Parse::KeywordX;

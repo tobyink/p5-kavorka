@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::TraitFor::Sub::begin;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.035';
+our $VERSION   = '0.036';
 
 use Moo::Role;
 use namespace::sweep;
