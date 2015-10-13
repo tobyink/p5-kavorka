@@ -51,7 +51,7 @@ Example:
 
    #  (1) (2)    (3)          (4)     (5)   (6)     (7)
       fun foobar ($foo, $bar) is cool :($$) :cached { return $foo + $bar }
-   
+
    #          (1) (6)
       my $f = fun { return $_[0] + $_[1] };
 
@@ -92,7 +92,7 @@ for a function name:
    fun my $add ($x, $y) {
       $x + $y;
    }
-   
+
    my $sum = $add->(20, 22);
 
 =head2 The Signature
@@ -125,12 +125,12 @@ These are all aliases for C<< fun >>, though not exported by default.
 
    use v5.14;
    use Kavorka qw( function f );
-   
+
    function make_plusser (Num $x = 1)
    {
       return f(Num $y) { $x + $y };
    }
-   
+
    my $plusser = make_plusser();
    say $plusser->(41);   # says 42
 

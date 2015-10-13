@@ -167,7 +167,7 @@ The final parameter in the signature may be an array or hash, which
 will consume all remaining arguments:
 
    fun foo ( $x, $y, %z ) { ... }
-   
+
    foo(1..4);  # %z is (3 => 4)
 
 This feature is shared with Perl 6 signatures, L<Function::Parameters>,
@@ -180,7 +180,7 @@ Unique to Kavorka is the ability to specify slurpy arrayrefs or
 hashrefs.
 
    fun foo ( $x, $y, slurpy HashRef $z ) { ... }
-   
+
    foo(1..4);  # $z is { 3 => 4 }
 
 For slurpy references you should specify a type constraint (see
@@ -195,12 +195,12 @@ with their usual meaning >>.
    fun foo ( @_ ) {
       ...;
    }
-   
+
    # disallowed because the @_ array would usually include $x
    fun bar ( $x, @_ ) {
       ...;
    }
-   
+
    # ok because the invocant $x would usually be shifted off @_
    fun baz ( $x: @_ ) {
       ...;
@@ -233,7 +233,7 @@ L<Type::Tiny> object, or any other value that L<Types::TypeTiny> can
 coerce to a Type::Tiny object.
 
    use Types::Standard qw( LaxNum StrictNum );
-   
+
    fun foo ( ($ENV{AUTOMATED_TESTING} ? StrictNum : LaxNum) $x ) {
       ...;
    }
@@ -261,7 +261,7 @@ A smartmatch-like shortcut is supported:
    method foo ( Int $x where TERM ) {
       ...
    }
-   
+
    # For this:
    #
    use match::simple ();
@@ -337,7 +337,7 @@ You hadn't forgotten how to do that already, had you?
 Traits may be added to each parameter using the C<is> keyword:
 
    fun foo ( $greeting is polite = "Hello world" ) { ... }
-   
+
    fun bar ( $baz is quux is xyzzy ) { ... }
 
 This feature is shared with Perl 6 signatures and L<Method::Signatures>.
@@ -357,7 +357,7 @@ This makes your lexical variable into an alias for an item within
 the C<< @_ >> array.
 
    fun increment (Int $i is alias) { ++$i }
-   
+
    my $count = 0;
    increment($count);
    increment($count);
@@ -374,7 +374,7 @@ Switches off the type constraint check, though the original type
 constraint is still visible through the introspection API.
 
    fun increment (Int $i is alias but assumed) { ++$i }
-   
+
    my $count = 1.1;
    increment($count);  # called incorrectly but will not die
 
@@ -400,7 +400,7 @@ variable a (very shallow) copy of the argument from C<< @_ >>. That is,
 it's equivalent to doing:
 
    my $param = $_[$i];
-   
+
    # whereas the `alias` trait does this...
    Data::Alias::alias(my $param = $_[$i]);
 
@@ -417,11 +417,11 @@ keys, unless the type constraint includes a C<slurpy> component.
    fun foo (HashRef $x is locked) {
       $x->{foo} = 1;
    }
-   
+
    my $var1 = { foo => 42 };
    foo($var1);
    say $var1->{foo};           # says 1
-   
+
    my $var2 = { bar => 42 };
    foo($var2);                 # dies
 
@@ -442,7 +442,7 @@ hash or scalar. For example:
    fun get_key_from_hash(%h is ref_alias, $key) {
       return $h{$key};
    }
-   
+
    my %data = ( foo => 42 );
    get_key_from_hash(\%data, 'foo');   # returns 42
 
@@ -463,7 +463,7 @@ This feature is shared with L<Method::Signatures>.
 This makes the parameter a (shallow) read-only variable.
 
    fun foo ($x is ro) { $x++ }
-   
+
    foo(42);   # dies
 
 This feature is shared with Perl 6 signatures.
@@ -487,7 +487,7 @@ trait.
 Coercion can be enabled for a parameter using the C<coerce> trait.
 
    use Types::Path::Tiny qw(AbsPath);
-   
+
    method print_to_file ( AbsFile $file does coerce, Str @lines ) {
       $file->spew(@lines);
    }
@@ -502,7 +502,7 @@ signature will throw an exception:
    fun foo ($x) {
       return $x;
    }
-   
+
    foo(1, 2);    # error - too many arguments
 
 Adding the yada yada operator to the end of the signature allows the
@@ -511,7 +511,7 @@ function to accept extra trailing parameters:
    fun foo ($x, ...) {
       return $x;
    }
-   
+
    foo(1, 2);    # ok
 
 This feature is shared with L<Method::Signatures>.

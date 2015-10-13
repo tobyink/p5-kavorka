@@ -51,7 +51,7 @@ Example:
 
    #  (1)    (2)    (3)    (4)     (5)  (6)     (7)
       method foobar ($foo) is cool :($) :cached { return $foo + $self->bar }
-   
+
    #          (1)    (6)
       my $m = method { return $_[0] + $self->bar };
 
@@ -97,7 +97,7 @@ lexical variable for a method name:
    objectmethod my $set_name (Str $new) {
       $self->{name} = $new;
    }
-   
+
    $obj->$set_name("Bob");
    $obj->get_name;            # Bob
 

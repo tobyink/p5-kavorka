@@ -70,7 +70,7 @@ request:
 
 =head2 The Method Names
 
-These are the names of the methods being wrapped. 
+These are the names of the methods being wrapped.
 
 Multiple names may be separated by colons:
 

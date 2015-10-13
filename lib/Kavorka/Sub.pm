@@ -63,7 +63,7 @@ sub install_sub
 {
 	my $self = shift;
 	my $code = $self->body;
-	
+
 	if ($self->is_anonymous)
 	{
 		# no installation
@@ -79,7 +79,7 @@ sub install_sub
 		no strict 'refs';
 		*{$name} = $code;
 	}
-	
+
 	$code;
 }
 
@@ -100,9 +100,9 @@ sub parse
 {
 	my $class = shift;
 	my $self  = $class->new(@_, package => compiling_package);
-	
+
 	lex_read_space;
-	
+
 	# sub name
 	$self->parse_subname;
 	unless ($self->is_anonymous or $self->is_lexical)
@@ -111,14 +111,14 @@ sub parse
 		$self->_set_qualified_name($qualified);
 		$self->forward_declare_sub;
 	}
-	
+
 	# Thanks to Perl 5.20 subs, we have to allow attributes before
 	# the signature too.
 	lex_read_space;
 	$self->parse_attributes
 		if lex_peek    eq ':'
 		&& lex_peek(2) ne ':(';
-	
+
 	# signature
 	$self->parse_signature;
 	my $sig = $self->signature;
@@ -128,7 +128,7 @@ sub parse
 		unshift @{$sig->params}, @defaults;
 		$sig->_set_has_invocants(scalar @defaults);
 	}
-	
+
 	# traits
 	$self->parse_traits;
 	my $traits = $self->traits;
@@ -136,23 +136,23 @@ sub parse
 	{
 		# traits handled natively (none so far)
 		state $native_traits = {};
-		
+
 		my @custom_traits =
 			map  "Kavorka::TraitFor::Sub::$_",
 			grep !exists($native_traits->{$_}),
 			keys %$traits;
-		
+
 		'Moo::Role'->apply_roles_to_object($self, @custom_traits) if @custom_traits;
 	}
-	
+
 	# prototype and attributes
 	$self->parse_prototype;
 	$self->parse_attributes;
 	push @{$self->attributes}, $self->default_attributes;
-	
+
 	# body
 	$self->parse_body;
-	
+
 	$self;
 }
 
@@ -160,19 +160,19 @@ sub parse_subname
 {
 	my $self = shift;
 	my $peek = lex_peek(2);
-	
+
 	my $saw_my = 0;
-	
+
 	if ($peek =~ /\A(?:\w|::)/)     # normal sub
 	{
 		my $name = parse_name('subroutine', 1);
-		
+
 		if ($name eq 'my')
 		{
 			lex_read_space;
 			$saw_my = 1 if lex_peek eq '$';
 		}
-		
+
 		if ($saw_my)
 		{
 			$peek = lex_peek(2);
@@ -183,24 +183,24 @@ sub parse_subname
 			return;
 		}
 	}
-	
+
 	if ($peek =~ /\A\$[^\W0-9]/) # lexical sub
 	{
 		carp("'${\ $self->keyword }' should be '${\ $self->keyword } my'")
 			unless $saw_my;
-		
+
 		lex_read(1);
 		$self->_set_declared_name('$' . parse_name('lexical subroutine', 0));
-		
+
 		croak("Keyword '${\ $self->keyword }' does not support defining lexical subs")
 			unless $self->allow_lexical;
-		
+
 		return;
 	}
-	
+
 	croak("Keyword '${\ $self->keyword }' does not support defining anonymous subs")
 		unless $self->allow_anonymous;
-	
+
 	();
 }
 
@@ -208,7 +208,7 @@ sub parse_signature
 {
 	my $self = shift;
 	lex_read_space;
-	
+
 	# default signature
 	my $dummy = 0;
 	if (lex_peek ne '(')
@@ -216,15 +216,15 @@ sub parse_signature
 		$dummy = 1;
 		lex_stuff('(...)');
 	}
-	
+
 	lex_read(1);
 	my $sig = $self->signature_class->parse(package => $self->package, _is_dummy => $dummy);
 	lex_peek eq ')' or croak('Expected ")" after signature');
 	lex_read(1);
 	lex_read_space;
-	
+
 	$self->_set_signature($sig);
-	
+
 	();
 }
 
@@ -232,21 +232,21 @@ sub parse_prototype
 {
 	my $self = shift;
 	lex_read_space;
-	
+
 	my $peek = lex_peek(1000);
 	if ($peek =~ / \A \: \s* \( /xsm )
 	{
 		lex_read(1);
 		lex_read_space;
 		$peek = lex_peek(1000);
-		
+
 		my $extracted = extract_bracketed($peek, '()');
 		lex_read(length $extracted);
 		$extracted =~ s/(?: \A\( | \)\z )//xgsm;
-		
+
 		$self->_set_prototype($extracted);
 	}
-	
+
 	();
 }
 
@@ -254,7 +254,7 @@ sub parse_traits
 {
 	my $self = shift;
 	lex_read_space;
-	
+
 	while (lex_peek(5) =~ m{ \A (is|does|but) \s }xsm)
 	{
 		lex_read(length($1));
@@ -263,7 +263,7 @@ sub parse_traits
 		$self->traits->{$name} = $args;
 		lex_read_space;
 	}
-	
+
 	();
 }
 
@@ -271,7 +271,7 @@ sub parse_attributes
 {
 	my $self = shift;
 	lex_read_space;
-	
+
 	if (lex_peek eq ':')
 	{
 		lex_read(1);
@@ -281,12 +281,12 @@ sub parse_attributes
 	{
 		return;
 	}
-	
+
 	while (lex_peek(4) =~ /\A([^\W0-9]\w+)/)
 	{
 		my $parsed = [parse_trait];
 		lex_read_space;
-		
+
 		if ($parsed->[0] eq 'prototype')
 		{
 			$self->_set_prototype($parsed->[1]);
@@ -295,7 +295,7 @@ sub parse_attributes
 		{
 			push @{$self->attributes}, $parsed;
 		}
-		
+
 		if (lex_peek eq ':')
 		{
 			lex_read(1);
@@ -315,24 +315,24 @@ sub _build__tmp_name
 sub parse_body
 {
 	my $self = shift;
-	
+
 	lex_read_space;
 	lex_peek(1) eq '{' or croak("expected block!");
 	lex_read(1);
-	
+
 	if ($self->is_anonymous)
 	{
 		lex_stuff(sprintf("{ %s", $self->inject_prelude));
-		
+
 		# Parse the actual code
 		my $code = parse_block(0) or Carp::croak("cannot parse block!");
-		
+
 		# Set up prototype
 		&Scalar::Util::set_prototype($code, $self->prototype);
-		
+
 		# Fix sub name
 		$code = Sub::Util::set_subname(join('::', $self->package, '__ANON__'), $code);
-		
+
 		# Set up attributes - this doesn't much work
 		my $attrs = $self->attributes;
 		if (@$attrs)
@@ -345,14 +345,14 @@ sub parse_body
 				map($_->[0], @$attrs),
 			);
 		}
-		
+
 		# And keep the coderef
 		$self->_set_body($code);
 	}
 	else
 	{
 		state $i = 0;
-		
+
 		my $lex = '';
 		if ($self->is_lexical)
 		{
@@ -362,7 +362,7 @@ sub parse_body
 				$self->_tmp_name,
 			);
 		}
-		
+
 		# Here instead of parsing the body we'll leave it to plain old
 		# Perl. We'll pick it up later from this name in _post_parse
 		lex_stuff(
@@ -376,14 +376,14 @@ sub parse_body
 		);
 		$self->{argh} = $self->_tmp_name;
 	}
-	
+
 	();
 }
 
 sub _post_parse
 {
 	my $self = shift;
-	
+
 	if ($self->{argh})
 	{
 		no strict 'refs';
@@ -397,38 +397,38 @@ sub _post_parse
 		&Scalar::Util::set_prototype($code, $self->prototype);
 		$self->_set_body($code);
 	}
-	
+
 	$self->_apply_return_types;
-	
+
 	$self->_set_signature(undef)
 		if $self->signature && $self->signature->_is_dummy;
-	
+
 	();
 }
 
 sub _apply_return_types
 {
 	my $self = shift;
-	
+
 	my @rt = @{ $self->signature ? $self->signature->return_types : [] };
-	
+
 	if (@rt)
 	{
 		my @scalar = grep !$_->list, @rt;
 		my @list   = grep  $_->list, @rt;
-		
+
 		my $scalar =
 			(@scalar == 0) ? undef :
 			(@scalar == 1) ? $scalar[0] :
 			croak("Multiple scalar context return types specified for function");
-		
+
 		my $list =
 			(@list == 0) ? undef :
 			(@list == 1) ? $list[0] :
 			croak("Multiple list context return types specified for function");
-		
+
 		return if (!$scalar || $scalar->assumed) && (!$list || $list->assumed);
-		
+
 		require Return::Type;
 		my $wrapped = Return::Type->wrap_sub(
 			$self->body,
@@ -440,22 +440,22 @@ sub _apply_return_types
 		$self->_set__unwrapped_body($self->body);
 		$self->_set_body($wrapped);
 	}
-	
+
 	();
 }
 
 sub _build__pads_to_poke
 {
 	my $self = shift;
-	
+
 	my @pads = $self->_unwrapped_body // $self->body;
-	
+
 	for my $param (@{ $self->signature ? $self->signature->params : [] })
 	{
 		push @pads, $param->default if $param->default;
 		push @pads, @{ $param->constraints };
 	}
-	
+
 	\@pads;
 }
 
@@ -463,7 +463,7 @@ sub _poke_pads
 {
 	my $self = shift;
 	my ($vars) = @_;
-	
+
 	for my $code (@{$self->_pads_to_poke})
 	{
 		my $closed_over = PadWalker::closed_over($code);
@@ -471,7 +471,7 @@ sub _poke_pads
 			for keys %$closed_over;
 		PadWalker::set_closed_over($code, $closed_over);
 	}
-	
+
 	();
 }
 
@@ -563,7 +563,7 @@ C<parse_signature>,
 C<parse_traits>,
 C<parse_prototype>,
 C<parse_attributes>,
-C<parse_body> 
+C<parse_body>
 
 Internal methods used to parse a subroutine. It only makes sense to call
 these from a L<Parse::Keyword> parser, but may make sense to override
@@ -636,9 +636,9 @@ keyword while bypassing the Perl keyword API's custom parsing.
 Examples of how they can do that are:
 
    use Kavorka 'method';
-   
+
    &method(...);
-   
+
    __PACKAGE__->can("method")->(...);
 
 The default implementation of C<bypass_custom_parsing> is to croak,

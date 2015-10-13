@@ -73,9 +73,9 @@ sub _fqname ($;$)
 {
 	my $name = shift;
 	my ($package, $subname);
-	
+
 	$name =~ s{'}{::}g;
-	
+
 	if ($name =~ /::/)
 	{
 		($package, $subname) = $name =~ m{^(.+)::(\w+)$};
@@ -85,7 +85,7 @@ sub _fqname ($;$)
 		my $caller = @_ ? shift : $^H{'Kavorka/package'};
 		($package, $subname) = ($caller, $name);
 	}
-	
+
 	return wantarray ? ($package, $subname) : "$package\::$subname";
 }
 
@@ -94,25 +94,25 @@ sub _exporter_fail
 {
 	my $me = shift;
 	my ($name, $args, $globals) = @_;
-	
+
 	my $implementation =
 		$args->{'implementation'}
 		// $me->guess_implementation($name)
 		// $me;
-	
+
 	my $into = $globals->{into};
-	
+
 	Module::Runtime::use_package_optimistically($implementation);
-	
+
 	{
 		my $traits = $globals->{traits} // $args->{traits};
 		$implementation = $me->compose_implementation($implementation, @$traits)
 			if $traits;
 	}
-	
+
 	$implementation->can('parse')
 		or Carp::croak("No suitable implementation for keyword '$name'");
-	
+
 	# Workaround for RT#95786 which might be caused by a bug in the Perl
 	# interpreter.
 	# Also RT#98666 is why we can't just call undefer_all.
@@ -122,11 +122,11 @@ sub _exporter_fail
 		Sub::Defer::undefer_sub($_)
 			if $Sub::Defer::DEFERRED{$_} && $Sub::Defer::DEFERRED{$_}[0] =~ /\AKavorkaX?\b/;
 	}
-	
+
 	# Kavorka::Multi (for example) needs to know what Kavorka keywords are
 	# currently in scope.
 	$^H{'Kavorka'} .= "$name=$implementation ";
-	
+
 	# This is the code that gets called at run-time.
 	#
 	my $code = Sub::Util::set_subname(
@@ -138,18 +138,18 @@ sub _exporter_fail
 			}
 
 			my $subroutine = shift;
-						
+
 			# Post-parse clean-up
 			$subroutine->_post_parse();
-			
+
 			# Store $subroutine for introspection
 			$INFO{ $subroutine->body } = $subroutine;
-			
+
 			# Install sub
 			my @r = wantarray
 				? $subroutine->install_sub
 				: scalar($subroutine->install_sub);
-			
+
 			# Workarounds for closure issues in Parse::Keyword
 			if ($subroutine->is_anonymous)
 			{
@@ -167,15 +167,15 @@ sub _exporter_fail
 			{
 				$subroutine->_poke_pads( PadWalker::peek_my(1) );
 			}
-			
+
 			# Prevents a cycle between %INFO and $subroutine.
 			Scalar::Util::weaken($subroutine->{body})
 				unless Scalar::Util::isweak($subroutine->{body});
-			
+
 			wantarray ? @r : $r[0];
 		},
 	);
-	
+
 	# This joins up the code above with our custom parsing via
 	# Parse::Keyword
 	#
@@ -192,7 +192,7 @@ sub _exporter_fail
 			},
 		),
 	);
-	
+
 	# Symbol for Exporter::Tiny to export
 	return ($name => $code);
 }
@@ -214,7 +214,7 @@ Kavorka - function signatures with the lure of the animal
 =head1 SYNOPSIS
 
    use Kavorka;
-   
+
    fun maxnum (Num @numbers) {
       my $max = shift @numbers;
       for (@numbers) {
@@ -222,7 +222,7 @@ Kavorka - function signatures with the lure of the animal
       }
       return $max;
    }
-   
+
    my $biggest = maxnum(42, 3.14159, 666);
 
 =head1 STATUS
@@ -315,12 +315,12 @@ C<< Kavorka->info >> method. This returns a blessed object that
 does the L<Kavorka::Sub> role.
 
    fun foo (:$x, :$y) { }
-   
+
    my $info = Kavorka->info(\&foo);
-   
+
    my $function_name = $info->qualified_name;
    my @named_params  = $info->signature->named_params;
-   
+
    say $named_params[0]->named_names->[0];   # says 'x'
 
 See L<Kavorka::Sub>, L<Kavorka::Signature> and
