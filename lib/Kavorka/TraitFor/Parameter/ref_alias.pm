@@ -9,6 +9,8 @@ our $VERSION   = '0.035';
 
 use Moo::Role;
 
+use constant HAS_REFALIASING => ($] >= 5.022);
+
 around _injection_assignment => sub
 {
 	my $next = shift;
@@ -17,8 +19,25 @@ around _injection_assignment => sub
 	
 	if ($self->kind eq 'my')
 	{
-		require Data::Alias;
-		return sprintf('Data::Alias::alias(my %s = %s{ +do { %s } });', $var, $self->sigil, $val);
+		my $format;
+		if (HAS_REFALIASING) {
+			$format = <<'EOF';
+my %s;
+{
+	use experimental 'refaliasing';
+	\%s = \%s{ +do { %s } };
+};
+EOF
+			return sprintf($format, ($var) x 2, $self->sigil, $val);
+		}
+		else {
+			require Data::Alias;
+			$format = <<'EOF';
+Data::Alias::alias(my %s = %s{ +do { %s } });
+EOF
+
+			return sprintf($format, $var, $self->sigil, $val);
+		}
 	}
 	elsif ($self->kind eq 'our')
 	{
