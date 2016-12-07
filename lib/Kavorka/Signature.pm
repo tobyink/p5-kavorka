@@ -279,10 +279,9 @@ sub _injection_hash_underscore
 	or $slurpy && $slurpy->name =~ /\A\$/ && $slurpy->type->is_a_type_of(Types::Standard::HashRef()))
 	{
 		my $ix  = 1 + $self->last_position;
-		my $format;
 		my $str;
 		if (HAS_REFALIASING) {
-			$format = <<'EOF';
+			my $format = <<'EOF';
 local %%_;
 {
 	use Carp qw(croak);
@@ -312,14 +311,10 @@ EOF
 		}
 		else {
 			require Data::Alias;
-			$format = <<'EOF';
-local %%_;
-{
-	use warnings FATAL => qw(all);
-	Data::Alias::alias(%%_ = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]);
- };
-EOF
-			$str = sprintf($format,($ix) x 5,);
+			$str = sprintf(
+			'local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]) };',
+			($ix) x 4,
+		);
 		}
 
 		unless ($slurpy or $self->yadayada)

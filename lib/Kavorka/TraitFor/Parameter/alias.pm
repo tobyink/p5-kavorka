@@ -28,14 +28,12 @@ my %s;
 	\%s = \do { %s };
 };
 EOF
+			return sprintf($format, ($var) x 2, $val);
 		}
 		else {
 			require Data::Alias;
-			$format = <<'EOF';
-Data::Alias::alias(my %s = do { %s });
-EOF
+			return sprintf('Data::Alias::alias(my %s = do { %s });', $var, $val);
 		}
-		return sprintf($format, ($var) x 2, $val);
 	}
 	elsif ($self->kind eq 'our')
 	{

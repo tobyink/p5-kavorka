@@ -32,11 +32,7 @@ EOF
 		}
 		else {
 			require Data::Alias;
-			$format = <<'EOF';
-Data::Alias::alias(my %s = %s{ +do { %s } });
-EOF
-
-			return sprintf($format, $var, $self->sigil, $val);
+			return sprintf('Data::Alias::alias(my %s = %s{ +do { %s } });', $var, $self->sigil, $val);
 		}
 	}
 	elsif ($self->kind eq 'our')
