@@ -19,6 +19,8 @@ use Parse::KeywordX;
 use Moo;
 use namespace::sweep;
 
+use constant HAS_REFALIASING => ($] >= 5.022);
+
 has package           => (is => 'ro');
 has _is_dummy         => (is => 'ro');
 has params            => (is => 'ro',  default => sub { +[] });
@@ -276,13 +278,45 @@ sub _injection_hash_underscore
 	or $slurpy && $slurpy->name =~ /\A\%/
 	or $slurpy && $slurpy->name =~ /\A\$/ && $slurpy->type->is_a_type_of(Types::Standard::HashRef()))
 	{
-		require Data::Alias;
 		my $ix  = 1 + $self->last_position;
-		my $str = sprintf(
+		my $str;
+		if (HAS_REFALIASING) {
+			my $format = <<'EOF';
+local %%_;
+{
+	use Carp qw(croak);
+	use experimental 'refaliasing';
+
+	if ($#_==%d && ref($_[%d]) eq q(HASH)) {
+		\%%_ = \%%{$_[%d]};
+	}
+	else {
+		# Make a hash reference from array refalias does not work
+		# Manual build
+		my $slice_length = ($#_ + 1 - %d);
+		if ($slice_length %% 2 != 0) {
+			# Seems to be what t/10positional.t wants
+			croak("Odd number of elements in anonymous hash");
+		}
+		my $i = %d;
+		while ($i <= $#_) {
+			my $key = $_[$i];
+			\$_{$key} = \$_[$i+1];
+			$i += 2;
+		}
+	}
+};
+EOF
+			$str = sprintf($format,($ix) x 5,);
+		}
+		else {
+			require Data::Alias;
+			$str = sprintf(
 			'local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]) };',
 			($ix) x 4,
 		);
-		
+		}
+
 		unless ($slurpy or $self->yadayada)
 		{
 			my @allowed_names = map +($_=>1), map @{$_->named_names}, $self->named_params;
