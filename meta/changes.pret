@@ -446,3 +446,16 @@
 			dcs:blame cpan:CAMSPI;
 		];
 	].
+
+`Kavorka 0.037 cpan:TOBYINK`
+	issued  2017-01-31;
+	changeset [
+		item [
+			a dcs:Bugfix, dcs:Update;
+			label "Eliminate dependency on Data::Alias in modern versions of Perl.";
+			seealso <https://github.com/tobyink/p5-kavorka/issues/18>;
+			dcs:fixes <tdb:2013:https://github.com/tobyink/p5-kavorka/issues/18>;
+			dcs:blame [ foaf:name "Daniel Dehennin" ];
+			comment "Used a modified version of code from PR#19.";
+		];
+	].
