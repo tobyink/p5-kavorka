@@ -14,7 +14,7 @@ Aaron James Trevena E<lt>teejay@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Aaron James Trevena.
+This software is copyright (c) 2014, 2017 by Aaron James Trevena.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
