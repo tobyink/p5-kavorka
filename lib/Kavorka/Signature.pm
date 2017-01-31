@@ -301,7 +301,7 @@ sub _injection_hash_underscore
 				.'};',
 				$pragma,
 				($ix) x 4,
-			);			
+			);
 		}
 		else
 		{
