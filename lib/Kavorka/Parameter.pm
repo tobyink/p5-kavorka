@@ -628,13 +628,12 @@ sub _injection_type_check
 	for my $i (0 .. $#{$self->constraints})
 	{
 		$check .= sprintf(
-			'do { local $_ = %s; $%s::PARAMS[%d]->{constraints}[%d]->() } or Carp::croak(sprintf("%%s failed value constraint", %s, %d));',
+			'do { local $_ = %s; $%s::PARAMS[%d]->{constraints}[%d]->() } or Carp::croak(sprintf("%%s failed value constraint", %s));',
 			$var,
 			__PACKAGE__,
 			$self->ID,
 			$i,
 			B::perlstring($var),
-			$i,
 		);
 	}
 	
