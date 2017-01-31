@@ -21,7 +21,7 @@ around _injection_assignment => sub
 		my $pragma = "use experimental 'refaliasing';no warnings 'experimental::refaliasing';";
 		my $kind   = $self->kind;
 		$kind = 'local' unless $kind eq 'my' || $kind eq 'our';
-		return sprintf('%s\\%s %s = \\ do { %s };', $pragma, $kind, $var, $val);
+		return sprintf('%s %s; { %s\\%s = \\ do { %s } };', $kind, $var, $pragma, $var, $val);
 	}
 	elsif ($self->kind eq 'my')
 	{

@@ -15,7 +15,15 @@ around _injection_assignment => sub
 	my $self = shift;
 	my ($sig, $var, $val) = @_;
 	
-	if ($self->kind eq 'my')
+	if ($] >= 5.022)
+	{
+		# in some future version of Perl, should be able to set $pragma=''
+		my $pragma = "use experimental 'refaliasing';no warnings 'experimental::refaliasing';";
+		my $kind   = $self->kind;
+		$kind = 'local' unless $kind eq 'my' || $kind eq 'our';
+		return sprintf('%s %s; { %s\\%s = \\%s{ +do { %s }  }};', $kind, $var, $pragma, $var, $self->sigil, $val);
+	}
+	elsif ($self->kind eq 'my')
 	{
 		require Data::Alias;
 		return sprintf('Data::Alias::alias(my %s = %s{ +do { %s } });', $var, $self->sigil, $val);

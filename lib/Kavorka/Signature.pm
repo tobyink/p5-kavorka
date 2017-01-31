@@ -276,12 +276,41 @@ sub _injection_hash_underscore
 	or $slurpy && $slurpy->name =~ /\A\%/
 	or $slurpy && $slurpy->name =~ /\A\$/ && $slurpy->type->is_a_type_of(Types::Standard::HashRef()))
 	{
-		require Data::Alias;
 		my $ix  = 1 + $self->last_position;
-		my $str = sprintf(
-			'local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]) };',
-			($ix) x 4,
-		);
+		my $str;
+		if ($] >= 5.022)
+		{
+			my $pragma = "use warnings FATAL => qw(all);use experimental 'refaliasing';no warnings 'experimental::refaliasing';";
+			$str = sprintf(
+				'local %%_;'
+				.'{ %s '
+					.'if ($#_==%d && ref($_[%d]) eq q(HASH)) { '
+						.'\\%%_ = $_[%d]; '
+					.'} else { '
+						.'my $i = %d; '
+						.'my $slice_length = ($#_ + 1 - $i); '
+						.'if ($slice_length %% 2 != 0) { '
+							.'Carp::croak("Odd number of elements in anonymous hash");'
+						.'} '
+						.'while ($i <= $#_) { '
+							.'my $key = $_[$i]; '
+							.'\\$_{$key} = \\$_[$i+1]; '
+							.'$i += 2; '
+						.'} '
+					.'} '
+				.'};',
+				$pragma,
+				($ix) x 4,
+			);			
+		}
+		else
+		{
+			require Data::Alias;
+			$str = sprintf(
+				'local %%_; { use warnings FATAL => qw(all); Data::Alias::alias(%%_ = ($#_==%d && ref($_[%d]) eq q(HASH)) ? %%{$_[%d]} : @_[ %d .. $#_ ]) };',
+				($ix) x 4,
+			);
+		}
 		
 		unless ($slurpy or $self->yadayada)
 		{

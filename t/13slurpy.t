@@ -140,4 +140,22 @@ is_deeply(
 	'function with named parameters and slurpy hashref'
 );
 
+
+{
+	package Example3;
+	use Kavorka;
+	fun foo1 (:$x, :$y, %z) {
+		$_{goop}++;
+	}
+	fun foo2 (:$x, :$y, slurpy HashRef $z) {
+		$_{goop}++;
+	}
+}
+
+my $goop = 40;
+Example3::foo1(x => 1, y => 2, goop => $goop);
+is($goop, 41, '%_ is an alias with slurpy hash');
+Example3::foo2(x => 1, y => 2, goop => $goop);
+is($goop, 42, '%_ is an alias with slurpy hashref');
+
 done_testing;

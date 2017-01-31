@@ -100,11 +100,21 @@ is($z, 5);
 		$foo{yyy} = 42;
 		return $foo{xxx};
 	}
+
+	fun bar (\@bar)
+	{
+		$bar[1] = 42;
+		return $bar[0];
+	}
 }
 
 my $foo = { xxx => 666 };
 is(Example4::foo(foo => $foo), 666);
 is_deeply($foo, { xxx => 666, yyy => 42 });
+
+my $bar = [ 666, 0 ];
+is(Example4::bar($bar), 666);
+is_deeply($bar, [ 666, 42 ]);
 
 done_testing;
 
