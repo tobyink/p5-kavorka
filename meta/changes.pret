@@ -459,3 +459,14 @@
 			comment "Used a modified version of code from PR#19.";
 		];
 	].
+
+`Kavorka 0.037 cpan:TOBYINK`
+	issued  2017-01-31;
+	changeset [
+		item [
+			label "98undefer.t now requires Moops 0.035";
+			dcs:thanks cpan:SREZIC;
+			dcs:fixes RT#124827;
+		];
+		item "Add note about Devel::CallParser issue to documentation."^^Documentation;
+	].

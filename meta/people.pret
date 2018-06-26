@@ -28,3 +28,6 @@ cpan:THILP
 
 cpan:CAMSPI
 	:name  "Chris Tijerina".
+
+cpan:SREZIC
+	:name  "Slaven Rezić".
