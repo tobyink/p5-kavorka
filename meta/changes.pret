@@ -461,7 +461,7 @@
 	].
 
 `Kavorka 0.038 cpan:TOBYINK`
-	issued  2017-01-31;
+	issued  2018-06-26;
 	changeset [
 		item [
 			label "98undefer.t now requires Moops 0.035";
@@ -469,4 +469,10 @@
 			dcs:fixes RT#124827;
 		];
 		item "Add note about Devel::CallParser issue to documentation."^^Documentation;
+	].
+
+`Kavorka 0.039 cpan:TOBYINK`
+	issued  2018-07-27;
+	changeset [
+		item "Cope with minor regression in Type::Tiny exceptions."^^Tests;
 	].
