@@ -184,7 +184,7 @@ hashrefs.
    foo(1..4);  # $z is { 3 => 4 }
 
 For slurpy references you should specify a type constraint (see
-L</Type Constraints>) so that Kavorka can create the correct type of
+L</Type constraints>) so that Kavorka can create the correct type of
 reference.
 
 The variables C<< @_ >> and C<< %_ >> I<< may >> be used as slurpy
