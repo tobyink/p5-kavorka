@@ -13,7 +13,7 @@ use Parse::Keyword {};
 use Parse::KeywordX qw(parse_trait);
 
 use Moo;
-use namespace::sweep;
+use namespace::autoclean;
 
 has package         => (is => 'ro');
 has type            => (is => 'ro');

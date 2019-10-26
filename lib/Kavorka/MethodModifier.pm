@@ -97,7 +97,7 @@ use Scalar::Util qw(reftype);
 
 use Moo::Role;
 with 'Kavorka::Sub';
-use namespace::sweep;
+use namespace::autoclean;
 
 requires 'method_modifier';
 
